@@ -1,0 +1,7 @@
+# Parameters for the YouTube shorts script generator
+
+# Topic for the YouTube short
+topic: "Artificial Intelligence in 2024"
+
+# Whether to save the generated script to a file
+save_script: true

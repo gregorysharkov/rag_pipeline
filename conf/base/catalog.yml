@@ -1,0 +1,9 @@
+# Data Catalog for the YouTube shorts script generator
+
+# The generated YouTube script
+youtube_script:
+  type: kedro.io.MemoryDataset
+  
+# The path to the saved script file
+script_path:
+  type: kedro.io.MemoryDataset
