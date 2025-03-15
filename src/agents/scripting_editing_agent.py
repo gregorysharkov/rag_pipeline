@@ -41,6 +41,8 @@ class ScriptEditingAgent(BaseAgent):
         4. Improve transitions between sections
         5. Ensure the script flows naturally when read aloud
         6. Keep the same information and structure, just make it more engaging
+        7. Add analogies where appropriate
+        8. Simplify the language to make it more accessible
 
         Return the complete edited script.
         """
