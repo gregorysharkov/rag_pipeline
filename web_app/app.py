@@ -47,8 +47,8 @@ def allowed_file(filename):
 
 @app.route("/")
 def index():
-    """Landing page that redirects to the first step of the wizard."""
-    # Reset session data when starting a new workflow
+    """Home page / landing page."""
+    # Clear session data for a fresh start
     session.clear()
     return redirect(url_for("context"))
 
@@ -354,9 +354,16 @@ def edit():
         additional_instructions = request.form.get("additional_instructions", "")
         edited_script = request.form.get("edited_script", "")
 
+        # Debug logging
+        print(f"Received edited_script: {edited_script[:100]}...")  # Print first 100 chars
+        print(f"Form keys: {list(request.form.keys())}")
+
         session["edit_options"] = edit_options
         session["additional_instructions"] = additional_instructions
         session["edited_script"] = edited_script
+
+        # Debug logging
+        print(f"Saved to session: {session.get('edited_script', '')[:100]}...")
 
         # Proceed to next step
         return redirect(url_for("short_video"))
@@ -364,6 +371,55 @@ def edit():
     return render_template(
         "edit.html",
         step=6 if session.get("use_web_search", True) else 5,
+        total_steps=len(WIZARD_STEPS) - 1,
+    )
+
+
+@app.route("/short_video", methods=["GET", "POST"])
+def short_video():
+    """Short Video step: Generate YouTube Shorts from the main script."""
+    # Check if previous steps were completed
+    if "topic" not in session:
+        flash("Please complete the context step first.", "warning")
+        return redirect(url_for("context"))
+
+    # Check for script content - either edited script or script sections
+    if not session.get("edited_script") and (
+        not session.get("script_sections") or len(session.get("script_sections", [])) == 0
+    ):
+        flash("Please create a script first.", "warning")
+        return redirect(url_for("script"))
+
+    # If we have script sections but no edited script, use the original script
+    if not session.get("edited_script") and session.get("script_sections"):
+        # Create a combined script from the sections
+        combined_script = ""
+        for section in session.get("script_sections", []):
+            combined_script += f"**[{section.get('title', '')}]**\n\n"
+            combined_script += f"{section.get('content', '')}\n\n"
+
+        session["edited_script"] = combined_script
+        print(f"Auto-generated edited script from sections: {combined_script[:100]}...")
+
+    if request.method == "POST":
+        # Save shorts generation options
+        shorts_count = request.form.get("shorts_count", "3")
+        shorts_duration = request.form.get("shorts_duration", "30")
+        shorts_focus = request.form.getlist("shorts_focus[]")
+        generated_shorts = request.form.getlist("generated_shorts[]")
+
+        session["shorts_count"] = shorts_count
+        session["shorts_duration"] = shorts_duration
+        session["shorts_focus"] = shorts_focus
+        session["generated_shorts"] = generated_shorts
+
+        # Proceed to completion
+        flash("Congratulations! You've completed the YouTube Script Generator wizard.", "success")
+        return redirect(url_for("index"))
+
+    return render_template(
+        "short_video.html",
+        step=7 if session.get("use_web_search", True) else 6,
         total_steps=len(WIZARD_STEPS) - 1,
     )
 
