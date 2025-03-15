@@ -183,62 +183,109 @@
                         </div>
                     </div>
 
-                    <!-- Plan Section -->
+                    <!-- Video Details Section -->
                     <div class="mb-4">
-                        <h5>Video Structure</h5>
-                        <div class="mb-3">
-                            <label for="structure_preference" class="form-label">Preferred Structure</label>
-                            <select class="form-select" id="structure_preference" name="structure_preference" required>
-                                <option value="" {% if not session.get('structure_preference') %}selected{% endif %} disabled>Choose a structure...</option>
-                                <option value="tutorial" {% if session.get('structure_preference') == 'tutorial' %}selected{% endif %}>Tutorial/How-to</option>
-                                <option value="explainer" {% if session.get('structure_preference') == 'explainer' %}selected{% endif %}>Explainer Video</option>
-                                <option value="listicle" {% if session.get('structure_preference') == 'listicle' %}selected{% endif %}>List-based (Top 5, 10 Tips, etc.)</option>
-                                <option value="storytelling" {% if session.get('structure_preference') == 'storytelling' %}selected{% endif %}>Storytelling</option>
-                                <option value="interview" {% if session.get('structure_preference') == 'interview' %}selected{% endif %}>Interview/Q&A Format</option>
-                                <option value="debate" {% if session.get('structure_preference') == 'debate' %}selected{% endif %}>Debate/Pros & Cons</option>
-                                <option value="case_study" {% if session.get('structure_preference') == 'case_study' %}selected{% endif %}>Case Study</option>
-                            </select>
-                            <div class="form-text">Select the overall structure for your video script.</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="plan_notes" class="form-label">Additional Planning Notes</label>
-                            <textarea class="form-control" id="plan_notes" name="plan_notes" rows="4" placeholder="Add any specific instructions or notes for the script structure...">{{ session.get('plan_notes', '') }}</textarea>
-                            <div class="form-text">Include any specific requirements or preferences for your video script.</div>
+                        <h5>Video Details</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="video_title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="video_title" name="video_title" 
+                                       value="{{ session.get('video_title', '') }}" 
+                                       placeholder="Enter a catchy title for your video" required>
+                                <div class="form-text">Create a compelling title that will attract viewers.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="video_audience" class="form-label">Target Audience</label>
+                                <input type="text" class="form-control" id="video_audience" name="video_audience" 
+                                       value="{{ session.get('video_audience', session.get('target_audience', '')) }}" 
+                                       placeholder="Who is this video for?">
+                                <div class="form-text">Specify who your video is targeting.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="video_duration" class="form-label">Duration (minutes)</label>
+                                <input type="number" class="form-control" id="video_duration" name="video_duration" 
+                                       value="{{ session.get('video_duration', '5') }}" min="1" max="60" required>
+                                <div class="form-text">Estimated length of your video in minutes.</div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Key Points Section -->
+                    <!-- Script Plan Section -->
                     <div class="mb-4">
-                        <h5>Key Points to Cover</h5>
-                        <p class="text-muted">Add the main points you want to cover in your video.</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Script Plan</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="generate-plan-btn">
+                                <i class="bi bi-magic"></i> Generate Plan
+                            </button>
+                        </div>
+                        <p class="text-muted mb-3">
+                            Organize your video into sections with key points for each. 
+                            You can reorder sections by using the up and down arrows.
+                        </p>
                         
-                        <div id="key-points-container">
-                            {% if session.get('key_points') %}
-                                {% for point in session.get('key_points') %}
-                                <div class="key-point-item mb-2">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" name="key_points[]" value="{{ point }}" placeholder="Enter a key point">
-                                        <button type="button" class="btn btn-outline-danger remove-key-point">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                        <div id="script-plan-container">
+                            {% if session.get('script_plan') %}
+                                {% for section in session.get('script_plan') %}
+                                <div class="card mb-3 script-section" data-section-id="{{ loop.index0 }}">
+                                    <div class="card-header d-flex justify-content-between align-items-center py-2">
+                                        <div class="d-flex align-items-center">
+                                            <span class="section-number me-2">{{ loop.index }}.</span>
+                                            <input type="text" class="form-control form-control-sm section-name" 
+                                                   name="section_names[]" value="{{ section.name }}" 
+                                                   placeholder="Section Name" required>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary move-up" 
+                                                    {% if loop.first %}disabled{% endif %}>
+                                                <i class="bi bi-arrow-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary move-down" 
+                                                    {% if loop.last %}disabled{% endif %}>
+                                                <i class="bi bi-arrow-down"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-section">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body py-2">
+                                        <textarea class="form-control section-key-points" name="section_key_points[]" 
+                                                  rows="3" placeholder="Key points for this section...">{{ section.key_points }}</textarea>
                                     </div>
                                 </div>
                                 {% endfor %}
                             {% else %}
-                                <div class="key-point-item mb-2">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" name="key_points[]" placeholder="Enter a key point">
-                                        <button type="button" class="btn btn-outline-danger remove-key-point" style="display: none;">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                <!-- Default empty section if no plan exists -->
+                                <div class="card mb-3 script-section" data-section-id="0">
+                                    <div class="card-header d-flex justify-content-between align-items-center py-2">
+                                        <div class="d-flex align-items-center">
+                                            <span class="section-number me-2">1.</span>
+                                            <input type="text" class="form-control form-control-sm section-name" 
+                                                   name="section_names[]" value="Introduction" 
+                                                   placeholder="Section Name" required>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary move-up" disabled>
+                                                <i class="bi bi-arrow-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary move-down" disabled>
+                                                <i class="bi bi-arrow-down"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-section" disabled>
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body py-2">
+                                        <textarea class="form-control section-key-points" name="section_key_points[]" 
+                                                  rows="3" placeholder="Key points for this section..."></textarea>
                                     </div>
                                 </div>
                             {% endif %}
                         </div>
                         
-                        <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="add-key-point">
-                            <i class="bi bi-plus-circle"></i> Add Another Key Point
+                        <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="add-section-btn">
+                            <i class="bi bi-plus-circle"></i> Add Section
                         </button>
                     </div>
 
@@ -259,6 +306,28 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<style>
+    .script-section {
+        transition: all 0.2s ease;
+    }
+    .script-section:hover {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    .section-name {
+        width: auto;
+        min-width: 200px;
+    }
+    .section-number {
+        font-weight: bold;
+        min-width: 25px;
+    }
+    .move-up:hover, .move-down:hover {
+        background-color: #e9ecef;
+    }
+    .remove-section:hover {
+        background-color: #f8d7da;
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -281,47 +350,171 @@
             {% endif %}
         });
         
-        // Key points functionality
-        const keyPointsContainer = document.getElementById('key-points-container');
-        const addKeyPointButton = document.getElementById('add-key-point');
+        // Script Plan Functionality
+        const scriptPlanContainer = document.getElementById('script-plan-container');
+        const addSectionBtn = document.getElementById('add-section-btn');
+        const generatePlanBtn = document.getElementById('generate-plan-btn');
         
-        // Add new key point field
-        addKeyPointButton.addEventListener('click', function() {
-            const newKeyPointItem = document.createElement('div');
-            newKeyPointItem.className = 'key-point-item mb-2';
-            
-            newKeyPointItem.innerHTML = `
-                <div class="input-group">
-                    <input type="text" class="form-control" name="key_points[]" placeholder="Enter a key point">
-                    <button type="button" class="btn btn-outline-danger remove-key-point">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            `;
-            keyPointsContainer.appendChild(newKeyPointItem);
-            
-            // Show the first remove button if it was hidden
-            const removeButtons = document.querySelectorAll('.remove-key-point');
-            if (removeButtons.length > 1) {
-                removeButtons.forEach(button => {
-                    button.style.display = 'block';
-                });
-            }
+        // Add new section
+        addSectionBtn.addEventListener('click', function() {
+            addSection();
         });
         
-        // Remove key point field
-        keyPointsContainer.addEventListener('click', function(e) {
-            if (e.target.closest('.remove-key-point')) {
-                const keyPointItem = e.target.closest('.key-point-item');
-                keyPointItem.remove();
+        // Generate plan (mock functionality for now)
+        generatePlanBtn.addEventListener('click', function() {
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Clear existing sections
+                scriptPlanContainer.innerHTML = '';
                 
-                // Hide the remove button if only one key point remains
-                const removeButtons = document.querySelectorAll('.remove-key-point');
-                if (removeButtons.length === 1) {
-                    removeButtons[0].style.display = 'none';
+                // Add generated sections
+                const generatedPlan = [
+                    {
+                        name: "Introduction",
+                        key_points: "- Welcome viewers\n- Briefly introduce the topic: {{ session.get('topic', 'your topic') }}\n- Explain why this topic matters to {{ session.get('target_audience', 'the audience') }}"
+                    },
+                    {
+                        name: "Background & Context",
+                        key_points: "- Provide necessary background information\n- Define key terms and concepts\n- Share relevant statistics or facts"
+                    },
+                    {
+                        name: "Main Points",
+                        key_points: "- Discuss the first key aspect of {{ session.get('topic', 'the topic') }}\n- Explain the second important element\n- Cover the third critical component"
+                    },
+                    {
+                        name: "Practical Applications",
+                        key_points: "- Show how viewers can apply this information\n- Provide actionable tips or steps\n- Address common challenges and solutions"
+                    },
+                    {
+                        name: "Conclusion",
+                        key_points: "- Summarize the main points covered\n- Reinforce the key takeaway\n- Call to action: what should viewers do next?"
+                    }
+                ];
+                
+                // Add each section to the container
+                generatedPlan.forEach((section, index) => {
+                    addSection(section.name, section.key_points);
+                });
+                
+                // Reset button state
+                this.disabled = false;
+                this.innerHTML = '<i class="bi bi-magic"></i> Generate Plan';
+                
+                // Update section numbers
+                updateSectionNumbers();
+            }, 1500);
+        });
+        
+        // Function to add a new section
+        function addSection(name = '', keyPoints = '') {
+            const sectionCount = document.querySelectorAll('.script-section').length;
+            const newSection = document.createElement('div');
+            newSection.className = 'card mb-3 script-section';
+            newSection.dataset.sectionId = sectionCount;
+            
+            newSection.innerHTML = `
+                <div class="card-header d-flex justify-content-between align-items-center py-2">
+                    <div class="d-flex align-items-center">
+                        <span class="section-number me-2">${sectionCount + 1}.</span>
+                        <input type="text" class="form-control form-control-sm section-name" 
+                               name="section_names[]" value="${name}" 
+                               placeholder="Section Name" required>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary move-up" 
+                                ${sectionCount === 0 ? 'disabled' : ''}>
+                            <i class="bi bi-arrow-up"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary move-down">
+                            <i class="bi bi-arrow-down"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-section" 
+                                ${sectionCount === 0 && document.querySelectorAll('.script-section').length === 0 ? 'disabled' : ''}>
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body py-2">
+                    <textarea class="form-control section-key-points" name="section_key_points[]" 
+                              rows="3" placeholder="Key points for this section...">${keyPoints}</textarea>
+                </div>
+            `;
+            
+            scriptPlanContainer.appendChild(newSection);
+            
+            // Update move buttons for all sections
+            updateMoveButtons();
+        }
+        
+        // Event delegation for section actions (move up, move down, remove)
+        scriptPlanContainer.addEventListener('click', function(e) {
+            const section = e.target.closest('.script-section');
+            if (!section) return;
+            
+            // Move section up
+            if (e.target.closest('.move-up')) {
+                const prevSection = section.previousElementSibling;
+                if (prevSection) {
+                    scriptPlanContainer.insertBefore(section, prevSection);
+                    updateSectionNumbers();
+                    updateMoveButtons();
+                }
+            }
+            
+            // Move section down
+            if (e.target.closest('.move-down')) {
+                const nextSection = section.nextElementSibling;
+                if (nextSection) {
+                    scriptPlanContainer.insertBefore(nextSection, section);
+                    updateSectionNumbers();
+                    updateMoveButtons();
+                }
+            }
+            
+            // Remove section
+            if (e.target.closest('.remove-section')) {
+                if (document.querySelectorAll('.script-section').length > 1) {
+                    section.remove();
+                    updateSectionNumbers();
+                    updateMoveButtons();
                 }
             }
         });
+        
+        // Update section numbers
+        function updateSectionNumbers() {
+            document.querySelectorAll('.script-section').forEach((section, index) => {
+                section.querySelector('.section-number').textContent = `${index + 1}.`;
+                section.dataset.sectionId = index;
+            });
+        }
+        
+        // Update move buttons (disable first up and last down)
+        function updateMoveButtons() {
+            const sections = document.querySelectorAll('.script-section');
+            
+            sections.forEach((section, index) => {
+                // Update move up button
+                const moveUpBtn = section.querySelector('.move-up');
+                moveUpBtn.disabled = index === 0;
+                
+                // Update move down button
+                const moveDownBtn = section.querySelector('.move-down');
+                moveDownBtn.disabled = index === sections.length - 1;
+                
+                // Update remove button
+                const removeBtn = section.querySelector('.remove-section');
+                removeBtn.disabled = sections.length === 1;
+            });
+        }
+        
+        // Initialize
+        updateSectionNumbers();
+        updateMoveButtons();
     });
 </script>
 {% endblock %} 

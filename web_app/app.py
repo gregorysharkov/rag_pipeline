@@ -266,10 +266,26 @@ def plan():
         return redirect(url_for("context"))
 
     if request.method == "POST":
-        # Save plan data
-        session["plan_notes"] = request.form.get("plan_notes", "")
-        session["structure_preference"] = request.form.get("structure_preference", "")
-        session["key_points"] = request.form.getlist("key_points[]")
+        # Save video details
+        session["video_title"] = request.form.get("video_title", "")
+        session["video_audience"] = request.form.get("video_audience", "")
+        session["video_duration"] = request.form.get("video_duration", "5")
+
+        # Save script plan sections
+        section_names = request.form.getlist("section_names[]")
+        section_key_points = request.form.getlist("section_key_points[]")
+
+        script_plan = []
+        for i in range(len(section_names)):
+            if section_names[i].strip():  # Only add non-empty sections
+                script_plan.append(
+                    {
+                        "name": section_names[i],
+                        "key_points": section_key_points[i] if i < len(section_key_points) else "",
+                    }
+                )
+
+        session["script_plan"] = script_plan
 
         # Proceed to next step
         return redirect(url_for("script"))
