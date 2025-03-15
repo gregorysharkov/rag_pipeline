@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Step 3: Plan - YouTube Script Generator{% endblock %}
+{% block title %}{% if session.get('use_web_search', True) %}Step 4{% else %}Step 3{% endif %}: Plan - YouTube Script Generator{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -18,12 +18,30 @@
                         {% elif i == 2 %}
                             References
                         {% elif i == 3 %}
+                            {% if session.get('use_web_search', True) %}
+                            Web Search
+                            {% else %}
                             Plan
+                            {% endif %}
                         {% elif i == 4 %}
+                            {% if session.get('use_web_search', True) %}
+                            Plan
+                            {% else %}
                             Script
+                            {% endif %}
                         {% elif i == 5 %}
+                            {% if session.get('use_web_search', True) %}
+                            Script
+                            {% else %}
                             Edit
+                            {% endif %}
                         {% elif i == 6 %}
+                            {% if session.get('use_web_search', True) %}
+                            Edit
+                            {% else %}
+                            Short Video
+                            {% endif %}
+                        {% elif i == 7 %}
                             Short Video
                         {% endif %}
                     </div>
@@ -37,7 +55,7 @@
     <div class="col-12">
         <div class="card form-card">
             <div class="card-body">
-                <h2 class="card-title">Step 3: Plan Your Video</h2>
+                <h2 class="card-title">{% if session.get('use_web_search', True) %}Step 4{% else %}Step 3{% endif %}: Plan Your Video</h2>
                 <p class="card-text text-muted mb-4">
                     Create a plan for your video script. Define the structure and key points you want to cover.
                 </p>
@@ -121,6 +139,31 @@
                                             {% endif %}
                                         </div>
                                     </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Display Selected Search Results (if any) -->
+                            {% if session.get('selected_search_results') and session.get('search_results') %}
+                            <div class="mb-3">
+                                <h6>Selected Web Search Results</h6>
+                                <div class="list-group">
+                                    {% for result in session.get('search_results') %}
+                                        {% if result.id in session.get('selected_search_results') %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex flex-column">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <strong>{{ result.title }}</strong>
+                                                    <a href="{{ result.url }}" target="_blank" class="ms-2">
+                                                        <i class="bi bi-box-arrow-up-right"></i>
+                                                    </a>
+                                                </div>
+                                                <small class="text-muted text-truncate">{{ result.url }}</small>
+                                                <p class="mb-0 mt-1">{{ result.summary }}</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
                                     {% endfor %}
                                 </div>
                             </div>
@@ -231,7 +274,11 @@
         });
         
         document.getElementById('previous-btn').addEventListener('click', function() {
+            {% if session.get('use_web_search', True) %}
+            window.location.href = '{{ url_for('web_search') }}';
+            {% else %}
             window.location.href = '{{ url_for('references') }}';
+            {% endif %}
         });
         
         // Key points functionality

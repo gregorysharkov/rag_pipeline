@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Step 3: Web Search - YouTube Script Generator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Wizard Progress Bar -->
+        <div class="wizard-progress mb-4">
+            {% for i in range(1, total_steps + 1) %}
+                <div class="wizard-step">
+                    <div class="step-number {% if i < step %}completed{% elif i == step %}active{% endif %}">
+                        {{ i }}
+                    </div>
+                    <div class="step-label">
+                        {% if i == 1 %}
+                            Context
+                        {% elif i == 2 %}
+                            References
+                        {% elif i == 3 %}
+                            Web Search
+                        {% elif i == 4 %}
+                            Plan
+                        {% elif i == 5 %}
+                            Script
+                        {% elif i == 6 %}
+                            Edit
+                        {% elif i == 7 %}
+                            Short Video
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card form-card">
+            <div class="card-body">
+                <h2 class="card-title">Step 3: Web Search Results</h2>
+                <p class="card-text text-muted mb-4">
+                    Review and select web search results to include in your script. These resources will help the AI generate more accurate and relevant content.
+                </p>
+
+                <form method="POST" action="{{ url_for('web_search') }}" class="needs-validation" novalidate>
+                    <!-- Context Information from Previous Steps (Disabled) -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Context Information</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-context-btn">
+                                Edit <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Topic</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('topic', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Additional Context</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <textarea class="form-control" rows="3" disabled>{{ session.get('additional_context', '') }}</textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Target Audience</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('target_audience', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Content Type</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('content_type', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Tone</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('tone', '') }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- References Information -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">References & Resources</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-references-btn">
+                                Edit <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <!-- Display Uploaded Files (if any) -->
+                            {% if session.get('reference_files') %}
+                            <div class="mb-3">
+                                <h6>Uploaded Files</h6>
+                                <div class="list-group">
+                                    {% for file in session.get('reference_files') %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi {% if file.type == 'pdf' %}bi-file-earmark-pdf{% elif file.type in ['doc', 'docx'] %}bi-file-earmark-word{% elif file.type in ['jpg', 'jpeg', 'png'] %}bi-file-earmark-image{% else %}bi-file-earmark-text{% endif %} me-2"></i>
+                                            <span>{{ file.original_name }}</span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Display Web Links (if any) -->
+                            {% if session.get('web_links') %}
+                            <div class="mb-3">
+                                <h6>Web Links</h6>
+                                <div class="list-group">
+                                    {% for link in session.get('web_links') %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <a href="{{ link.url }}" target="_blank">{{ link.url }}</a>
+                                            {% if link.description %}
+                                            <small class="text-muted">{{ link.description }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if not session.get('reference_files') and not session.get('web_links') %}
+                            <p class="text-muted">No reference files or web links have been added.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Search Results Section -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Web Search Results</h5>
+                            <a href="{{ url_for('web_search', refresh=1) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh Search Results
+                            </a>
+                        </div>
+                        <p class="text-muted mb-3">
+                            Based on your topic "{{ session.get('topic', 'your topic') }}", we found the following resources. 
+                            Select the ones you want to include in your script.
+                        </p>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="select-all-results">
+                            <label class="form-check-label" for="select-all-results">
+                                <strong>Select All Results</strong>
+                            </label>
+                        </div>
+                        
+                        <div class="search-results-container">
+                            {% if session.get('search_results') %}
+                                {% for result in session.get('search_results') %}
+                                <div class="card mb-3 search-result-card">
+                                    <div class="card-body">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input result-checkbox" type="checkbox" 
+                                                   name="selected_results[]" value="{{ result.id }}" 
+                                                   id="result-{{ result.id }}"
+                                                   {% if session.get('selected_search_results') and result.id in session.get('selected_search_results') %}checked{% endif %}>
+                                            <label class="form-check-label" for="result-{{ result.id }}">
+                                                <h5 class="card-title mb-1">{{ result.title }}</h5>
+                                            </label>
+                                        </div>
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                            <a href="{{ result.url }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 90%;">
+                                                {{ result.url }}
+                                            </a>
+                                        </h6>
+                                        <p class="card-text">{{ result.summary }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="alert alert-info">
+                                    No search results found. Please try a different topic or add more context.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="wizard-buttons">
+                        <button type="button" class="btn btn-outline-secondary" id="previous-btn">
+                            <i class="bi bi-arrow-left"></i> Previous
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Next <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<style>
+    .search-result-card {
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+    .search-result-card:hover {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    .search-result-card.selected {
+        border-left: 3px solid #0d6efd;
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .form-check-input:checked + .form-check-label h5 {
+        color: #0d6efd;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navigation buttons
+        document.getElementById('edit-context-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('context') }}';
+        });
+        
+        document.getElementById('edit-references-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('references') }}';
+        });
+        
+        document.getElementById('previous-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('references') }}';
+        });
+        
+        // Select all functionality
+        const selectAllCheckbox = document.getElementById('select-all-results');
+        const resultCheckboxes = document.querySelectorAll('.result-checkbox');
+        
+        selectAllCheckbox.addEventListener('change', function() {
+            const isChecked = this.checked;
+            resultCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+                updateCardStyle(checkbox);
+            });
+        });
+        
+        // Individual checkbox functionality
+        resultCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateCardStyle(this);
+                
+                // Update "select all" checkbox state
+                const allChecked = Array.from(resultCheckboxes).every(cb => cb.checked);
+                const someChecked = Array.from(resultCheckboxes).some(cb => cb.checked);
+                
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = someChecked && !allChecked;
+            });
+            
+            // Initialize card styles
+            updateCardStyle(checkbox);
+        });
+        
+        // Update card styling based on checkbox state
+        function updateCardStyle(checkbox) {
+            const card = checkbox.closest('.search-result-card');
+            if (checkbox.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        }
+    });
+</script>
+{% endblock %} 

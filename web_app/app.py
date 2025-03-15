@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from werkzeug.utils import secure_filename
 import uuid
+import random
+import datetime
 
 # Load environment variables
 load_dotenv()
@@ -23,7 +25,16 @@ api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
 # Define the steps in the wizard
-WIZARD_STEPS = ["context", "references", "plan", "script", "edit", "short_video", "complete"]
+WIZARD_STEPS = [
+    "context",
+    "references",
+    "web_search",
+    "plan",
+    "script",
+    "edit",
+    "short_video",
+    "complete",
+]
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {"pdf", "doc", "docx", "jpg", "jpeg", "png"}
@@ -144,15 +155,111 @@ def references():
             if new_links_count > 0:
                 flash(f"Successfully added {new_links_count} web link(s).", "success")
 
-        # Proceed to next step
-        return redirect(url_for("plan"))
+        # Proceed to next step - either web search or plan depending on setting
+        if session.get("use_web_search", True):
+            return redirect(url_for("web_search"))
+        else:
+            return redirect(url_for("plan"))
 
     return render_template("references.html", step=2, total_steps=len(WIZARD_STEPS) - 1)
 
 
+@app.route("/web_search", methods=["GET", "POST"])
+def web_search():
+    """Web search step: Show search results from the web."""
+    # Check if previous steps were completed
+    if "topic" not in session:
+        flash("Please complete the context step first.", "warning")
+        return redirect(url_for("context"))
+
+    # Skip this step if web search is disabled
+    if not session.get("use_web_search", True):
+        return redirect(url_for("plan"))
+
+    if request.method == "POST":
+        # Save selected search results
+        selected_results = request.form.getlist("selected_results[]")
+        if selected_results:
+            session["selected_search_results"] = selected_results
+            flash(
+                f"Selected {len(selected_results)} search results to include in your script.",
+                "success",
+            )
+
+        # Proceed to next step
+        return redirect(url_for("plan"))
+
+    # For GET requests, perform the web search if not already done or if refresh requested
+    refresh_requested = request.args.get("refresh", "0") == "1"
+    if "search_results" not in session or refresh_requested:
+        # This would be replaced with actual web search functionality
+        # For now, we'll use mock data
+        mock_search_results = [
+            {
+                "id": "1",
+                "title": "How to Create Engaging YouTube Videos",
+                "url": "https://example.com/youtube-tips",
+                "summary": "A comprehensive guide on creating engaging content for YouTube, including tips on scripting, filming, and editing.",
+            },
+            {
+                "id": "2",
+                "title": "YouTube Script Writing: Best Practices",
+                "url": "https://example.com/script-writing",
+                "summary": "Learn the best practices for writing effective YouTube scripts that keep viewers engaged and boost your channel's performance.",
+            },
+            {
+                "id": "3",
+                "title": f"Everything You Need to Know About {session.get('topic', 'Your Topic')}",
+                "url": "https://example.com/topic-guide",
+                "summary": f"An in-depth exploration of {session.get('topic', 'your topic')}, covering key concepts, recent developments, and expert insights.",
+            },
+            {
+                "id": "4",
+                "title": "Video Production Tips for Beginners",
+                "url": "https://example.com/video-production",
+                "summary": "Essential tips and tricks for beginners looking to improve their video production quality without expensive equipment.",
+            },
+            {
+                "id": "5",
+                "title": f"{session.get('content_type', 'Content')} Creation Guide",
+                "url": "https://example.com/content-creation",
+                "summary": f"A step-by-step guide to creating high-quality {session.get('content_type', 'content')} that resonates with your target audience.",
+            },
+        ]
+
+        # If refreshing, add some variation to show different results
+        if refresh_requested:
+            random.shuffle(mock_search_results)
+            # Add a couple more results to show variation
+            additional_results = [
+                {
+                    "id": "6",
+                    "title": f"Latest Trends in {session.get('topic', 'Your Field')}",
+                    "url": "https://example.com/latest-trends",
+                    "summary": f"Stay up-to-date with the latest developments and trends in {session.get('topic', 'your field')} for {datetime.datetime.now().year}.",
+                },
+                {
+                    "id": "7",
+                    "title": f"Expert Insights: {session.get('topic', 'Topic')} for {session.get('target_audience', 'Your Audience')}",
+                    "url": "https://example.com/expert-insights",
+                    "summary": f"Expert advice on creating {session.get('content_type', 'content')} about {session.get('topic', 'your topic')} specifically tailored for {session.get('target_audience', 'your target audience')}.",
+                },
+            ]
+            mock_search_results = mock_search_results[:3] + additional_results
+
+            flash("Search results refreshed successfully!", "success")
+            # Clear previous selections when refreshing
+            if "selected_search_results" in session:
+                session.pop("selected_search_results")
+
+        session["search_results"] = mock_search_results
+
+    return render_template("web_search.html", step=3, total_steps=len(WIZARD_STEPS) - 1)
+
+
 @app.route("/plan", methods=["GET", "POST"])
 def plan():
-    """Third step: Plan the video script."""
+    """Plan step: Plan the video script."""
     # Check if previous steps were completed
     if "topic" not in session:
         flash("Please complete the context step first.", "warning")
@@ -167,7 +274,11 @@ def plan():
         # Proceed to next step
         return redirect(url_for("script"))
 
-    return render_template("plan.html", step=3, total_steps=len(WIZARD_STEPS) - 1)
+    return render_template(
+        "plan.html",
+        step=4 if session.get("use_web_search", True) else 3,
+        total_steps=len(WIZARD_STEPS) - 1,
+    )
 
 
 # Add routes for other steps (to be implemented)
