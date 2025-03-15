@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Step 1: Context - YouTube Script Generator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Wizard Progress Bar -->
+        <div class="wizard-progress mb-4">
+            {% for i in range(1, total_steps + 1) %}
+                <div class="wizard-step">
+                    <div class="step-number {% if i < step %}completed{% elif i == step %}active{% endif %}">
+                        {{ i }}
+                    </div>
+                    <div class="step-label">
+                        {% if i == 1 %}
+                            Context
+                        {% elif i == 2 %}
+                            References
+                        {% elif i == 3 %}
+                            Plan
+                        {% elif i == 4 %}
+                            Script
+                        {% elif i == 5 %}
+                            Edit
+                        {% elif i == 6 %}
+                            Short Video
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card form-card">
+            <div class="card-body">
+                <h2 class="card-title">Step 1: Provide Context</h2>
+                <p class="card-text text-muted mb-4">
+                    This information will be used to guide the AI in generating content that matches your needs.
+                </p>
+
+                <form method="POST" action="{{ url_for('context') }}" class="needs-validation" novalidate>
+                    <div class="mb-4">
+                        <label for="topic" class="form-label">Topic *</label>
+                        <input type="text" class="form-control" id="topic" name="topic" 
+                               placeholder="e.g., The impact of artificial intelligence on healthcare" 
+                               required>
+                        <div class="form-text">
+                            Enter the main topic for your YouTube video.
+                        </div>
+                        <div class="invalid-feedback">
+                            Please provide a topic.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="additional_context" class="form-label">Additional Context</label>
+                        <textarea class="form-control" id="additional_context" name="additional_context" 
+                                  rows="6" placeholder="e.g., Focus on recent advancements and ethical considerations"
+                                  data-max-chars="2000"></textarea>
+                        <div class="form-text">
+                            Provide any additional information or specific aspects you want to include (up to 2000 characters).
+                        </div>
+                        <div id="additional_context-counter" class="form-text text-end">
+                            2000 characters remaining
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="target_audience" class="form-label">Target Audience</label>
+                        <div class="input-group">
+                            <select class="form-select" id="audience_select" onchange="updateTargetAudience(this.value)">
+                                <option value="" selected>Select target audience</option>
+                                <option value="general">General audience</option>
+                                <option value="beginners">Beginners</option>
+                                <option value="intermediate">Intermediate knowledge</option>
+                                <option value="experts">Experts</option>
+                                <option value="students">Students</option>
+                                <option value="professionals">Professionals</option>
+                                <option value="custom">Custom (enter your own)</option>
+                            </select>
+                            <input type="text" class="form-control" id="target_audience" name="target_audience" 
+                                   placeholder="Enter custom audience" style="display: none;">
+                        </div>
+                        <div class="form-text">
+                            Select from the list or choose "Custom" to enter your own target audience.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="content_type" class="form-label">Content Type</label>
+                        <select class="form-select" id="content_type" name="content_type">
+                            <option value="" selected>Select content type</option>
+                            <option value="educational">Educational</option>
+                            <option value="tutorial">Tutorial</option>
+                            <option value="explainer">Explainer</option>
+                            <option value="review">Review</option>
+                            <option value="opinion">Opinion/Commentary</option>
+                            <option value="entertainment">Entertainment</option>
+                        </select>
+                        <div class="form-text">
+                            Select the type of content you want to create.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="tone" class="form-label">Tone</label>
+                        <select class="form-select" id="tone" name="tone">
+                            <option value="" selected>Select tone</option>
+                            <option value="formal">Formal</option>
+                            <option value="conversational">Conversational</option>
+                            <option value="enthusiastic">Enthusiastic</option>
+                            <option value="humorous">Humorous</option>
+                            <option value="serious">Serious</option>
+                            <option value="inspirational">Inspirational</option>
+                        </select>
+                        <div class="form-text">
+                            Select the tone you want for your content.
+                        </div>
+                    </div>
+
+                    <div class="wizard-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('index') }}'">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Next <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function updateTargetAudience(value) {
+        const customInput = document.getElementById('target_audience');
+        
+        if (value === 'custom') {
+            // Show the custom input field
+            customInput.style.display = 'block';
+            customInput.focus();
+            customInput.value = '';
+        } else {
+            // Hide the custom input field and set its value to the selected option
+            customInput.style.display = 'none';
+            customInput.value = value;
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if there's a previously selected value
+        const audienceSelect = document.getElementById('audience_select');
+        const targetAudience = document.getElementById('target_audience');
+        
+        // If there's a value in the hidden input that doesn't match any option,
+        // select "custom" and show the input
+        const audienceValue = targetAudience.value;
+        if (audienceValue) {
+            let found = false;
+            for (let i = 0; i < audienceSelect.options.length; i++) {
+                if (audienceSelect.options[i].value === audienceValue) {
+                    audienceSelect.selectedIndex = i;
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found && audienceValue !== '') {
+                // Select the "custom" option
+                for (let i = 0; i < audienceSelect.options.length; i++) {
+                    if (audienceSelect.options[i].value === 'custom') {
+                        audienceSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+                // Show the custom input
+                targetAudience.style.display = 'block';
+            }
+        }
+    });
+</script>
+{% endblock %} 

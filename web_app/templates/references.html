@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Step 2: References - YouTube Script Generator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Wizard Progress Bar -->
+        <div class="wizard-progress mb-4">
+            {% for i in range(1, total_steps + 1) %}
+                <div class="wizard-step">
+                    <div class="step-number {% if i < step %}completed{% elif i == step %}active{% endif %}">
+                        {{ i }}
+                    </div>
+                    <div class="step-label">
+                        {% if i == 1 %}
+                            Context
+                        {% elif i == 2 %}
+                            References
+                        {% elif i == 3 %}
+                            Plan
+                        {% elif i == 4 %}
+                            Script
+                        {% elif i == 5 %}
+                            Edit
+                        {% elif i == 6 %}
+                            Short Video
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card form-card">
+            <div class="card-body">
+                <h2 class="card-title">Step 2: Web Search References</h2>
+                <p class="card-text text-muted mb-4">
+                    The AI will search the web for relevant information about your topic.
+                </p>
+
+                <!-- Display context information from previous step -->
+                <div class="card context-card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Context Information</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Topic:</strong> {{ session.get('topic', 'Not provided') }}</p>
+                                {% if session.get('additional_context') %}
+                                <p><strong>Additional Context:</strong> {{ session.get('additional_context') }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {% if session.get('target_audience') %}
+                                <p><strong>Target Audience:</strong> {{ session.get('target_audience') }}</p>
+                                {% endif %}
+                                {% if session.get('content_type') %}
+                                <p><strong>Content Type:</strong> {{ session.get('content_type') }}</p>
+                                {% endif %}
+                                {% if session.get('tone') %}
+                                <p><strong>Tone:</strong> {{ session.get('tone') }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    This is a placeholder for the references step. In the actual implementation, 
+                    this page will show the results of the web search and allow you to select 
+                    which references to include in your script.
+                </div>
+
+                <div class="wizard-buttons">
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('context') }}'">
+                        <i class="bi bi-arrow-left"></i> Previous
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="alert('This is a placeholder. The next steps will be implemented in future iterations.')">
+                        Next <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock %} 
