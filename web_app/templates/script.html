@@ -1,0 +1,492 @@
+{% extends "base.html" %}
+
+{% block title %}{% if session.get('use_web_search', True) %}Step 5{% else %}Step 4{% endif %}: Script - YouTube Script Generator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Wizard Progress Bar -->
+        <div class="wizard-progress mb-4">
+            {% for i in range(1, total_steps + 1) %}
+                <div class="wizard-step">
+                    <div class="step-number {% if i < step %}completed{% elif i == step %}active{% endif %}">
+                        {{ i }}
+                    </div>
+                    <div class="step-label">
+                        {% if i == 1 %}
+                            Context
+                        {% elif i == 2 %}
+                            References
+                        {% elif i == 3 %}
+                            {% if session.get('use_web_search', True) %}
+                            Web Search
+                            {% else %}
+                            Plan
+                            {% endif %}
+                        {% elif i == 4 %}
+                            {% if session.get('use_web_search', True) %}
+                            Plan
+                            {% else %}
+                            Script
+                            {% endif %}
+                        {% elif i == 5 %}
+                            {% if session.get('use_web_search', True) %}
+                            Script
+                            {% else %}
+                            Edit
+                            {% endif %}
+                        {% elif i == 6 %}
+                            {% if session.get('use_web_search', True) %}
+                            Edit
+                            {% else %}
+                            Short Video
+                            {% endif %}
+                        {% elif i == 7 %}
+                            Short Video
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card form-card">
+            <div class="card-body">
+                <h2 class="card-title">{% if session.get('use_web_search', True) %}Step 5{% else %}Step 4{% endif %}: Write Your Script</h2>
+                <p class="card-text text-muted mb-4">
+                    Create your video script based on the plan. You can generate a draft script or write it manually.
+                </p>
+
+                <form method="POST" action="{{ url_for('script') }}" class="needs-validation" novalidate>
+                    <!-- Context Information from Previous Steps (Disabled) -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Context Information</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-context-btn">
+                                Edit <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Topic</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('topic', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Additional Context</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <textarea class="form-control" rows="3" disabled>{{ session.get('additional_context', '') }}</textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Target Audience</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('target_audience', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Content Type</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('content_type', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Tone</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('tone', '') }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- References Information -->
+                    <div class="card mb-4 collapse-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link text-decoration-none p-0 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#referencesCollapse" aria-expanded="false" aria-controls="referencesCollapse">
+                                    References & Resources <i class="bi bi-chevron-down"></i>
+                                </button>
+                            </h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-references-btn">
+                                Edit <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="collapse" id="referencesCollapse">
+                            <div class="card-body">
+                                <!-- Display Uploaded Files (if any) -->
+                                {% if session.get('reference_files') %}
+                                <div class="mb-3">
+                                    <h6>Uploaded Files</h6>
+                                    <div class="list-group">
+                                        {% for file in session.get('reference_files') %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi {% if file.type == 'pdf' %}bi-file-earmark-pdf{% elif file.type in ['doc', 'docx'] %}bi-file-earmark-word{% elif file.type in ['jpg', 'jpeg', 'png'] %}bi-file-earmark-image{% else %}bi-file-earmark-text{% endif %} me-2"></i>
+                                                <span>{{ file.original_name }}</span>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Display Web Links (if any) -->
+                                {% if session.get('web_links') %}
+                                <div class="mb-3">
+                                    <h6>Web Links</h6>
+                                    <div class="list-group">
+                                        {% for link in session.get('web_links') %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <a href="{{ link.url }}" target="_blank">{{ link.url }}</a>
+                                                {% if link.description %}
+                                                <small class="text-muted">{{ link.description }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Display Selected Search Results (if any) -->
+                                {% if session.get('selected_search_results') and session.get('search_results') %}
+                                <div class="mb-3">
+                                    <h6>Selected Web Search Results</h6>
+                                    <div class="list-group">
+                                        {% for result in session.get('search_results') %}
+                                            {% if result.id in session.get('selected_search_results') %}
+                                            <div class="list-group-item">
+                                                <div class="d-flex flex-column">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <strong>{{ result.title }}</strong>
+                                                        <a href="{{ result.url }}" target="_blank" class="ms-2">
+                                                            <i class="bi bi-box-arrow-up-right"></i>
+                                                        </a>
+                                                    </div>
+                                                    <small class="text-muted text-truncate">{{ result.url }}</small>
+                                                    <p class="mb-0 mt-1">{{ result.summary }}</p>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Details -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Video Details</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-plan-btn">
+                                Edit <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Title</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('video_title', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Target Audience</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('video_audience', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Duration</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('video_duration', '') }} minutes" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Script Plan -->
+                    <div class="card mb-4 collapse-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link text-decoration-none p-0 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#planCollapse" aria-expanded="false" aria-controls="planCollapse">
+                                    Script Plan <i class="bi bi-chevron-down"></i>
+                                </button>
+                            </h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-plan-sections-btn">
+                                Edit <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="collapse" id="planCollapse">
+                            <div class="card-body">
+                                {% if session.get('script_plan') %}
+                                    <div class="list-group">
+                                        {% for section in session.get('script_plan') %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex flex-column">
+                                                <strong>{{ loop.index }}. {{ section.name }}</strong>
+                                                <p class="mb-0 mt-1 text-muted">{{ section.key_points|replace('\n', '<br>')|safe }}</p>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">No script plan has been created yet.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Script Sections -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Script Content</h5>
+                            <button type="button" class="btn btn-primary" id="generate-script-btn">
+                                <i class="bi bi-magic"></i> Generate Script
+                            </button>
+                        </div>
+                        <p class="text-muted mb-3">
+                            Write your script content for each section. You can generate a draft script or write it manually.
+                        </p>
+                        
+                        <div id="script-sections-container">
+                            {% if session.get('script_sections') %}
+                                {% for section in session.get('script_sections') %}
+                                <div class="card mb-4 script-section-card">
+                                    <div class="card-header">
+                                        <div class="d-flex align-items-center">
+                                            <span class="section-number me-2">{{ loop.index }}.</span>
+                                            <input type="text" class="form-control section-title" 
+                                                   name="section_titles[]" value="{{ section.title }}" 
+                                                   placeholder="Section Title" required>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <textarea class="form-control script-content" name="section_contents[]" 
+                                                  rows="8" placeholder="Write your script content here...">{{ section.content }}</textarea>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% elif session.get('script_plan') %}
+                                {% for section in session.get('script_plan') %}
+                                <div class="card mb-4 script-section-card">
+                                    <div class="card-header">
+                                        <div class="d-flex align-items-center">
+                                            <span class="section-number me-2">{{ loop.index }}.</span>
+                                            <input type="text" class="form-control section-title" 
+                                                   name="section_titles[]" value="{{ section.name }}" 
+                                                   placeholder="Section Title" required>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <textarea class="form-control script-content" name="section_contents[]" 
+                                                  rows="8" placeholder="Write your script content here..."></textarea>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> Please create a script plan first.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="wizard-buttons">
+                        <button type="button" class="btn btn-outline-secondary" id="previous-btn">
+                            <i class="bi bi-arrow-left"></i> Previous
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Next <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<style>
+    .collapse-card .card-header .btn-link i {
+        transition: transform 0.3s ease;
+    }
+    .collapse-card .card-header .btn-link:not(.collapsed) i {
+        transform: rotate(180deg);
+    }
+    .section-title {
+        font-weight: 500;
+    }
+    .script-section-card {
+        transition: all 0.2s ease;
+    }
+    .script-section-card:hover {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    .section-number {
+        font-weight: bold;
+        min-width: 25px;
+    }
+    .script-content {
+        font-family: 'Courier New', Courier, monospace;
+        line-height: 1.5;
+    }
+    .word-count {
+        color: #6c757d;
+        font-size: 0.875rem;
+        text-align: right;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navigation buttons
+        document.getElementById('edit-context-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('context') }}';
+        });
+        
+        document.getElementById('edit-references-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('references') }}';
+        });
+        
+        document.getElementById('edit-plan-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('plan') }}';
+        });
+        
+        document.getElementById('edit-plan-sections-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('plan') }}';
+        });
+        
+        document.getElementById('previous-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('plan') }}';
+        });
+        
+        // Generate script functionality
+        const generateScriptBtn = document.getElementById('generate-script-btn');
+        
+        generateScriptBtn.addEventListener('click', function() {
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
+            
+            // Get all script content textareas
+            const scriptContentAreas = document.querySelectorAll('.script-content');
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Generate script for each section
+                scriptContentAreas.forEach((textarea, index) => {
+                    // Get the section title
+                    const sectionTitle = document.querySelectorAll('.section-title')[index].value;
+                    
+                    // Generate script based on section title and plan
+                    let generatedScript = '';
+                    
+                    if (index === 0) {
+                        // Introduction section
+                        generatedScript = `[Upbeat music]\n\nHello everyone, and welcome to this video about ${sectionTitle.toLowerCase() || "{{ session.get('topic', 'our topic') }}"}.`;
+                        generatedScript += `\n\nMy name is [Your Name], and today we're going to explore ${sectionTitle.toLowerCase() || "{{ session.get('topic', 'our topic') }}"} in detail.`;
+                        generatedScript += `\n\nThis video is perfect for ${sectionTitle.includes('Introduction') ? "{{ session.get('video_audience', 'everyone interested in this topic') }}" : "beginners and those looking to expand their knowledge"}.`;
+                        generatedScript += `\n\nLet's dive right in!`;
+                    } else if (index === scriptContentAreas.length - 1) {
+                        // Conclusion section
+                        generatedScript = `Now that we've covered all the key aspects of ${sectionTitle.toLowerCase() || "{{ session.get('topic', 'our topic') }}"}, let's summarize what we've learned.`;
+                        generatedScript += `\n\nWe started by exploring the basics and background information. Then we discussed the main concepts and practical applications.`;
+                        generatedScript += `\n\nRemember, the most important thing to take away is that ${sectionTitle.toLowerCase() || "{{ session.get('topic', 'this topic') }}"} requires practice and patience.`;
+                        generatedScript += `\n\nIf you found this video helpful, please give it a thumbs up and consider subscribing to the channel for more content like this.`;
+                        generatedScript += `\n\nThank you for watching, and I'll see you in the next video!`;
+                        generatedScript += `\n\n[Outro music]`;
+                    } else {
+                        // Middle sections
+                        generatedScript = `Now let's talk about ${sectionTitle.toLowerCase() || "this important aspect"}.`;
+                        generatedScript += `\n\nThis is a crucial part of understanding ${sectionTitle.toLowerCase() || "{{ session.get('topic', 'our topic') }}"} because it provides the foundation for everything else.`;
+                        generatedScript += `\n\nThere are several key points to consider here:`;
+                        generatedScript += `\n\nFirst, [insert specific point related to ${sectionTitle}].`;
+                        generatedScript += `\n\nSecond, [insert another important aspect of ${sectionTitle}].`;
+                        generatedScript += `\n\nFinally, [insert concluding point about ${sectionTitle}].`;
+                        generatedScript += `\n\nLet me show you a practical example of how this works in real life.`;
+                        generatedScript += `\n\n[Insert example or demonstration]`;
+                        generatedScript += `\n\nAs you can see, this approach makes it much easier to understand and apply these concepts.`;
+                    }
+                    
+                    // Set the generated script
+                    textarea.value = generatedScript;
+                });
+                
+                // Reset button state
+                this.disabled = false;
+                this.innerHTML = '<i class="bi bi-magic"></i> Generate Script';
+                
+                // Show success message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    <i class="bi bi-check-circle-fill"></i> Script generated successfully! Feel free to edit it to match your style.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                document.querySelector('.script-section-card').before(alertDiv);
+                
+                // Auto-dismiss alert after 5 seconds
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alertDiv);
+                    bsAlert.close();
+                }, 5000);
+            }, 2000);
+        });
+        
+        // Add word count functionality to script content textareas
+        document.querySelectorAll('.script-content').forEach(textarea => {
+            // Create word count element
+            const wordCountDiv = document.createElement('div');
+            wordCountDiv.className = 'word-count';
+            textarea.parentNode.appendChild(wordCountDiv);
+            
+            // Update word count on input
+            function updateWordCount() {
+                const text = textarea.value.trim();
+                const wordCount = text ? text.split(/\s+/).length : 0;
+                wordCountDiv.textContent = `${wordCount} words`;
+            }
+            
+            // Initial word count
+            updateWordCount();
+            
+            // Update word count on input
+            textarea.addEventListener('input', updateWordCount);
+        });
+    });
+</script>
+{% endblock %} 

@@ -297,6 +297,45 @@ def plan():
     )
 
 
+@app.route("/script", methods=["GET", "POST"])
+def script():
+    """Script step: Write the video script."""
+    # Check if previous steps were completed
+    if "topic" not in session:
+        flash("Please complete the context step first.", "warning")
+        return redirect(url_for("context"))
+
+    if "script_plan" not in session or not session["script_plan"]:
+        flash("Please create a script plan first.", "warning")
+        return redirect(url_for("plan"))
+
+    if request.method == "POST":
+        # Save script sections
+        section_titles = request.form.getlist("section_titles[]")
+        section_contents = request.form.getlist("section_contents[]")
+
+        script_sections = []
+        for i in range(len(section_titles)):
+            if section_titles[i].strip():  # Only add non-empty sections
+                script_sections.append(
+                    {
+                        "title": section_titles[i],
+                        "content": section_contents[i] if i < len(section_contents) else "",
+                    }
+                )
+
+        session["script_sections"] = script_sections
+
+        # Proceed to next step
+        return redirect(url_for("edit"))
+
+    return render_template(
+        "script.html",
+        step=5 if session.get("use_web_search", True) else 4,
+        total_steps=len(WIZARD_STEPS) - 1,
+    )
+
+
 # Add routes for other steps (to be implemented)
 
 
