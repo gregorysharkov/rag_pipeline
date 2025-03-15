@@ -336,6 +336,38 @@ def script():
     )
 
 
+@app.route("/edit", methods=["GET", "POST"])
+def edit():
+    """Edit step: Enhance the script with editing options."""
+    # Check if previous steps were completed
+    if "topic" not in session:
+        flash("Please complete the context step first.", "warning")
+        return redirect(url_for("context"))
+
+    if "script_sections" not in session or not session["script_sections"]:
+        flash("Please create a script first.", "warning")
+        return redirect(url_for("script"))
+
+    if request.method == "POST":
+        # Save editing options
+        edit_options = request.form.getlist("edit_options[]")
+        additional_instructions = request.form.get("additional_instructions", "")
+        edited_script = request.form.get("edited_script", "")
+
+        session["edit_options"] = edit_options
+        session["additional_instructions"] = additional_instructions
+        session["edited_script"] = edited_script
+
+        # Proceed to next step
+        return redirect(url_for("short_video"))
+
+    return render_template(
+        "edit.html",
+        step=6 if session.get("use_web_search", True) else 5,
+        total_steps=len(WIZARD_STEPS) - 1,
+    )
+
+
 # Add routes for other steps (to be implemented)
 
 

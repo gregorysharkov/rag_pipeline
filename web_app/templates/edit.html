@@ -1,0 +1,499 @@
+{% extends "base.html" %}
+
+{% block title %}{% if session.get('use_web_search', True) %}Step 6{% else %}Step 5{% endif %}: Edit - YouTube Script Generator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Wizard Progress Bar -->
+        <div class="wizard-progress mb-4">
+            {% for i in range(1, total_steps + 1) %}
+                <div class="wizard-step">
+                    <div class="step-number {% if i < step %}completed{% elif i == step %}active{% endif %}">
+                        {{ i }}
+                    </div>
+                    <div class="step-label">
+                        {% if i == 1 %}
+                            Context
+                        {% elif i == 2 %}
+                            References
+                        {% elif i == 3 %}
+                            {% if session.get('use_web_search', True) %}
+                            Web Search
+                            {% else %}
+                            Plan
+                            {% endif %}
+                        {% elif i == 4 %}
+                            {% if session.get('use_web_search', True) %}
+                            Plan
+                            {% else %}
+                            Script
+                            {% endif %}
+                        {% elif i == 5 %}
+                            {% if session.get('use_web_search', True) %}
+                            Script
+                            {% else %}
+                            Edit
+                            {% endif %}
+                        {% elif i == 6 %}
+                            {% if session.get('use_web_search', True) %}
+                            Edit
+                            {% else %}
+                            Short Video
+                            {% endif %}
+                        {% elif i == 7 %}
+                            Short Video
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card form-card">
+            <div class="card-body">
+                <h2 class="card-title">{% if session.get('use_web_search', True) %}Step 6{% else %}Step 5{% endif %}: Edit Your Script</h2>
+                <p class="card-text text-muted mb-4">
+                    Enhance your script with editing options to make it more engaging and visually appealing.
+                </p>
+
+                <form method="POST" action="{{ url_for('edit') }}" class="needs-validation" novalidate>
+                    <!-- Original Script Content (Read-only) -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Original Script</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-script-btn">
+                                Edit <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="script-info mb-3">
+                                <strong>Title:</strong> {{ session.get('video_title', '') }}<br>
+                                <strong>Topic:</strong> {{ session.get('topic', '') }}<br>
+                                <strong>Target Audience:</strong> {{ session.get('video_audience', session.get('target_audience', '')) }}<br>
+                                <strong>Duration:</strong> {{ session.get('video_duration', '') }} minutes<br>
+                                <strong>Content Type:</strong> {{ session.get('content_type', '') }}<br>
+                                <strong>Tone:</strong> {{ session.get('tone', '') }}
+                            </div>
+                            
+                            <div class="original-script">
+                                {% if session.get('script_sections') %}
+                                    <div class="script-content-readonly">
+                                    {% for section in session.get('script_sections') %}
+                                        <strong>**[{{ section.title }}]**</strong>
+                                        
+                                        {{ section.content|replace('\n\n\n\n', '\n\n')|replace('\n\n\n', '\n\n')|replace('    ', ' ')|replace('   ', ' ')|replace('  ', ' ') }}
+                                        
+                                        {% if not loop.last %}
+                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">No script content has been created yet.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Editing Options -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Editing Options</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">
+                                Select the editing options you want to apply to your script.
+                            </p>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Script Enhancements</h6>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="conversational" name="edit_options[]" value="conversational">
+                                        <label class="form-check-label" for="conversational">
+                                            Add more conversational elements and natural speech patterns
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="rhetorical" name="edit_options[]" value="rhetorical">
+                                        <label class="form-check-label" for="rhetorical">
+                                            Include rhetorical questions to engage the audience
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="humor" name="edit_options[]" value="humor">
+                                        <label class="form-check-label" for="humor">
+                                            Add humor where appropriate
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="transitions" name="edit_options[]" value="transitions">
+                                        <label class="form-check-label" for="transitions">
+                                            Improve transitions between sections
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="flow" name="edit_options[]" value="flow">
+                                        <label class="form-check-label" for="flow">
+                                            Ensure the script flows naturally when read aloud
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="analogies" name="edit_options[]" value="analogies">
+                                        <label class="form-check-label" for="analogies">
+                                            Add analogies where appropriate
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="simplify" name="edit_options[]" value="simplify">
+                                        <label class="form-check-label" for="simplify">
+                                            Simplify the language to make it more accessible
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h6>Visual Elements</h6>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="scene_descriptions" name="edit_options[]" value="scene_descriptions">
+                                        <label class="form-check-label" for="scene_descriptions">
+                                            Add scene descriptions
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="visuals" name="edit_options[]" value="visuals">
+                                        <label class="form-check-label" for="visuals">
+                                            Add visual cues and suggestions
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="cuts" name="edit_options[]" value="cuts">
+                                        <label class="form-check-label" for="cuts">
+                                            Add camera cuts and transitions
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="b_roll" name="edit_options[]" value="b_roll">
+                                        <label class="form-check-label" for="b_roll">
+                                            Suggest B-roll footage
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="graphics" name="edit_options[]" value="graphics">
+                                        <label class="form-check-label" for="graphics">
+                                            Add on-screen text and graphics suggestions
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <h6>Additional Instructions</h6>
+                                <textarea class="form-control" id="additional_instructions" name="additional_instructions" rows="3" placeholder="Add any specific editing instructions or notes...">{{ session.get('additional_instructions', '') }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edited Script Preview -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Edited Script Preview</h5>
+                            <button type="button" class="btn btn-primary" id="generate-edit-btn">
+                                <i class="bi bi-magic"></i> Generate Edited Script
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="edited-script-container">
+                                <p class="text-muted text-center py-5">
+                                    <i class="bi bi-pencil-square fs-1 d-block mb-3"></i>
+                                    Select your editing options and click "Generate Edited Script" to see a preview of your enhanced script.
+                                </p>
+                            </div>
+                            
+                            <textarea class="form-control d-none" id="edited_script" name="edited_script" rows="15">{{ session.get('edited_script', '') }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="wizard-buttons">
+                        <button type="button" class="btn btn-outline-secondary" id="previous-btn">
+                            <i class="bi bi-arrow-left"></i> Previous
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Next <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<style>
+    .script-content-readonly {
+        font-family: 'Courier New', Courier, monospace;
+        line-height: 1.5;
+        white-space: pre-line;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.25rem;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .script-info {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.25rem;
+        line-height: 1.6;
+    }
+    
+    .edited-script {
+        font-family: 'Courier New', Courier, monospace;
+        line-height: 1.5;
+        white-space: pre-line;
+        padding: 1rem;
+        border-radius: 0.25rem;
+        border: 1px solid #dee2e6;
+    }
+    
+    .scene-description {
+        background-color: #e2f0d9;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        margin: 0.5rem 0;
+        font-style: italic;
+    }
+    
+    .visual-cue {
+        background-color: #deebf7;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        margin: 0.5rem 0;
+        font-weight: bold;
+    }
+    
+    .camera-cut {
+        background-color: #fff2cc;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        margin: 0.5rem 0;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+    
+    .on-screen-text {
+        background-color: #f2dcdb;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        margin: 0.5rem 0;
+        text-align: center;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navigation buttons
+        document.getElementById('edit-script-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('script') }}';
+        });
+        
+        document.getElementById('previous-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('script') }}';
+        });
+        
+        // Generate edited script
+        const generateEditBtn = document.getElementById('generate-edit-btn');
+        const editedScriptContainer = document.getElementById('edited-script-container');
+        const editedScriptTextarea = document.getElementById('edited_script');
+        
+        generateEditBtn.addEventListener('click', function() {
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
+            
+            // Get selected options
+            const selectedOptions = [];
+            document.querySelectorAll('input[name="edit_options[]"]:checked').forEach(checkbox => {
+                selectedOptions.push(checkbox.value);
+            });
+            
+            // Get additional instructions
+            const additionalInstructions = document.getElementById('additional_instructions').value;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Generate edited script based on original script and selected options
+                let editedScript = '';
+                
+                {% if session.get('script_sections') %}
+                    {% for section in session.get('script_sections') %}
+                        try {
+                            // Get the section title and convert to lowercase in JavaScript
+                            const sectionTitle = "{{ section.title|replace('"', '\\"')|safe }}";
+                            const sectionTitleLower = sectionTitle.toLowerCase();
+                            
+                            // Get the original content with proper escaping
+                            // Use backticks to avoid issues with quotes and newlines
+                            const sectionContent = `{{ section.content|replace('\n', '\\n')|replace('"', '\\"')|replace("'", "\\'")|safe }}`;
+                            
+                            editedScript += `<div class="mb-4">
+                                <h6>{{ loop.index }}. {{ section.title }}</h6>
+                                <div class="edited-script">`;
+                            
+                            // Create a working copy of the content
+                            let processedContent = sectionContent;
+                            
+                            // Apply selected edits
+                            if (selectedOptions.includes('conversational')) {
+                                // Add conversational elements
+                                processedContent = processedContent.replace(/\. /g, '. You know, ');
+                                processedContent = processedContent.replace(/\\n\\n/g, '\\n\\nAnyway, ');
+                            }
+                            
+                            if (selectedOptions.includes('rhetorical')) {
+                                // Add rhetorical questions
+                                processedContent = processedContent.replace(/\. /g, '. Have you ever wondered about this? ');
+                            }
+                            
+                            if (selectedOptions.includes('scene_descriptions')) {
+                                // Add scene descriptions
+                                editedScript += `<div class="scene-description">[Scene: Person speaking directly to camera with ${sectionTitleLower} visuals in background]</div>`;
+                            }
+                            
+                            // Add the content with line breaks
+                            editedScript += processedContent.replace(/\\n/g, '<br>');
+                            
+                            if (selectedOptions.includes('visuals')) {
+                                // Add visual cues
+                                editedScript += `<div class="visual-cue">[Visual: Show ${sectionTitleLower} diagram or illustration]</div>`;
+                            }
+                            
+                            if (selectedOptions.includes('cuts')) {
+                                // Add camera cuts
+                                editedScript += `<div class="camera-cut">[Cut to: Close-up shot]</div>`;
+                            }
+                            
+                            if (selectedOptions.includes('graphics')) {
+                                // Add on-screen text
+                                editedScript += `<div class="on-screen-text">[Text on screen: Key points about ${sectionTitleLower}]</div>`;
+                            }
+                            
+                            editedScript += `</div></div>`;
+                        } catch (error) {
+                            console.error("Error processing section {{ loop.index }}: ", error);
+                            editedScript += `<div class="alert alert-danger">Error processing section {{ loop.index }}: ${error.message}</div>`;
+                        }
+                    {% endfor %}
+                {% else %}
+                    editedScript = '<p class="text-muted">No script content to edit.</p>';
+                {% endif %}
+                
+                // Update the edited script container
+                editedScriptContainer.innerHTML = editedScript;
+                
+                // Clean up any excessive spacing in the HTML content
+                const scriptDivs = editedScriptContainer.querySelectorAll('.edited-script');
+                scriptDivs.forEach(div => {
+                    // Replace multiple <br><br><br> with just <br><br>
+                    let html = div.innerHTML;
+                    html = html.replace(/<br><br><br>+/g, '<br><br>');
+                    div.innerHTML = html;
+                });
+                
+                // Extract text content while preserving formatting
+                function extractFormattedText(element) {
+                    let text = '';
+                    
+                    // Process all child nodes
+                    for (const node of element.childNodes) {
+                        if (node.nodeType === Node.TEXT_NODE) {
+                            // Text node - add its content
+                            text += node.textContent;
+                        } else if (node.nodeType === Node.ELEMENT_NODE) {
+                            // Element node
+                            if (node.classList.contains('scene-description')) {
+                                text += '\n' + node.textContent + '\n';
+                            } else if (node.classList.contains('visual-cue')) {
+                                text += '\n' + node.textContent + '\n';
+                            } else if (node.classList.contains('camera-cut')) {
+                                text += '\n' + node.textContent + '\n';
+                            } else if (node.classList.contains('on-screen-text')) {
+                                text += '\n' + node.textContent + '\n';
+                            } else if (node.tagName === 'BR') {
+                                text += '\n';
+                            } else if (node.tagName === 'DIV' || node.tagName === 'H6') {
+                                // For divs and headings, add newlines before and after
+                                const innerText = extractFormattedText(node);
+                                if (innerText.trim()) {
+                                    text += (text.endsWith('\n') ? '' : '\n') + innerText + (innerText.endsWith('\n') ? '' : '\n');
+                                }
+                            } else {
+                                // For other elements, recursively extract text
+                                text += extractFormattedText(node);
+                            }
+                        }
+                    }
+                    
+                    return text;
+                }
+                
+                try {
+                    // Make the hidden textarea visible and update with formatted text
+                    editedScriptTextarea.classList.remove('d-none');
+                    let formattedText = extractFormattedText(editedScriptContainer);
+                    
+                    // Clean up excessive newlines - replace 3 or more consecutive newlines with 2
+                    formattedText = formattedText.replace(/\n{3,}/g, '\n\n');
+                    
+                    editedScriptTextarea.value = formattedText.trim();
+                    
+                    // Log for debugging
+                    console.log("Extracted formatted text:", formattedText);
+                } catch (error) {
+                    console.error("Error updating textarea:", error);
+                    // Add an error message to the page
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'alert alert-danger mt-3';
+                    errorDiv.textContent = `Error updating textarea: ${error.message}`;
+                    editedScriptContainer.after(errorDiv);
+                }
+                
+                // Reset button state
+                this.disabled = false;
+                this.innerHTML = '<i class="bi bi-magic"></i> Generate Edited Script';
+                
+                // Show success message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show mt-3';
+                alertDiv.innerHTML = `
+                    <i class="bi bi-check-circle-fill"></i> Script edited successfully! Review the changes and proceed to the next step.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                editedScriptContainer.before(alertDiv);
+                
+                // Auto-dismiss alert after 5 seconds
+                setTimeout(() => {
+                    // Check if Bootstrap is available
+                    if (typeof bootstrap !== 'undefined') {
+                        const bsAlert = new bootstrap.Alert(alertDiv);
+                        bsAlert.close();
+                    } else {
+                        // Fallback if Bootstrap is not available
+                        alertDiv.style.display = 'none';
+                    }
+                }, 5000);
+            }, 2000);
+        });
+    });
+</script>
+{% endblock %} 
