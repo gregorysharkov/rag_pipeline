@@ -37,52 +37,182 @@
     <div class="col-12">
         <div class="card form-card">
             <div class="card-body">
-                <h2 class="card-title">Step 2: Web Search References</h2>
+                <h2 class="card-title">Step 2: References & Resources</h2>
                 <p class="card-text text-muted mb-4">
-                    The AI will search the web for relevant information about your topic.
+                    Provide reference materials and resources to help the AI generate better content.
                 </p>
 
-                <!-- Display context information from previous step -->
-                <div class="card context-card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Context Information</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong>Topic:</strong> {{ session.get('topic', 'Not provided') }}</p>
-                                {% if session.get('additional_context') %}
-                                <p><strong>Additional Context:</strong> {{ session.get('additional_context') }}</p>
-                                {% endif %}
+                <form method="POST" action="{{ url_for('references') }}" class="needs-validation" enctype="multipart/form-data" novalidate>
+                    <!-- Context Information from Previous Step (Disabled) -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Context Information</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-context-btn">
+                                Edit <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Topic</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('topic', '') }}" disabled>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                {% if session.get('target_audience') %}
-                                <p><strong>Target Audience:</strong> {{ session.get('target_audience') }}</p>
-                                {% endif %}
-                                {% if session.get('content_type') %}
-                                <p><strong>Content Type:</strong> {{ session.get('content_type') }}</p>
-                                {% endif %}
-                                {% if session.get('tone') %}
-                                <p><strong>Tone:</strong> {{ session.get('tone') }}</p>
-                                {% endif %}
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Additional Context</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <textarea class="form-control" rows="3" disabled>{{ session.get('additional_context', '') }}</textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Target Audience</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('target_audience', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Content Type</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('content_type', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Tone</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('tone', '') }}" disabled>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle-fill me-2"></i>
-                    This is a placeholder for the references step. In the actual implementation, 
-                    this page will show the results of the web search and allow you to select 
-                    which references to include in your script.
-                </div>
+                    <!-- Web Search Toggle -->
+                    <div class="form-check form-switch mb-4">
+                        <input class="form-check-input" type="checkbox" id="use_web_search" name="use_web_search" {% if session.get('use_web_search', True) %}checked{% endif %}>
+                        <label class="form-check-label" for="use_web_search">Use web search to find additional information</label>
+                        <div class="form-text">
+                            Enable this option to allow the AI to search the web for information related to your topic.
+                        </div>
+                    </div>
 
-                <div class="wizard-buttons">
-                    <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('context') }}'">
-                        <i class="bi bi-arrow-left"></i> Previous
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="alert('This is a placeholder. The next steps will be implemented in future iterations.')">
-                        Next <i class="bi bi-arrow-right"></i>
-                    </button>
-                </div>
+                    <!-- Display Uploaded Files (if any) -->
+                    {% if session.get('reference_files') %}
+                    <div class="mb-4">
+                        <h5>Uploaded Files</h5>
+                        <div id="uploaded-files-list">
+                            {% for file in session.get('reference_files') %}
+                            <div class="file-item card mb-2">
+                                <div class="card-body py-2 px-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="bi {% if file.original_name.endswith('.pdf') %}bi-file-earmark-pdf{% elif file.original_name.endswith('.doc') or file.original_name.endswith('.docx') %}bi-file-earmark-word{% elif file.original_name.endswith('.jpg') or file.original_name.endswith('.png') or file.original_name.endswith('.jpeg') %}bi-file-earmark-image{% else %}bi-file-earmark-text{% endif %} me-2"></i>
+                                            <span>{{ file.original_name }}</span>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-file" data-filename="{{ file.stored_name }}">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="files_to_remove" id="files-to-remove" value="">
+                    </div>
+                    {% endif %}
+
+                    <!-- Display Web Links (if any) -->
+                    {% if session.get('web_links') %}
+                    <div class="mb-4">
+                        <h5>Added Web Links</h5>
+                        <div class="list-group">
+                            {% for link in session.get('web_links') %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ link.url }}</h6>
+                                    <small><a href="{{ link.url }}" target="_blank">Open Link</a></small>
+                                </div>
+                                {% if link.description %}
+                                <p class="mb-1">{{ link.description }}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- File Upload Section -->
+                    <div class="mb-4">
+                        <label for="reference_files" class="form-label">Upload Reference Files (Optional)</label>
+                        <div class="file-upload-container">
+                            <div class="custom-file-upload mb-2">
+                                <input type="file" class="form-control" id="reference_files" name="reference_files" multiple 
+                                       accept=".pdf,.doc,.docx,.jpg,.png,.jpeg" style="display: none;">
+                                <div class="upload-area card p-3 text-center" id="upload-area">
+                                    <div class="upload-icon mb-2">
+                                        <i class="bi bi-cloud-arrow-up fs-3"></i>
+                                    </div>
+                                    <h5 class="mb-2">Drop files here</h5>
+                                    <p class="mb-2">or <span class="text-primary" id="browse-files">browse files</span></p>
+                                    <small class="text-muted">PDF, Word or image documents (max 5 files, 10MB each)</small>
+                                </div>
+                            </div>
+                            <div id="file-preview-container" class="d-none">
+                                <h6 class="mb-2">Selected Files:</h6>
+                                <div id="file-preview-list" class="list-group mb-2"></div>
+                            </div>
+                        </div>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i> Files are only uploaded when you click the "Next" button. They will be stored in the server's uploads directory.
+                        </div>
+                    </div>
+
+                    <!-- Web Links Section -->
+                    <div class="mb-4">
+                        <label class="form-label">Additional Web Links (Optional)</label>
+                        <div id="web-links-container">
+                            <div class="web-link-item mb-3">
+                                <div class="row g-2">
+                                    <div class="col-md-8">
+                                        <input type="url" class="form-control" name="web_links[]" placeholder="https://example.com">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" name="web_link_descriptions[]" placeholder="Brief description">
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-outline-danger remove-link" style="display: none;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="add-web-link">
+                            <i class="bi bi-plus-circle"></i> Add Another Link
+                        </button>
+                    </div>
+
+                    <div class="wizard-buttons">
+                        <button type="button" class="btn btn-outline-secondary" id="previous-btn">
+                            <i class="bi bi-arrow-left"></i> Previous
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Next <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -91,4 +221,280 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<style>
+    .upload-area {
+        border: 2px dashed #dee2e6;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        padding: 2rem !important;
+        margin-bottom: 1rem;
+    }
+    .upload-area:hover, .upload-area.dragover {
+        border-color: #0d6efd;
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .upload-area .upload-icon {
+        font-size: 2rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+    .upload-area:hover .upload-icon, .upload-area.dragover .upload-icon {
+        color: #0d6efd;
+    }
+    .file-preview-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 1rem;
+    }
+    .file-item {
+        border-left: 3px solid #0d6efd;
+    }
+    #browse-files {
+        font-weight: 500;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navigation buttons
+        document.getElementById('edit-context-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('context') }}';
+        });
+        
+        document.getElementById('previous-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('context') }}';
+        });
+        
+        // Web links functionality
+        const webLinksContainer = document.getElementById('web-links-container');
+        const addWebLinkButton = document.getElementById('add-web-link');
+        
+        // Add new web link fields
+        addWebLinkButton.addEventListener('click', function() {
+            const newLinkItem = document.createElement('div');
+            newLinkItem.className = 'web-link-item mb-3';
+            
+            newLinkItem.innerHTML = `
+                <div class="row g-2">
+                    <div class="col-md-8">
+                        <input type="url" class="form-control" name="web_links[]" placeholder="https://example.com">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="web_link_descriptions[]" placeholder="Brief description">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-outline-danger remove-link">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            webLinksContainer.appendChild(newLinkItem);
+            
+            // Show the first remove button if it was hidden
+            const removeButtons = document.querySelectorAll('.remove-link');
+            if (removeButtons.length > 1) {
+                removeButtons.forEach(button => {
+                    button.style.display = 'block';
+                });
+            }
+        });
+        
+        // Remove web link fields
+        webLinksContainer.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-link')) {
+                const linkItem = e.target.closest('.web-link-item');
+                linkItem.remove();
+                
+                // Hide the remove button if only one link remains
+                const removeButtons = document.querySelectorAll('.remove-link');
+                if (removeButtons.length === 1) {
+                    removeButtons[0].style.display = 'none';
+                }
+            }
+        });
+        
+        // Enhanced file upload functionality
+        const fileInput = document.getElementById('reference_files');
+        const uploadArea = document.getElementById('upload-area');
+        const browseFiles = document.getElementById('browse-files');
+        const filePreviewContainer = document.getElementById('file-preview-container');
+        const filePreviewList = document.getElementById('file-preview-list');
+        const filesToRemoveInput = document.getElementById('files-to-remove');
+        const maxFileSize = 10 * 1024 * 1024; // 10MB
+        const maxFiles = 5;
+        
+        // Click on browse files text - prevent default behavior
+        browseFiles.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent default behavior
+            e.stopPropagation(); // Stop event propagation
+            fileInput.click();
+        });
+        
+        // Click on upload area - prevent default behavior
+        uploadArea.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent default behavior
+            e.stopPropagation(); // Stop event propagation
+            fileInput.click();
+        });
+        
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            uploadArea.classList.add('dragover');
+        }
+        
+        function unhighlight() {
+            uploadArea.classList.remove('dragover');
+        }
+        
+        // Handle dropped files
+        uploadArea.addEventListener('drop', function(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        });
+        
+        // Handle selected files
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+        
+        function handleFiles(files) {
+            if (files.length > maxFiles) {
+                alert(`You can upload a maximum of ${maxFiles} files.`);
+                fileInput.value = '';
+                return;
+            }
+            
+            let validFiles = true;
+            
+            // Check each file
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileExt = file.name.split('.').pop().toLowerCase();
+                
+                // Check file type
+                if (!['pdf', 'doc', 'docx', 'jpg', 'png', 'jpeg'].includes(fileExt)) {
+                    alert(`File "${file.name}" is not a supported format. Please upload PDF, Word or image documents only.`);
+                    validFiles = false;
+                    break;
+                }
+                
+                // Check file size
+                if (file.size > maxFileSize) {
+                    alert(`File "${file.name}" exceeds the maximum file size of 10MB.`);
+                    validFiles = false;
+                    break;
+                }
+            }
+            
+            if (!validFiles) {
+                fileInput.value = '';
+                return;
+            }
+            
+            // Display file previews
+            filePreviewList.innerHTML = '';
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileExt = file.name.split('.').pop().toLowerCase();
+                const fileItem = document.createElement('div');
+                fileItem.className = 'list-group-item file-preview-item';
+                
+                let iconClass = 'bi-file-earmark-text';
+                if (fileExt === 'pdf') {
+                    iconClass = 'bi-file-earmark-pdf';
+                } else if (['doc', 'docx'].includes(fileExt)) {
+                    iconClass = 'bi-file-earmark-word';
+                } else if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
+                    iconClass = 'bi-file-earmark-image';
+                }
+                
+                fileItem.innerHTML = `
+                    <div>
+                        <i class="bi ${iconClass} me-2"></i>
+                        <span>${file.name}</span>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-preview-file" data-index="${i}">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                `;
+                filePreviewList.appendChild(fileItem);
+            }
+            
+            if (files.length > 0) {
+                filePreviewContainer.classList.remove('d-none');
+            } else {
+                filePreviewContainer.classList.add('d-none');
+            }
+        }
+        
+        // Remove file from preview
+        filePreviewList.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-preview-file')) {
+                const button = e.target.closest('.remove-preview-file');
+                const index = button.getAttribute('data-index');
+                
+                // Create a new FileList without the removed file
+                const dt = new DataTransfer();
+                const files = fileInput.files;
+                
+                for (let i = 0; i < files.length; i++) {
+                    if (i != index) {
+                        dt.items.add(files[i]);
+                    }
+                }
+                
+                fileInput.files = dt.files;
+                
+                // Update preview
+                handleFiles(fileInput.files);
+            }
+        });
+        
+        // Remove already uploaded file
+        const uploadedFilesList = document.getElementById('uploaded-files-list');
+        if (uploadedFilesList) {
+            uploadedFilesList.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-file')) {
+                    const button = e.target.closest('.remove-file');
+                    const filename = button.getAttribute('data-filename');
+                    const fileItem = button.closest('.file-item');
+                    
+                    // Add to the list of files to remove
+                    const currentFilesToRemove = filesToRemoveInput.value ? 
+                        filesToRemoveInput.value.split(',') : [];
+                    currentFilesToRemove.push(filename);
+                    filesToRemoveInput.value = currentFilesToRemove.join(',');
+                    
+                    // Hide the file item (will be removed on form submit)
+                    fileItem.style.display = 'none';
+                }
+            });
+        }
+    });
+</script>
 {% endblock %} 

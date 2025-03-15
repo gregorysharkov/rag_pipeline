@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Step 3: Plan - YouTube Script Generator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Wizard Progress Bar -->
+        <div class="wizard-progress mb-4">
+            {% for i in range(1, total_steps + 1) %}
+                <div class="wizard-step">
+                    <div class="step-number {% if i < step %}completed{% elif i == step %}active{% endif %}">
+                        {{ i }}
+                    </div>
+                    <div class="step-label">
+                        {% if i == 1 %}
+                            Context
+                        {% elif i == 2 %}
+                            References
+                        {% elif i == 3 %}
+                            Plan
+                        {% elif i == 4 %}
+                            Script
+                        {% elif i == 5 %}
+                            Edit
+                        {% elif i == 6 %}
+                            Short Video
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card form-card">
+            <div class="card-body">
+                <h2 class="card-title">Step 3: Plan Your Video</h2>
+                <p class="card-text text-muted mb-4">
+                    Create a plan for your video script. Define the structure and key points you want to cover.
+                </p>
+
+                <form method="POST" action="{{ url_for('plan') }}" class="needs-validation" novalidate>
+                    <!-- Context Information from Previous Steps (Disabled) -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Context Information</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-context-btn">
+                                Edit <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Topic</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('topic', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Target Audience</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('target_audience', '') }}" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Content Type</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" value="{{ session.get('content_type', '') }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- References Information -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">References & Resources</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-references-btn">
+                                Edit <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <!-- Display Uploaded Files (if any) -->
+                            {% if session.get('reference_files') %}
+                            <div class="mb-3">
+                                <h6>Uploaded Files</h6>
+                                <div class="list-group">
+                                    {% for file in session.get('reference_files') %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi {% if file.type == 'pdf' %}bi-file-earmark-pdf{% elif file.type in ['doc', 'docx'] %}bi-file-earmark-word{% elif file.type in ['jpg', 'jpeg', 'png'] %}bi-file-earmark-image{% else %}bi-file-earmark-text{% endif %} me-2"></i>
+                                            <span>{{ file.original_name }}</span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Display Web Links (if any) -->
+                            {% if session.get('web_links') %}
+                            <div class="mb-3">
+                                <h6>Web Links</h6>
+                                <div class="list-group">
+                                    {% for link in session.get('web_links') %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <a href="{{ link.url }}" target="_blank">{{ link.url }}</a>
+                                            {% if link.description %}
+                                            <small class="text-muted">{{ link.description }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Web Search Toggle Status -->
+                            <div class="mb-0">
+                                <h6>Web Search</h6>
+                                <p class="mb-0">
+                                    {% if session.get('use_web_search', True) %}
+                                    <i class="bi bi-check-circle-fill text-success"></i> Web search is enabled
+                                    {% else %}
+                                    <i class="bi bi-x-circle-fill text-danger"></i> Web search is disabled
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Plan Section -->
+                    <div class="mb-4">
+                        <h5>Video Structure</h5>
+                        <div class="mb-3">
+                            <label for="structure_preference" class="form-label">Preferred Structure</label>
+                            <select class="form-select" id="structure_preference" name="structure_preference" required>
+                                <option value="" {% if not session.get('structure_preference') %}selected{% endif %} disabled>Choose a structure...</option>
+                                <option value="tutorial" {% if session.get('structure_preference') == 'tutorial' %}selected{% endif %}>Tutorial/How-to</option>
+                                <option value="explainer" {% if session.get('structure_preference') == 'explainer' %}selected{% endif %}>Explainer Video</option>
+                                <option value="listicle" {% if session.get('structure_preference') == 'listicle' %}selected{% endif %}>List-based (Top 5, 10 Tips, etc.)</option>
+                                <option value="storytelling" {% if session.get('structure_preference') == 'storytelling' %}selected{% endif %}>Storytelling</option>
+                                <option value="interview" {% if session.get('structure_preference') == 'interview' %}selected{% endif %}>Interview/Q&A Format</option>
+                                <option value="debate" {% if session.get('structure_preference') == 'debate' %}selected{% endif %}>Debate/Pros & Cons</option>
+                                <option value="case_study" {% if session.get('structure_preference') == 'case_study' %}selected{% endif %}>Case Study</option>
+                            </select>
+                            <div class="form-text">Select the overall structure for your video script.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="plan_notes" class="form-label">Additional Planning Notes</label>
+                            <textarea class="form-control" id="plan_notes" name="plan_notes" rows="4" placeholder="Add any specific instructions or notes for the script structure...">{{ session.get('plan_notes', '') }}</textarea>
+                            <div class="form-text">Include any specific requirements or preferences for your video script.</div>
+                        </div>
+                    </div>
+
+                    <!-- Key Points Section -->
+                    <div class="mb-4">
+                        <h5>Key Points to Cover</h5>
+                        <p class="text-muted">Add the main points you want to cover in your video.</p>
+                        
+                        <div id="key-points-container">
+                            {% if session.get('key_points') %}
+                                {% for point in session.get('key_points') %}
+                                <div class="key-point-item mb-2">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="key_points[]" value="{{ point }}" placeholder="Enter a key point">
+                                        <button type="button" class="btn btn-outline-danger remove-key-point">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="key-point-item mb-2">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="key_points[]" placeholder="Enter a key point">
+                                        <button type="button" class="btn btn-outline-danger remove-key-point" style="display: none;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="add-key-point">
+                            <i class="bi bi-plus-circle"></i> Add Another Key Point
+                        </button>
+                    </div>
+
+                    <div class="wizard-buttons">
+                        <button type="button" class="btn btn-outline-secondary" id="previous-btn">
+                            <i class="bi bi-arrow-left"></i> Previous
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Next <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navigation buttons
+        document.getElementById('edit-context-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('context') }}';
+        });
+        
+        document.getElementById('edit-references-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('references') }}';
+        });
+        
+        document.getElementById('previous-btn').addEventListener('click', function() {
+            window.location.href = '{{ url_for('references') }}';
+        });
+        
+        // Key points functionality
+        const keyPointsContainer = document.getElementById('key-points-container');
+        const addKeyPointButton = document.getElementById('add-key-point');
+        
+        // Add new key point field
+        addKeyPointButton.addEventListener('click', function() {
+            const newKeyPointItem = document.createElement('div');
+            newKeyPointItem.className = 'key-point-item mb-2';
+            
+            newKeyPointItem.innerHTML = `
+                <div class="input-group">
+                    <input type="text" class="form-control" name="key_points[]" placeholder="Enter a key point">
+                    <button type="button" class="btn btn-outline-danger remove-key-point">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `;
+            keyPointsContainer.appendChild(newKeyPointItem);
+            
+            // Show the first remove button if it was hidden
+            const removeButtons = document.querySelectorAll('.remove-key-point');
+            if (removeButtons.length > 1) {
+                removeButtons.forEach(button => {
+                    button.style.display = 'block';
+                });
+            }
+        });
+        
+        // Remove key point field
+        keyPointsContainer.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-key-point')) {
+                const keyPointItem = e.target.closest('.key-point-item');
+                keyPointItem.remove();
+                
+                // Hide the remove button if only one key point remains
+                const removeButtons = document.querySelectorAll('.remove-key-point');
+                if (removeButtons.length === 1) {
+                    removeButtons[0].style.display = 'none';
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

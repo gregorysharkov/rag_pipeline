@@ -172,3 +172,4 @@ cython_debug/
 
 scripts/
 output/
+web_app/uploads/

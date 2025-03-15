@@ -47,6 +47,7 @@
                         <label for="topic" class="form-label">Topic *</label>
                         <input type="text" class="form-control" id="topic" name="topic" 
                                placeholder="e.g., The impact of artificial intelligence on healthcare" 
+                               value="{{ session.get('topic', '') }}"
                                required>
                         <div class="form-text">
                             Enter the main topic for your YouTube video.
@@ -60,12 +61,12 @@
                         <label for="additional_context" class="form-label">Additional Context</label>
                         <textarea class="form-control" id="additional_context" name="additional_context" 
                                   rows="6" placeholder="e.g., Focus on recent advancements and ethical considerations"
-                                  data-max-chars="2000"></textarea>
+                                  data-max-chars="2000">{{ session.get('additional_context', '') }}</textarea>
                         <div class="form-text">
                             Provide any additional information or specific aspects you want to include (up to 2000 characters).
                         </div>
                         <div id="additional_context-counter" class="form-text text-end">
-                            2000 characters remaining
+                            {{ 2000 - (session.get('additional_context', '') | length) }} characters remaining
                         </div>
                     </div>
 
@@ -73,17 +74,19 @@
                         <label for="target_audience" class="form-label">Target Audience</label>
                         <div class="input-group">
                             <select class="form-select" id="audience_select" onchange="updateTargetAudience(this.value)">
-                                <option value="" selected>Select target audience</option>
-                                <option value="general">General audience</option>
-                                <option value="beginners">Beginners</option>
-                                <option value="intermediate">Intermediate knowledge</option>
-                                <option value="experts">Experts</option>
-                                <option value="students">Students</option>
-                                <option value="professionals">Professionals</option>
-                                <option value="custom">Custom (enter your own)</option>
+                                <option value="" {% if not session.get('target_audience') %}selected{% endif %}>Select target audience</option>
+                                <option value="general" {% if session.get('target_audience') == 'general' %}selected{% endif %}>General audience</option>
+                                <option value="beginners" {% if session.get('target_audience') == 'beginners' %}selected{% endif %}>Beginners</option>
+                                <option value="intermediate" {% if session.get('target_audience') == 'intermediate' %}selected{% endif %}>Intermediate knowledge</option>
+                                <option value="experts" {% if session.get('target_audience') == 'experts' %}selected{% endif %}>Experts</option>
+                                <option value="students" {% if session.get('target_audience') == 'students' %}selected{% endif %}>Students</option>
+                                <option value="professionals" {% if session.get('target_audience') == 'professionals' %}selected{% endif %}>Professionals</option>
+                                <option value="custom" {% if session.get('target_audience') and session.get('target_audience') not in ['general', 'beginners', 'intermediate', 'experts', 'students', 'professionals'] %}selected{% endif %}>Custom (enter your own)</option>
                             </select>
                             <input type="text" class="form-control" id="target_audience" name="target_audience" 
-                                   placeholder="Enter custom audience" style="display: none;">
+                                   placeholder="Enter custom audience" 
+                                   value="{{ session.get('target_audience', '') }}"
+                                   style="display: {% if session.get('target_audience') and session.get('target_audience') not in ['general', 'beginners', 'intermediate', 'experts', 'students', 'professionals'] %}block{% else %}none{% endif %}">
                         </div>
                         <div class="form-text">
                             Select from the list or choose "Custom" to enter your own target audience.
@@ -93,13 +96,13 @@
                     <div class="mb-4">
                         <label for="content_type" class="form-label">Content Type</label>
                         <select class="form-select" id="content_type" name="content_type">
-                            <option value="" selected>Select content type</option>
-                            <option value="educational">Educational</option>
-                            <option value="tutorial">Tutorial</option>
-                            <option value="explainer">Explainer</option>
-                            <option value="review">Review</option>
-                            <option value="opinion">Opinion/Commentary</option>
-                            <option value="entertainment">Entertainment</option>
+                            <option value="" {% if not session.get('content_type') %}selected{% endif %}>Select content type</option>
+                            <option value="educational" {% if session.get('content_type') == 'educational' %}selected{% endif %}>Educational</option>
+                            <option value="tutorial" {% if session.get('content_type') == 'tutorial' %}selected{% endif %}>Tutorial</option>
+                            <option value="explainer" {% if session.get('content_type') == 'explainer' %}selected{% endif %}>Explainer</option>
+                            <option value="review" {% if session.get('content_type') == 'review' %}selected{% endif %}>Review</option>
+                            <option value="opinion" {% if session.get('content_type') == 'opinion' %}selected{% endif %}>Opinion/Commentary</option>
+                            <option value="entertainment" {% if session.get('content_type') == 'entertainment' %}selected{% endif %}>Entertainment</option>
                         </select>
                         <div class="form-text">
                             Select the type of content you want to create.
@@ -109,13 +112,13 @@
                     <div class="mb-4">
                         <label for="tone" class="form-label">Tone</label>
                         <select class="form-select" id="tone" name="tone">
-                            <option value="" selected>Select tone</option>
-                            <option value="formal">Formal</option>
-                            <option value="conversational">Conversational</option>
-                            <option value="enthusiastic">Enthusiastic</option>
-                            <option value="humorous">Humorous</option>
-                            <option value="serious">Serious</option>
-                            <option value="inspirational">Inspirational</option>
+                            <option value="" {% if not session.get('tone') %}selected{% endif %}>Select tone</option>
+                            <option value="formal" {% if session.get('tone') == 'formal' %}selected{% endif %}>Formal</option>
+                            <option value="conversational" {% if session.get('tone') == 'conversational' %}selected{% endif %}>Conversational</option>
+                            <option value="enthusiastic" {% if session.get('tone') == 'enthusiastic' %}selected{% endif %}>Enthusiastic</option>
+                            <option value="humorous" {% if session.get('tone') == 'humorous' %}selected{% endif %}>Humorous</option>
+                            <option value="serious" {% if session.get('tone') == 'serious' %}selected{% endif %}>Serious</option>
+                            <option value="inspirational" {% if session.get('tone') == 'inspirational' %}selected{% endif %}>Inspirational</option>
                         </select>
                         <div class="form-text">
                             Select the tone you want for your content.
