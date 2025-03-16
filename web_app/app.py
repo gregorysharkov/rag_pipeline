@@ -7,6 +7,11 @@ from werkzeug.utils import secure_filename
 import uuid
 import random
 import datetime
+import sys
+
+# Add the parent directory to the path so we can import from src
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from src.agents.web_search_agent import WebSearchAgent
 
 # Load environment variables
 load_dotenv()
@@ -192,67 +197,32 @@ def web_search():
     # For GET requests, perform the web search if not already done or if refresh requested
     refresh_requested = request.args.get("refresh", "0") == "1"
     if "search_results" not in session or refresh_requested:
-        # This would be replaced with actual web search functionality
-        # For now, we'll use mock data
-        mock_search_results = [
-            {
-                "id": "1",
-                "title": "How to Create Engaging YouTube Videos",
-                "url": "https://example.com/youtube-tips",
-                "summary": "A comprehensive guide on creating engaging content for YouTube, including tips on scripting, filming, and editing.",
-            },
-            {
-                "id": "2",
-                "title": "YouTube Script Writing: Best Practices",
-                "url": "https://example.com/script-writing",
-                "summary": "Learn the best practices for writing effective YouTube scripts that keep viewers engaged and boost your channel's performance.",
-            },
-            {
-                "id": "3",
-                "title": f"Everything You Need to Know About {session.get('topic', 'Your Topic')}",
-                "url": "https://example.com/topic-guide",
-                "summary": f"An in-depth exploration of {session.get('topic', 'your topic')}, covering key concepts, recent developments, and expert insights.",
-            },
-            {
-                "id": "4",
-                "title": "Video Production Tips for Beginners",
-                "url": "https://example.com/video-production",
-                "summary": "Essential tips and tricks for beginners looking to improve their video production quality without expensive equipment.",
-            },
-            {
-                "id": "5",
-                "title": f"{session.get('content_type', 'Content')} Creation Guide",
-                "url": "https://example.com/content-creation",
-                "summary": f"A step-by-step guide to creating high-quality {session.get('content_type', 'content')} that resonates with your target audience.",
-            },
-        ]
+        # Initialize the WebSearchAgent and perform the search
+        web_search_agent = WebSearchAgent(client)
+        topic = session.get("topic", "")
 
-        # If refreshing, add some variation to show different results
+        # Add additional context if available
+        if session.get("additional_context"):
+            topic += f". {session.get('additional_context')}"
+
+        # Add target audience if available
+        if session.get("target_audience"):
+            topic += f". Target audience: {session.get('target_audience')}"
+
+        # Perform the search
+        search_results = web_search_agent.run(topic)
+
+        # Add IDs to the search results for selection
+        for i, result in enumerate(search_results):
+            result["id"] = str(i + 1)
+
+        session["search_results"] = search_results
+
         if refresh_requested:
-            random.shuffle(mock_search_results)
-            # Add a couple more results to show variation
-            additional_results = [
-                {
-                    "id": "6",
-                    "title": f"Latest Trends in {session.get('topic', 'Your Field')}",
-                    "url": "https://example.com/latest-trends",
-                    "summary": f"Stay up-to-date with the latest developments and trends in {session.get('topic', 'your field')} for {datetime.datetime.now().year}.",
-                },
-                {
-                    "id": "7",
-                    "title": f"Expert Insights: {session.get('topic', 'Topic')} for {session.get('target_audience', 'Your Audience')}",
-                    "url": "https://example.com/expert-insights",
-                    "summary": f"Expert advice on creating {session.get('content_type', 'content')} about {session.get('topic', 'your topic')} specifically tailored for {session.get('target_audience', 'your target audience')}.",
-                },
-            ]
-            mock_search_results = mock_search_results[:3] + additional_results
-
             flash("Search results refreshed successfully!", "success")
             # Clear previous selections when refreshing
             if "selected_search_results" in session:
                 session.pop("selected_search_results")
-
-        session["search_results"] = mock_search_results
 
     return render_template("web_search.html", step=3, total_steps=len(WIZARD_STEPS) - 1)
 
