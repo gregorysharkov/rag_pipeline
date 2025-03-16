@@ -1,20 +1,24 @@
 import os
-import json
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from dotenv import load_dotenv
-from openai import OpenAI
-from werkzeug.utils import secure_filename
-import uuid
-import random
-import datetime
-import sys
+import logging
+import tempfile
+from datetime import datetime, timedelta
 
-# Add the parent directory to the path so we can import from src
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.agents.web_search_agent import WebSearchAgent
+from backend.agents.web_search_agent import WebSearchAgent
+from backend.agents.planning_agent import PlanningAgent
+from dotenv import load_dotenv
+from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask_session import Session
+from openai import OpenAI
+from utils.file_utils import remove_files, save_files
 
 # Load environment variables
 load_dotenv()
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -22,10 +26,21 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-key")
 app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50MB max upload size
 
+# Configure Flask-Session
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_FILE_DIR"] = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "flask_session"
+)
+app.config["SESSION_PERMANENT"] = True
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=1)
+app.config["SESSION_USE_SIGNER"] = True
+Session(app)
+
 # Create uploads directory if it doesn't exist
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+os.makedirs(app.config["SESSION_FILE_DIR"], exist_ok=True)
 
-# Initialize OpenAI client - simplified initialization to avoid parameter issues
+# Initialize OpenAI client
 api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
@@ -40,14 +55,6 @@ WIZARD_STEPS = [
     "short_video",
     "complete",
 ]
-
-# Allowed file extensions
-ALLOWED_EXTENSIONS = {"pdf", "doc", "docx", "jpg", "jpeg", "png"}
-
-
-def allowed_file(filename):
-    """Check if the file extension is allowed."""
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route("/")
@@ -95,43 +102,19 @@ def references():
         # Handle removal of previously uploaded files
         if "files_to_remove" in request.form and request.form.get("files_to_remove"):
             files_to_remove = request.form.get("files_to_remove").split(",")
-            if files_to_remove and session.get("reference_files"):
-                # Filter out files that should be removed
-                updated_files = []
-                for file in session.get("reference_files", []):
-                    if file["stored_name"] not in files_to_remove:
-                        updated_files.append(file)
-                    else:
-                        # Delete the file from the filesystem
-                        try:
-                            os.remove(file["path"])
-                        except (OSError, FileNotFoundError):
-                            # File might not exist, just continue
-                            pass
+            if not (files_to_remove and session.get("reference_files")):
+                flash("No files to remove.", "warning")
 
-                session["reference_files"] = updated_files
+            updated_files = remove_files(
+                files_to_remove, session.get("reference_files", []), app.config["UPLOAD_FOLDER"]
+            )
+            session["reference_files"] = updated_files
 
         # Handle file uploads - append to existing files if any
         if "reference_files" in request.files and any(request.files.getlist("reference_files")):
             uploaded_files = session.get("reference_files", [])
             files = request.files.getlist("reference_files")
-            for file in files:
-                if file and file.filename and allowed_file(file.filename):
-                    # Generate a unique filename to prevent collisions
-                    filename = secure_filename(file.filename)
-                    unique_filename = f"{uuid.uuid4().hex}_{filename}"
-                    file_path = os.path.join(app.config["UPLOAD_FOLDER"], unique_filename)
-                    file.save(file_path)
-
-                    # Store file info in session
-                    uploaded_files.append(
-                        {
-                            "original_name": filename,
-                            "stored_name": unique_filename,
-                            "path": file_path,
-                            "type": filename.rsplit(".", 1)[1].lower(),
-                        }
-                    )
+            uploaded_files = uploaded_files.extend(save_files(files, app.config["UPLOAD_FOLDER"]))
 
             session["reference_files"] = uploaded_files
             if uploaded_files:
@@ -217,6 +200,7 @@ def web_search():
             result["id"] = str(i + 1)
 
         session["search_results"] = search_results
+        print(f"{search_results=}")
 
         if refresh_requested:
             flash("Search results refreshed successfully!", "success")
@@ -229,41 +213,83 @@ def web_search():
 
 @app.route("/plan", methods=["GET", "POST"])
 def plan():
-    """Plan step: Plan the video script."""
-    # Check if previous steps were completed
+    """Third step of the wizard: Plan the video script."""
     if "topic" not in session:
         flash("Please complete the context step first.", "warning")
         return redirect(url_for("context"))
 
     if request.method == "POST":
-        # Save video details
-        session["video_title"] = request.form.get("video_title", "")
-        session["video_audience"] = request.form.get("video_audience", "")
-        session["video_duration"] = request.form.get("video_duration", "5")
+        # Get selected references from session
+        selected_refs = []
+        if "selected_search_results" in session and "search_results" in session:
+            selected_ids = session["selected_search_results"]
+            for result in session["search_results"]:
+                if result["id"] in selected_ids:
+                    selected_refs.append(
+                        {
+                            "title": result["title"],
+                            "url": result["url"],
+                            "summary": result["summary"],
+                        }
+                    )
 
-        # Save script plan sections
-        section_names = request.form.getlist("section_names[]")
-        section_key_points = request.form.getlist("section_key_points[]")
+        # Check if we have any references
+        if not selected_refs:
+            flash("Please select at least one reference before generating a plan.", "warning")
+            return redirect(url_for("web_search"))
 
-        script_plan = []
-        for i in range(len(section_names)):
-            if section_names[i].strip():  # Only add non-empty sections
-                script_plan.append(
-                    {
-                        "name": section_names[i],
-                        "key_points": section_key_points[i] if i < len(section_key_points) else "",
-                    }
-                )
+        # Create an instance of PlanningAgent and generate the plan
+        planning_agent = PlanningAgent(client=client)
 
-        session["script_plan"] = script_plan
+        logger.info(f"Generating plan for topic: {session['topic']}")
+        logger.info(f"Number of references: {len(selected_refs)}")
 
-        # Proceed to next step
-        return redirect(url_for("script"))
+        try:
+            # Generate plan using PlanningAgent
+            plan_result = planning_agent.run(
+                topic=session["topic"],
+                references=selected_refs,
+                additional_context=session.get("additional_context"),
+            )
+
+            logger.info(f"Plan generation result: {plan_result}")
+
+            # Check if the plan_result is empty (indicates an error in the agent)
+            if not plan_result or not plan_result.get("sections"):
+                logger.error("Plan result is empty or missing sections")
+                flash("Failed to generate a plan. Please try again or check your inputs.", "error")
+                return render_template("plan.html", step=3, total_steps=len(WIZARD_STEPS) - 1)
+
+            # Extract essential details for cookie-based session
+            session["video_title"] = plan_result["title"]
+            session["target_audience"] = plan_result["target_audience"]
+            session["duration"] = plan_result["duration"]
+
+            # Store full plan data in session
+            session["plan"] = plan_result
+            logger.info(
+                f"Stored plan in session with {len(plan_result.get('sections', []))} sections"
+            )
+
+            flash("Script plan generated successfully!", "success")
+            return redirect(url_for("script"))
+
+        except Exception as e:
+            logger.error(f"Error generating plan: {str(e)}", exc_info=True)
+            flash(f"Error generating plan: {str(e)}", "error")
+            return render_template("plan.html", step=3, total_steps=len(WIZARD_STEPS) - 1)
+
+    # For GET requests, check if we have plan data to display
+    plan_data = session.get("plan")
 
     return render_template(
         "plan.html",
-        step=4 if session.get("use_web_search", True) else 3,
+        step=3,
         total_steps=len(WIZARD_STEPS) - 1,
+        plan_data=plan_data,
+        video_title=session.get("video_title", ""),
+        target_audience=session.get("target_audience", ""),
+        duration=session.get("duration", ""),
     )
 
 
@@ -275,7 +301,9 @@ def script():
         flash("Please complete the context step first.", "warning")
         return redirect(url_for("context"))
 
-    if "script_plan" not in session or not session["script_plan"]:
+    # Load plan data from session
+    plan_data = session.get("plan")
+    if not plan_data or not plan_data.get("sections"):
         flash("Please create a script plan first.", "warning")
         return redirect(url_for("plan"))
 
@@ -284,25 +312,38 @@ def script():
         section_titles = request.form.getlist("section_titles[]")
         section_contents = request.form.getlist("section_contents[]")
 
-        script_sections = []
-        for i in range(len(section_titles)):
-            if section_titles[i].strip():  # Only add non-empty sections
-                script_sections.append(
-                    {
-                        "title": section_titles[i],
-                        "content": section_contents[i] if i < len(section_contents) else "",
-                    }
-                )
+        script_sections = [
+            {"title": title, "content": content}
+            for title, content in zip(section_titles, section_contents)
+        ]
 
-        session["script_sections"] = script_sections
+        # Save script sections to session
+        session["script"] = script_sections
+        session["script_complete"] = True
 
         # Proceed to next step
         return redirect(url_for("edit"))
 
+    # Format plan data for the template
+    sections = []
+    if plan_data and plan_data.get("sections"):
+        sections = [
+            {
+                "name": section["name"],
+                "key_points": section["points"],
+                "key_message": section["key_message"],
+            }
+            for section in plan_data["sections"]
+        ]
+
     return render_template(
         "script.html",
-        step=5 if session.get("use_web_search", True) else 4,
+        step=4,
         total_steps=len(WIZARD_STEPS) - 1,
+        sections=sections,
+        video_title=session.get("video_title", ""),
+        target_audience=session.get("target_audience", ""),
+        duration=session.get("duration", ""),
     )
 
 
@@ -314,7 +355,9 @@ def edit():
         flash("Please complete the context step first.", "warning")
         return redirect(url_for("context"))
 
-    if "script_sections" not in session or not session["script_sections"]:
+    # Load script sections from session
+    script_sections = session.get("script")
+    if not script_sections or not session.get("script_complete"):
         flash("Please create a script first.", "warning")
         return redirect(url_for("script"))
 
@@ -325,23 +368,34 @@ def edit():
         edited_script = request.form.get("edited_script", "")
 
         # Debug logging
-        print(f"Received edited_script: {edited_script[:100]}...")  # Print first 100 chars
-        print(f"Form keys: {list(request.form.keys())}")
+        logger.debug(f"Received edited_script: {edited_script[:100]}...")  # Print first 100 chars
+        logger.debug(f"Form keys: {list(request.form.keys())}")
 
-        session["edit_options"] = edit_options
-        session["additional_instructions"] = additional_instructions
-        session["edited_script"] = edited_script
+        # Save to session
+        session["edit"] = {
+            "edit_options": edit_options,
+            "additional_instructions": additional_instructions,
+            "edited_script": edited_script,
+        }
 
-        # Debug logging
-        print(f"Saved to session: {session.get('edited_script', '')[:100]}...")
+        session["edit_complete"] = True
 
         # Proceed to next step
         return redirect(url_for("short_video"))
 
+    # Prepare combined script content if needed
+    combined_script = ""
+    if script_sections:
+        for section in script_sections:
+            combined_script += f"**[{section.get('title', '')}]**\n\n"
+            combined_script += f"{section.get('content', '')}\n\n"
+
     return render_template(
         "edit.html",
-        step=6 if session.get("use_web_search", True) else 5,
+        step=5,
         total_steps=len(WIZARD_STEPS) - 1,
+        script_sections=script_sections,
+        combined_script=combined_script,
     )
 
 
@@ -354,22 +408,24 @@ def short_video():
         return redirect(url_for("context"))
 
     # Check for script content - either edited script or script sections
-    if not session.get("edited_script") and (
-        not session.get("script_sections") or len(session.get("script_sections", [])) == 0
-    ):
+    edit_data = session.get("edit")
+    script_data = session.get("script")
+
+    if not edit_data and not script_data:
         flash("Please create a script first.", "warning")
         return redirect(url_for("script"))
 
-    # If we have script sections but no edited script, use the original script
-    if not session.get("edited_script") and session.get("script_sections"):
+    # Get the edited script or build from script sections
+    edited_script = ""
+    if edit_data and edit_data.get("edited_script"):
+        edited_script = edit_data.get("edited_script")
+    elif script_data:
         # Create a combined script from the sections
-        combined_script = ""
-        for section in session.get("script_sections", []):
-            combined_script += f"**[{section.get('title', '')}]**\n\n"
-            combined_script += f"{section.get('content', '')}\n\n"
+        for section in script_data:
+            edited_script += f"**[{section.get('title', '')}]**\n\n"
+            edited_script += f"{section.get('content', '')}\n\n"
 
-        session["edited_script"] = combined_script
-        print(f"Auto-generated edited script from sections: {combined_script[:100]}...")
+        logger.debug(f"Auto-generated edited script from sections: {edited_script[:100]}...")
 
     if request.method == "POST":
         # Save shorts generation options
@@ -378,19 +434,20 @@ def short_video():
         shorts_focus = request.form.getlist("shorts_focus[]")
         generated_shorts = request.form.getlist("generated_shorts[]")
 
-        session["shorts_count"] = shorts_count
-        session["shorts_duration"] = shorts_duration
-        session["shorts_focus"] = shorts_focus
-        session["generated_shorts"] = generated_shorts
+        # Save to session
+        session["shorts"] = {
+            "shorts_count": shorts_count,
+            "shorts_duration": shorts_duration,
+            "shorts_focus": shorts_focus,
+            "generated_shorts": generated_shorts,
+        }
 
         # Proceed to completion
         flash("Congratulations! You've completed the YouTube Script Generator wizard.", "success")
         return redirect(url_for("index"))
 
     return render_template(
-        "short_video.html",
-        step=7 if session.get("use_web_search", True) else 6,
-        total_steps=len(WIZARD_STEPS) - 1,
+        "short_video.html", step=6, total_steps=len(WIZARD_STEPS) - 1, edited_script=edited_script
     )
 
 

@@ -60,6 +60,7 @@ def main():
 
     ## Result 2
     ...and so on
+
     """
 
     # The gpt-4o-search-preview model has built-in web search capabilities
@@ -95,7 +96,7 @@ def main():
 
     # Convert to JSON for further processing if needed
     results_json = json.dumps(results, indent=2)
-    print(f"\n{"*"*100}\nJSON format:")
+    print(f"\n{'*' * 100}\nJSON format:")
     print(results_json)
 
 
