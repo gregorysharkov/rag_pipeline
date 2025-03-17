@@ -50,10 +50,128 @@
     color: white;
 }
 
+.step-number.skipped {
+    background-color: #ffc107;
+    color: white;
+}
+
 .step-label {
     font-size: 0.8rem;
     color: #6c757d;
     text-align: center;
+}
+
+/* Wizard navigation tabs (round tabs) */
+.wizard {
+    margin-bottom: 30px;
+}
+
+.wizard .nav-tabs {
+    position: relative;
+    border-bottom-color: transparent;
+}
+
+.wizard .nav-tabs > li {
+    width: 14.285%; /* 7 steps = 14.285% each */
+    text-align: center;
+}
+
+.wizard .connecting-line {
+    height: 2px;
+    background: #e0e0e0;
+    position: absolute;
+    width: 80%;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    top: 50%;
+    z-index: 1;
+}
+
+.wizard .nav-tabs > li a {
+    width: 70px;
+    height: 70px;
+    margin: 20px auto;
+    border-radius: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    text-decoration: none;
+    color: #6c757d;
+}
+
+.wizard .nav-tabs > li a:hover {
+    background: transparent;
+}
+
+.wizard .nav-tabs > li a .round-tab {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    display: inline-block;
+    border-radius: 100%;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    z-index: 2;
+    text-align: center;
+    font-size: 16px;
+    color: #6c757d;
+}
+
+.wizard .nav-tabs > li a .round-tab-label {
+    font-size: 12px;
+    font-weight: 500;
+    padding-top: 5px;
+}
+
+.wizard .nav-tabs > li a.disabled {
+    cursor: not-allowed;
+    color: #e0e0e0;
+}
+
+.wizard .nav-tabs > li a.disabled .round-tab {
+    border-color: #e0e0e0;
+    color: #e0e0e0;
+}
+
+.wizard .nav-tabs > li a.done .round-tab {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: #fff;
+}
+
+.wizard .nav-tabs > li a.skipped .round-tab {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #fff;
+}
+
+.wizard .nav-tabs > li a.active .round-tab {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+/* Collapsible sections */
+.collapsible-section .card-header {
+    cursor: pointer;
+    padding: 0.75rem 1.25rem;
+    transition: background-color 0.2s ease;
+}
+
+.collapsible-section .card-header:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+.collapsible-section .card-header .collapse-icon {
+    transition: transform 0.2s ease;
+}
+
+.collapsible-section .card-header .collapse-icon.collapsed {
+    transform: rotate(-90deg);
 }
 
 /* Form styling */
@@ -94,6 +212,14 @@
     
     .wizard-step {
         min-width: 80px;
+    }
+    
+    .wizard .nav-tabs > li {
+        width: auto;
+    }
+    
+    .wizard .connecting-line {
+        width: 70%;
     }
 }
 
