@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from backend.agents.web_search_agent import WebSearchAgent
 from backend.agents.planning_agent import PlanningAgent
 from backend.agents.improved_script_writing_agent import ImprovedScriptWritingAgent
+from backend.agents.scripting_editing_agent import ScriptEditingAgent
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, session, url_for, jsonify
 from flask_session import Session
@@ -342,8 +343,10 @@ def script():
             for title, content in zip(section_titles, section_contents)
         ]
 
-        # Save script sections to session
+        # Save script sections to session - store both as script and script_sections
+        # to ensure backward compatibility
         session["script"] = script_sections
+        session["script_sections"] = script_sections  # Store with both keys
         session["script_complete"] = True
 
         # Proceed to next step
@@ -381,11 +384,14 @@ def edit():
         flash("Please complete the context step first.", "warning")
         return redirect(url_for("context"))
 
-    # Load script sections from session
-    script_sections = session.get("script")
+    # Load script sections from session (try both formats for compatibility)
+    script_sections = session.get("script_sections") or session.get("script")
     if not script_sections or not session.get("script_complete"):
         flash("Please create a script first.", "warning")
         return redirect(url_for("script"))
+
+    # Check if web search is skipped
+    is_web_search_skipped = not session.get("use_web_search", True)
 
     if request.method == "POST":
         # Save editing options
@@ -418,10 +424,11 @@ def edit():
 
     return render_template(
         "edit.html",
-        step=5,
+        step=5 if is_web_search_skipped else 6,
         total_steps=len(WIZARD_STEPS) - 1,
         script_sections=script_sections,
         combined_script=combined_script,
+        is_web_search_skipped=is_web_search_skipped,
     )
 
 
@@ -599,6 +606,57 @@ def generate_all_sections():
     except Exception as e:
         logger.error(f"Error generating all script sections: {str(e)}")
         return jsonify({"error": f"Error generating script: {str(e)}"}), 500
+
+
+@app.route("/api/edit-script", methods=["POST"])
+def edit_script():
+    """API endpoint to edit the script based on user-selected options."""
+    # Check for valid session data
+    script_sections = session.get("script_sections") or session.get("script")
+    if "topic" not in session or not script_sections:
+        return jsonify({"error": "Missing script data. Please create a script first."}), 400
+
+    try:
+        # Parse the request
+        data = request.get_json()
+        edit_options = data.get("edit_options", [])
+        additional_instructions = data.get("additional_instructions", "")
+
+        # Log request details
+        logger.info(
+            f"Edit script request: options={edit_options}, instructions={additional_instructions}"
+        )
+
+        # Combine script sections into one string
+        original_script = ""
+        for section in script_sections:
+            original_script += f"**[{section.get('title', '')}]**\n\n"
+            original_script += f"{section.get('content', '')}\n\n"
+
+        logger.info(f"Original script length: {len(original_script)}")
+
+        # Initialize the script editing agent
+        script_editing_agent = ScriptEditingAgent(client)
+
+        # Generate the edited script
+        edited_script = script_editing_agent.run(
+            original_script=original_script,
+            edit_options=edit_options,
+            additional_instructions=additional_instructions,
+        )
+
+        # Verify the response
+        logger.info(f"Edited script length: {len(edited_script)}")
+        logger.info(f"Edited script contains section markers: {'**[' in edited_script}")
+
+        # Save the edited script to session
+        session["edited_script"] = edited_script
+
+        return jsonify({"success": True, "edited_script": edited_script})
+
+    except Exception as e:
+        logger.error(f"Error editing script: {str(e)}")
+        return jsonify({"error": f"Error editing script: {str(e)}"}), 500
 
 
 if __name__ == "__main__":
