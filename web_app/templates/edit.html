@@ -38,6 +38,8 @@
         overflow-y: auto;
         white-space: pre-wrap;
         font-family: monospace;
+        margin-bottom: 20px;
+        line-height: 1.5;
     }
 </style>
 {% endblock %}
@@ -61,11 +63,10 @@
                         <span class="round-tab-label">References</span>
                     </a>
                 </li>
-                {% if session.get('use_web_search', True) %}
                 <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('web_search') }}" class="nav-link done">
+                    <a href="{{ url_for('web_search') }}" class="nav-link {% if is_web_search_skipped %}skipped{% else %}done{% endif %}">
                         <span class="round-tab">3</span>
-                        <span class="round-tab-label">References</span>
+                        <span class="round-tab-label">Web Search</span>
                     </a>
                 </li>
                 <li role="presentation" class="nav-item">
@@ -86,32 +87,6 @@
                         <span class="round-tab-label">Edit</span>
                     </a>
                 </li>
-                {% else %}
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('web_search') }}" class="nav-link skipped">
-                        <span class="round-tab">3</span>
-                        <span class="round-tab-label">References</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('plan') }}" class="nav-link done">
-                        <span class="round-tab">4</span>
-                        <span class="round-tab-label">Plan</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('script') }}" class="nav-link done">
-                        <span class="round-tab">5</span>
-                        <span class="round-tab-label">Script</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('edit') }}" class="nav-link active">
-                        <span class="round-tab">6</span>
-                        <span class="round-tab-label">Edit</span>
-                    </a>
-                </li>
-                {% endif %}
                 <li role="presentation" class="nav-item">
                     <a href="{{ url_for('short_video') }}" class="nav-link disabled">
                         <span class="round-tab">7</span>
@@ -119,6 +94,78 @@
                     </a>
                 </li>
             </ul>
+        </div>
+    </div>
+
+    <!-- Context Information (Read-only) -->
+    <div class="card mb-4 collapsible-section">
+        <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#contextInfo" aria-expanded="false">
+            <h5 class="mb-0">
+                <i class="bi bi-chevron-down collapse-icon me-2"></i>
+                Context Information
+            </h5>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-context-btn">
+                <i class="bi bi-pencil"></i> Edit
+            </button>
+        </div>
+        <div class="card-body collapse" id="contextInfo">
+            <div class="mb-3">
+                <label class="form-label">Topic</label>
+                <input type="text" class="form-control" value="{{ session.get('topic', '') }}" disabled>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Additional Context</label>
+                <textarea class="form-control" rows="3" disabled>{{ session.get('additional_context', '') }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Target Audience</label>
+                <input type="text" class="form-control" value="{{ session.get('target_audience', '') }}" disabled>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Content Type</label>
+                <input type="text" class="form-control" value="{{ session.get('content_type', '') }}" disabled>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tone</label>
+                <input type="text" class="form-control" value="{{ session.get('tone', '') }}" disabled>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Plan (Read-only) -->
+    <div class="card mb-4 collapsible-section">
+        <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#scriptPlan" aria-expanded="false">
+            <h5 class="mb-0">
+                <i class="bi bi-chevron-down collapse-icon me-2"></i>
+                Script Plan
+            </h5>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-plan-btn">
+                <i class="bi bi-pencil"></i> Edit
+            </button>
+        </div>
+        <div class="card-body collapse" id="scriptPlan">
+            {% if session.get('plan') and session.get('plan').get('sections') %}
+            <div class="list-group">
+                {% for section in session.get('plan').get('sections') %}
+                <div class="list-group-item">
+                    <h6 class="mb-1">{{ section.name }}</h6>
+                    <div class="mb-2">
+                        <strong>Key Message:</strong> {{ section.key_message }}
+                    </div>
+                    <div>
+                        <strong>Key Points:</strong>
+                        <ul class="mb-0">
+                            {% for point in section.points %}
+                            <li>{{ point }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No script plan available.</p>
+            {% endif %}
         </div>
     </div>
 
@@ -131,14 +178,17 @@
 
             <form method="POST" action="{{ url_for('edit') }}" class="needs-validation" novalidate>
                 <!-- Original Script -->
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Original Script</h5>
+                <div class="card mb-4 collapsible-section">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#originalScript" aria-expanded="true">
+                        <h5 class="mb-0">
+                            <i class="bi bi-chevron-down collapse-icon me-2"></i>
+                            Original Script
+                        </h5>
                         <button type="button" class="btn btn-sm btn-outline-primary" id="edit-script-btn">
                             Edit <i class="bi bi-pencil"></i>
                         </button>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body collapse show" id="originalScript">
                         <div class="script-info mb-3">
                             <strong>Title:</strong> {{ session.get('video_title', '') }}<br>
                             <strong>Topic:</strong> {{ session.get('topic', '') }}<br>
@@ -149,8 +199,8 @@
                         </div>
                         
                         <div class="original-script">
-                            {% if session.get('script_sections') %}
-                                {% for section in session.get('script_sections') %}
+                            {% if script_sections %}
+                                {% for section in script_sections %}
                                     **[{{ section.title }}]**
                                     
                                     {{ section.content }}
@@ -176,47 +226,60 @@
                             Select the editing options you want to apply to your script.
                         </p>
                         
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="select-all-options">
+                            <label class="form-check-label" for="select-all-options">
+                                <strong>Select All Editing Options</strong>
+                            </label>
+                        </div>
+                        
                         <div class="row">
                             <div class="col-md-6">
                                 <h6>Script Enhancements</h6>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="conversational" name="edit_options[]" value="conversational">
+                                    <input class="form-check-input select-all" type="checkbox" id="select-all-script" data-group="script-enhancements">
+                                    <label class="form-check-label" for="select-all-script">
+                                        <strong>Select All</strong>
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input script-enhancements" type="checkbox" id="conversational" name="edit_options[]" value="conversational">
                                     <label class="form-check-label" for="conversational">
                                         Add more conversational elements and natural speech patterns
                                     </label>
                                 </div>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="rhetorical" name="edit_options[]" value="rhetorical">
+                                    <input class="form-check-input script-enhancements" type="checkbox" id="rhetorical" name="edit_options[]" value="rhetorical">
                                     <label class="form-check-label" for="rhetorical">
                                         Include rhetorical questions to engage the audience
                                     </label>
                                 </div>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="humor" name="edit_options[]" value="humor">
+                                    <input class="form-check-input script-enhancements" type="checkbox" id="humor" name="edit_options[]" value="humor">
                                     <label class="form-check-label" for="humor">
                                         Add humor where appropriate
                                     </label>
                                 </div>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="transitions" name="edit_options[]" value="transitions">
+                                    <input class="form-check-input script-enhancements" type="checkbox" id="transitions" name="edit_options[]" value="transitions">
                                     <label class="form-check-label" for="transitions">
                                         Improve transitions between sections
                                     </label>
                                 </div>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="flow" name="edit_options[]" value="flow">
+                                    <input class="form-check-input script-enhancements" type="checkbox" id="flow" name="edit_options[]" value="flow">
                                     <label class="form-check-label" for="flow">
                                         Ensure the script flows naturally when read aloud
                                     </label>
                                 </div>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="analogies" name="edit_options[]" value="analogies">
+                                    <input class="form-check-input script-enhancements" type="checkbox" id="analogies" name="edit_options[]" value="analogies">
                                     <label class="form-check-label" for="analogies">
                                         Add analogies where appropriate
                                     </label>
                                 </div>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="simplify" name="edit_options[]" value="simplify">
+                                    <input class="form-check-input script-enhancements" type="checkbox" id="simplify" name="edit_options[]" value="simplify">
                                     <label class="form-check-label" for="simplify">
                                         Simplify the language to make it more accessible
                                     </label>
@@ -226,31 +289,37 @@
                             <div class="col-md-6">
                                 <h6>Visual Elements</h6>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="scene_descriptions" name="edit_options[]" value="scene_descriptions">
+                                    <input class="form-check-input select-all" type="checkbox" id="select-all-visual" data-group="visual-elements">
+                                    <label class="form-check-label" for="select-all-visual">
+                                        <strong>Select All</strong>
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input visual-elements" type="checkbox" id="scene_descriptions" name="edit_options[]" value="scene_descriptions">
                                     <label class="form-check-label" for="scene_descriptions">
                                         Add scene descriptions
                                     </label>
                                 </div>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="visuals" name="edit_options[]" value="visuals">
+                                    <input class="form-check-input visual-elements" type="checkbox" id="visuals" name="edit_options[]" value="visuals">
                                     <label class="form-check-label" for="visuals">
                                         Add visual cues and suggestions
                                     </label>
                                 </div>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="cuts" name="edit_options[]" value="cuts">
+                                    <input class="form-check-input visual-elements" type="checkbox" id="cuts" name="edit_options[]" value="cuts">
                                     <label class="form-check-label" for="cuts">
                                         Add camera cuts and transitions
                                     </label>
                                 </div>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="b_roll" name="edit_options[]" value="b_roll">
+                                    <input class="form-check-input visual-elements" type="checkbox" id="b_roll" name="edit_options[]" value="b_roll">
                                     <label class="form-check-label" for="b_roll">
                                         Suggest B-roll footage
                                     </label>
                                 </div>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="graphics" name="edit_options[]" value="graphics">
+                                    <input class="form-check-input visual-elements" type="checkbox" id="graphics" name="edit_options[]" value="graphics">
                                     <label class="form-check-label" for="graphics">
                                         Add on-screen text and graphics suggestions
                                     </label>
@@ -371,6 +440,15 @@
         font-size: 0.9rem;
     }
     
+    .b-roll {
+        background-color: #e6e0ec;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        margin: 0.5rem 0;
+        font-style: italic;
+        color: #5a2d82;
+    }
+    
     .on-screen-text {
         background-color: #f2dcdb;
         padding: 0.5rem;
@@ -379,12 +457,126 @@
         text-align: center;
         font-weight: bold;
     }
+    
+    .section-title {
+        color: #0d6efd;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .section-content {
+        margin-bottom: 20px;
+    }
+    
+    .section-content p {
+        margin-bottom: 8px;
+        line-height: 1.5;
+    }
+    
+    /* Collapsible sections */
+    .collapsible-section .card-header {
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .collapsible-section .collapse-icon {
+        transition: transform 0.3s ease;
+        display: inline-block;
+    }
+    
+    .collapsible-section .collapse-icon.collapsed {
+        transform: rotate(-90deg);
+    }
+    
+    .collapsible-section .card-header:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+    }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Master Select All functionality
+        const selectAllOptions = document.getElementById('select-all-options');
+        const selectAllCheckboxes = document.querySelectorAll('.select-all');
+        const scriptCheckboxes = document.querySelectorAll('.script-enhancements');
+        const visualCheckboxes = document.querySelectorAll('.visual-elements');
+        
+        // Set up Select All options for the master checkbox
+        selectAllOptions.addEventListener('change', function() {
+            const isChecked = this.checked;
+            
+            // Update all checkboxes in both groups
+            document.querySelectorAll('.script-enhancements, .visual-elements').forEach(cb => {
+                cb.checked = isChecked;
+            });
+            
+            // Also update the group select-all checkboxes
+            selectAllCheckboxes.forEach(cb => {
+                cb.checked = isChecked;
+            });
+        });
+        
+        // Set up event listeners for group Select All checkboxes
+        selectAllCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const group = this.dataset.group;
+                const isChecked = this.checked;
+                
+                // Update all checkboxes in this group
+                document.querySelectorAll(`.${group}`).forEach(cb => {
+                    cb.checked = isChecked;
+                });
+                
+                // Update the master checkbox
+                updateMasterSelectAll();
+            });
+        });
+        
+        // Add event listeners to all individual checkboxes to update their group's Select All
+        scriptCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateGroupSelectAll('select-all-script', 'script-enhancements');
+                updateMasterSelectAll();
+            });
+        });
+        
+        visualCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateGroupSelectAll('select-all-visual', 'visual-elements');
+                updateMasterSelectAll();
+            });
+        });
+        
+        // Function to update a group's Select All checkbox state
+        function updateGroupSelectAll(selectAllId, groupClass) {
+            const selectAll = document.getElementById(selectAllId);
+            const groupCheckboxes = document.querySelectorAll(`.${groupClass}`);
+            const allChecked = Array.from(groupCheckboxes).every(cb => cb.checked);
+            
+            selectAll.checked = allChecked;
+        }
+        
+        // Function to update the master Select All checkbox state
+        function updateMasterSelectAll() {
+            const allCheckboxes = document.querySelectorAll('.script-enhancements, .visual-elements');
+            const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+            
+            selectAllOptions.checked = allChecked;
+        }
+        
+        // Initialize all Select All checkboxes on page load
+        function initializeSelectAll() {
+            updateGroupSelectAll('select-all-script', 'script-enhancements');
+            updateGroupSelectAll('select-all-visual', 'visual-elements');
+            updateMasterSelectAll();
+        }
+        
+        // Run initialization
+        initializeSelectAll();
+        
         // Navigation buttons
         document.getElementById('edit-script-btn').addEventListener('click', function(event) {
             event.preventDefault();
@@ -392,6 +584,22 @@
             
             // Navigate to the script page
             window.location.href = "{{ url_for('script') }}";
+        });
+        
+        document.getElementById('edit-context-btn').addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Navigate to the context page
+            window.location.href = "{{ url_for('context') }}";
+        });
+        
+        document.getElementById('edit-plan-btn').addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Navigate to the plan page
+            window.location.href = "{{ url_for('plan') }}";
         });
         
         // Previous button handler
@@ -417,8 +625,8 @@
                 if (!editedScriptTextarea.value.trim()) {
                     // Create a combined script from the original sections
                     let originalScript = '';
-                    {% if session.get('script_sections') %}
-                        {% for section in session.get('script_sections') %}
+                    {% if script_sections %}
+                        {% for section in script_sections %}
                             originalScript += '**[{{ section.title }}]**\n\n';
                             originalScript += '{{ section.content|replace('\n', '\\n')|replace('"', '\\"')|replace("'", "\\'")|safe }}'.replace(/\\n/g, '\n');
                             originalScript += '\n\n';
@@ -432,6 +640,32 @@
             }
         });
         
+        // Handle collapsible sections
+        const collapsibleHeaders = document.querySelectorAll('.collapsible-section .card-header');
+        
+        collapsibleHeaders.forEach(header => {
+            const icon = header.querySelector('.collapse-icon');
+            const targetId = header.getAttribute('data-bs-target');
+            const targetElement = document.querySelector(targetId);
+            
+            header.addEventListener('click', function(e) {
+                // Don't toggle if they clicked on the edit button
+                if (e.target.closest('.btn')) {
+                    return;
+                }
+                
+                // Toggle the collapse state
+                const bsCollapse = new bootstrap.Collapse(targetElement, {
+                    toggle: true
+                });
+                
+                // Toggle the icon rotation
+                if (icon) {
+                    icon.classList.toggle('collapsed');
+                }
+            });
+        });
+        
         // Generate edited script button
         document.getElementById('generate-edit-btn').addEventListener('click', function(event) {
             event.preventDefault();
@@ -443,87 +677,92 @@
             button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
             button.disabled = true;
             
-            // Get the original script content
-            let originalScript = '';
-            {% if session.get('script_sections') %}
-                {% for section in session.get('script_sections') %}
-                    originalScript += '**[{{ section.title }}]**\n\n';
-                    originalScript += '{{ section.content|replace('\n', '\\n')|replace('"', '\\"')|replace("'", "\\'")|safe }}'.replace(/\\n/g, '\n');
-                    originalScript += '\n\n';
-                {% endfor %}
-            {% endif %}
+            // Get all selected editing options
+            const editOptions = [];
+            const checkboxes = document.querySelectorAll('input[name="edit_options[]"]:checked');
+            checkboxes.forEach(checkbox => {
+                editOptions.push(checkbox.value);
+            });
             
-            // Get the editing options
-            const tone = document.getElementById('tone').value;
-            const contentType = document.getElementById('content_type').value;
-            const duration = document.getElementById('duration').value;
+            // Get additional instructions
+            const additionalInstructions = document.getElementById('additional_instructions').value;
             
-            // Apply the edits (in a real app, this would call an API)
-            setTimeout(function() {
-                // For demo purposes, we'll just modify the original script slightly
-                let editedScript = originalScript;
-                
-                // Apply some basic transformations based on selected options
-                if (tone === 'casual') {
-                    editedScript = editedScript.replace(/formal/gi, 'casual')
-                                              .replace(/professional/gi, 'friendly');
-                } else if (tone === 'professional') {
-                    editedScript = editedScript.replace(/casual/gi, 'professional')
-                                              .replace(/friendly/gi, 'formal');
+            // Call the API to edit the script
+            fetch('{{ url_for("edit_script") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    edit_options: editOptions,
+                    additional_instructions: additionalInstructions
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
                 }
                 
-                if (contentType === 'educational') {
-                    editedScript = editedScript.replace(/entertaining/gi, 'educational')
-                                              .replace(/funny/gi, 'informative');
-                } else if (contentType === 'entertaining') {
-                    editedScript = editedScript.replace(/educational/gi, 'entertaining')
-                                              .replace(/informative/gi, 'engaging');
-                }
+                console.log("API Response:", data);
                 
-                // Add a note about the duration
-                editedScript = editedScript + `\n\n**[Note]**\n\nThis script has been optimized for a ${duration} minute video.`;
+                // Update the hidden textarea with the edited script
+                const editedScriptTextarea = document.getElementById('edited_script');
+                editedScriptTextarea.value = data.edited_script;
                 
                 // Update the preview
                 const editedScriptContainer = document.getElementById('edited-script-container');
                 editedScriptContainer.innerHTML = '';
                 
                 // Process the edited script to add formatting
-                const sections = editedScript.split(/\*\*\[(.*?)\]\*\*/g);
-                for (let i = 1; i < sections.length; i += 2) {
-                    const sectionTitle = sections[i];
-                    const sectionContent = sections[i+1].trim();
-                    
-                    // Create section title
-                    const titleElement = document.createElement('h5');
-                    titleElement.className = 'section-title';
-                    titleElement.textContent = sectionTitle;
-                    editedScriptContainer.appendChild(titleElement);
-                    
-                    // Create section content
+                const sections = data.edited_script.split(/\*\*\[(.*?)\]\*\*/g);
+                console.log("Parsed sections:", sections);
+                
+                // Only process if we have valid sections
+                if (sections.length > 1) {
+                    for (let i = 1; i < sections.length; i += 2) {
+                        const sectionTitle = sections[i];
+                        let sectionContent = '';
+                        
+                        if (i+1 < sections.length) {
+                            sectionContent = sections[i+1].trim();
+                        }
+                        
+                        console.log("Section", i, "Title:", sectionTitle);
+                        console.log("Section", i, "Content length:", sectionContent ? sectionContent.length : 0);
+                        
+                        // Create section title
+                        const titleElement = document.createElement('h5');
+                        titleElement.className = 'section-title';
+                        titleElement.textContent = sectionTitle;
+                        editedScriptContainer.appendChild(titleElement);
+                        
+                        // Create section content
+                        const contentElement = document.createElement('div');
+                        contentElement.className = 'section-content';
+                        
+                        // Format special elements (scene descriptions, visual cues, etc.)
+                        const formattedContent = formatSpecialElements(sectionContent);
+                        contentElement.innerHTML = formattedContent;
+                        
+                        editedScriptContainer.appendChild(contentElement);
+                    }
+                } else {
+                    // If no sections found, just display the entire content
+                    console.log("No sections found, displaying raw content");
                     const contentElement = document.createElement('div');
                     contentElement.className = 'section-content';
-                    
-                    // Process content line by line
-                    const lines = sectionContent.split('\n');
-                    lines.forEach(line => {
-                        if (line.trim()) {
-                            const p = document.createElement('p');
-                            p.textContent = line;
-                            contentElement.appendChild(p);
-                        } else {
-                            contentElement.appendChild(document.createElement('br'));
-                        }
-                    });
-                    
+                    contentElement.innerHTML = formatSpecialElements(data.edited_script);
                     editedScriptContainer.appendChild(contentElement);
                 }
                 
                 // Make the edited script visible
                 document.getElementById('edited-script-section').classList.remove('d-none');
-                
-                // Update the hidden textarea with the edited script
-                const editedScriptTextarea = document.getElementById('edited_script');
-                editedScriptTextarea.value = editedScript.trim();
                 
                 // Reset button
                 button.innerHTML = originalText;
@@ -531,8 +770,60 @@
                 
                 // Scroll to the edited script section
                 document.getElementById('edited-script-section').scrollIntoView({ behavior: 'smooth' });
-            }, 1500); // Simulate processing time
+            })
+            .catch(error => {
+                console.error('Error editing script:', error);
+                
+                // Show error message
+                alert(`Error editing script: ${error.message}`);
+                
+                // Reset button
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
         });
+        
+        // Function to format special elements in the script
+        function formatSpecialElements(content) {
+            if (!content) return '';
+            
+            // Handle escaped newlines
+            content = content.replace(/\\n/g, '\n');
+            
+            // Replace scene descriptions [SCENE: description]
+            content = content.replace(/\[SCENE\s*:\s*(.*?)\]/g, '<div class="scene-description"><i class="bi bi-camera"></i> $1</div>');
+            
+            // Replace visual cues [VISUAL: description]
+            content = content.replace(/\[VISUAL\s*:\s*(.*?)\]/g, '<div class="visual-cue"><i class="bi bi-eye"></i> $1</div>');
+            
+            // Replace camera cuts [CUT TO: description]
+            content = content.replace(/\[CUT TO\s*:\s*(.*?)\]/g, '<div class="camera-cut"><i class="bi bi-scissors"></i> $1</div>');
+            
+            // Replace B-roll suggestions [B-ROLL: description]
+            content = content.replace(/\[B-ROLL\s*:\s*(.*?)\]/g, '<div class="b-roll"><i class="bi bi-film"></i> $1</div>');
+            
+            // Replace graphics suggestions [GRAPHIC: description]
+            content = content.replace(/\[GRAPHIC\s*:\s*(.*?)\]/g, '<div class="on-screen-text"><i class="bi bi-text-left"></i> $1</div>');
+            
+            // Format paragraphs with proper handling of special elements
+            const paragraphs = content.split('\n');
+            let formattedContent = '';
+            
+            paragraphs.forEach(paragraph => {
+                if (paragraph.trim()) {
+                    // Check if paragraph already has HTML formatting
+                    if (paragraph.includes('<div class="')) {
+                        formattedContent += paragraph + '\n';
+                    } else {
+                        formattedContent += '<p>' + paragraph + '</p>\n';
+                    }
+                } else {
+                    formattedContent += '<br>\n';
+                }
+            });
+            
+            return formattedContent;
+        }
     });
 </script>
 {% endblock %} 
