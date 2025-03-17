@@ -49,7 +49,11 @@ class WebSearchAgent(BaseAgent):
                 logger.info(f"Successfully retrieved {len(references)} references using web search")
                 return references
         except Exception as e:
-            logger.error(f"Web search failed: {e}")
+            logger.error(f"Web search failed with error: {str(e)}")
+            logger.error(f"Error type: {type(e).__name__}")
+            import traceback
+
+            logger.error(f"Traceback: {traceback.format_exc()}")
 
         # If we get here, web search failed or returned no results, so fall back to generation
         logger.warning("Web search failed or returned no results")
@@ -92,19 +96,34 @@ class WebSearchAgent(BaseAgent):
         if additional_context:
             user_message += f"\n\nAdditional context to guide the search: {additional_context}"
 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": prompt,
-                },
-                {"role": "user", "content": user_message},
-            ],
-        )
+        logger.info(f"Using model: {self.model}")
+        logger.info(f"Sending search request for topic: {topic}")
 
-        # Process the response
-        return self._process_response(response, topic)
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": prompt,
+                    },
+                    {"role": "user", "content": user_message},
+                ],
+            )
+
+            logger.info("Search request successful")
+            logger.info(f"Response model: {response.model}")
+            logger.info(f"Response ID: {response.id}")
+
+            # Process the response
+            return self._process_response(response, topic)
+        except Exception as e:
+            logger.error(f"Error during API call: {str(e)}")
+            logger.error(f"Error type: {type(e).__name__}")
+            import traceback
+
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            raise
 
     def _process_response(self, response, topic: str) -> list[dict[str, str]]:
         """Process the API response and extract references."""
