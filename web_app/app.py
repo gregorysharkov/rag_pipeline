@@ -270,7 +270,7 @@ def plan():
             logger.info(
                 f"Stored plan in session with {len(plan_result.get('sections', []))} sections"
             )
-
+            print(f"{plan_result=}")
             flash("Script plan generated successfully!", "success")
             return redirect(url_for("script"))
 
