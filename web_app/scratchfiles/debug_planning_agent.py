@@ -72,7 +72,7 @@ def main():
     User provided additional context:
     {additional_context}
 
-    Here are the references to incorporate:
+    Here are the references to incorporate, if possible:
     {references_text}
 
     Create a comprehensive plan that incorporates the topic, the user provided additional context, and the references, that includes:
