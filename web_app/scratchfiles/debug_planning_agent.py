@@ -81,11 +81,24 @@ def main():
     3. Estimated duration (in minutes)
     4. Key sections
 
-    Format your response as a JSON object with keys: "title", "target_audience", "duration", "sections" (array of objects with "name", "points", "key_message")
+    The result should be only a JSON object. Please do not include any other text in your response.
+    format of the json object:
+    {{
+        "title": "string",
+        "target_audience": "string",
+        "duration": "number",
+        "sections": [
+            {{
+                "name": "string",
+                "points": ["string"],
+                "key_message": "string"
+            }}
+        ]
+    }}
     """
 
     response = client.chat.completions.create(
-        model="o1-2024-12-17",
+        model="o1",
         messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"},
     )
