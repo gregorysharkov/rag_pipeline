@@ -208,3 +208,89 @@ class ImprovedScriptWritingAgent(BaseAgent):
             return "\n".join(lines[3:])
 
         return full_script
+
+    def generate_section_content(
+        self,
+        topic: str,
+        plan: dict[str, Any],
+        section_index: int,
+        references: list[dict[str, str]],
+        additional_context: Optional[str] = None,
+    ) -> str:
+        """
+        Generate content for a specific section by index.
+
+        Args:
+            topic: The main topic of the video
+            plan: The script plan from the PlanningAgent
+            section_index: The index of the section to generate content for
+            references: List of reference materials from web search
+            additional_context: Optional additional context or requirements
+
+        Returns:
+            Content for the specified section
+        """
+        if not plan or "sections" not in plan or section_index >= len(plan["sections"]):
+            logger.error(f"Invalid section index {section_index} or plan structure")
+            return "Error: Invalid section index or plan structure"
+
+        # Create a new plan with only the requested section
+        section_plan = {
+            "title": plan.get("title", "Untitled"),
+            "target_audience": plan.get("target_audience", "General audience"),
+            "duration": plan.get("duration", "5-10"),
+            "sections": [plan["sections"][section_index]],
+        }
+
+        logger.info(f"Generating content for section: {section_plan['sections'][0]['name']}")
+
+        # Use the existing run method with section_only=True
+        return self.run(
+            topic=topic,
+            plan=section_plan,
+            references=references,
+            section_only=True,
+            additional_context=additional_context,
+        )
+
+    def generate_all_section_contents(
+        self,
+        topic: str,
+        plan: dict[str, Any],
+        references: list[dict[str, str]],
+        additional_context: Optional[str] = None,
+    ) -> Dict[int, str]:
+        """
+        Generate content for all sections independently.
+
+        Args:
+            topic: The main topic of the video
+            plan: The script plan from the PlanningAgent
+            references: List of reference materials from web search
+            additional_context: Optional additional context or requirements
+
+        Returns:
+            Dictionary mapping section indices to their content
+        """
+        if not plan or "sections" not in plan or not plan["sections"]:
+            logger.error("Invalid plan structure or no sections provided")
+            return {}
+
+        section_contents = {}
+
+        for i in range(len(plan["sections"])):
+            try:
+                content = self.generate_section_content(
+                    topic=topic,
+                    plan=plan,
+                    section_index=i,
+                    references=references,
+                    additional_context=additional_context,
+                )
+                section_contents[i] = content
+                logger.info(f"Generated content for section {i}: {plan['sections'][i]['name']}")
+            except Exception as e:
+                logger.error(f"Error generating content for section {i}: {str(e)}")
+                section_contents[i] = f"Error generating content: {str(e)}"
+
+        return section_contents

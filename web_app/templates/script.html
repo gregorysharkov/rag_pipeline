@@ -297,8 +297,163 @@ document.getElementById('edit-resources-btn').addEventListener('click', function
 });
 
 document.getElementById('generate-script-btn').addEventListener('click', function() {
-    // TODO: Implement script generation
-    alert('Script generation will be implemented in the next phase.');
+    if (!confirm('This will generate content for all script sections. Continue?')) {
+        return;
+    }
+    
+    // Show loading state
+    const generateBtn = this;
+    const originalBtnText = generateBtn.innerHTML;
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    
+    // Add a status message
+    const scriptSectionsEl = document.querySelector('.script-section').closest('.mb-4');
+    let statusEl = document.getElementById('generation-status');
+    if (!statusEl) {
+        statusEl = document.createElement('div');
+        statusEl.id = 'generation-status';
+        statusEl.className = 'alert alert-info';
+        statusEl.innerHTML = 'Starting content generation for all sections...';
+        scriptSectionsEl.insertBefore(statusEl, scriptSectionsEl.firstChild);
+    } else {
+        statusEl.className = 'alert alert-info';
+        statusEl.innerHTML = 'Starting content generation for all sections...';
+    }
+    
+    // Get all section textareas
+    const textareas = document.querySelectorAll('.script-section');
+    
+    // Call the API endpoint for each section independently
+    const sectionPromises = Array.from(textareas).map((textarea, index) => {
+        return fetch('{{ url_for("generate_script_section") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                section_index: index
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error for section ${index}: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(`Section ${index} generated:`, data);
+            statusEl.innerHTML = `Generating: ${index + 1} of ${textareas.length} sections completed`;
+            return {index, data};
+        })
+        .catch(error => {
+            console.error(`Error generating section ${index}:`, error);
+            return {index, error: error.message};
+        });
+    });
+    
+    // Process all sections
+    Promise.all(sectionPromises)
+        .then(results => {
+            // Update textareas with generated content
+            results.forEach(result => {
+                if (result.data && !result.error) {
+                    textareas[result.index].value = result.data.content;
+                } else {
+                    textareas[result.index].value = `Error generating content: ${result.error}`;
+                }
+            });
+            
+            // Update status
+            statusEl.className = 'alert alert-success';
+            statusEl.innerHTML = 'Content generation complete for all sections!';
+            
+            // Restore button
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = originalBtnText;
+        })
+        .catch(error => {
+            console.error('Error processing sections:', error);
+            
+            // Update status
+            statusEl.className = 'alert alert-danger';
+            statusEl.innerHTML = `Error generating content: ${error.message}`;
+            
+            // Restore button
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = originalBtnText;
+        });
+});
+
+// Add individual section generation buttons
+document.addEventListener('DOMContentLoaded', function() {
+    const sectionCards = document.querySelectorAll('.script-section');
+    
+    sectionCards.forEach((textarea, index) => {
+        const container = textarea.closest('.card-body');
+        const label = textarea.previousElementSibling;
+        
+        // Create a button container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'd-flex justify-content-end mb-2';
+        
+        // Create the generate button for this section
+        const generateBtn = document.createElement('button');
+        generateBtn.type = 'button';
+        generateBtn.className = 'btn btn-sm btn-outline-primary generate-section-btn';
+        generateBtn.dataset.sectionIndex = index;
+        generateBtn.innerHTML = '<i class="fas fa-magic"></i> Generate This Section';
+        
+        buttonContainer.appendChild(generateBtn);
+        
+        // Insert the button after the label
+        if (label) {
+            label.after(buttonContainer);
+        } else {
+            container.insertBefore(buttonContainer, textarea);
+        }
+        
+        // Add click event listener
+        generateBtn.addEventListener('click', function() {
+            // Show loading state
+            const originalBtnText = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            
+            // Call the API endpoint
+            fetch('{{ url_for("generate_script_section") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    section_index: index
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(`Section ${index} generated:`, data);
+                textarea.value = data.content;
+                
+                // Restore button
+                this.disabled = false;
+                this.innerHTML = originalBtnText;
+            })
+            .catch(error => {
+                console.error(`Error generating section ${index}:`, error);
+                textarea.value = `Error generating content: ${error.message}`;
+                
+                // Restore button
+                this.disabled = false;
+                this.innerHTML = originalBtnText;
+            });
+        });
+    });
 });
 </script>
 {% endblock %}
