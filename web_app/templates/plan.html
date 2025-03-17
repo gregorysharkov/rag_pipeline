@@ -16,21 +16,39 @@
                     </a>
                 </li>
                 <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('web_search') }}" class="nav-link done">
+                    <a href="{{ url_for('references') }}" class="nav-link done">
                         <span class="round-tab">2</span>
                         <span class="round-tab-label">References</span>
                     </a>
                 </li>
                 <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('plan') }}" class="nav-link active">
+                    <a href="{{ url_for('web_search') }}" class="nav-link {% if is_web_search_skipped %}skipped{% else %}done{% endif %}">
                         <span class="round-tab">3</span>
+                        <span class="round-tab-label">Web Search</span>
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('plan') }}" class="nav-link active">
+                        <span class="round-tab">4</span>
                         <span class="round-tab-label">Plan</span>
                     </a>
                 </li>
                 <li role="presentation" class="nav-item">
                     <a href="{{ url_for('script') }}" class="nav-link {% if session.get('sections') %}enabled{% else %}disabled{% endif %}">
-                        <span class="round-tab">4</span>
+                        <span class="round-tab">5</span>
                         <span class="round-tab-label">Script</span>
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('edit') }}" class="nav-link disabled">
+                        <span class="round-tab">6</span>
+                        <span class="round-tab-label">Edit</span>
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('short_video') }}" class="nav-link disabled">
+                        <span class="round-tab">7</span>
+                        <span class="round-tab-label">Short Video</span>
                     </a>
                 </li>
             </ul>

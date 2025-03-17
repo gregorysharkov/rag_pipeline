@@ -43,246 +43,274 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <!-- Wizard Progress Bar -->
-        <div class="wizard-progress mb-4">
-            {% for i in range(1, total_steps + 1) %}
-                <div class="wizard-step">
-                    <div class="step-number {% if i < step %}completed{% elif i == step %}active{% endif %}">
-                        {{ i }}
-                    </div>
-                    <div class="step-label">
-                        {% if i == 1 %}
-                            Context
-                        {% elif i == 2 %}
-                            References
-                        {% elif i == 3 %}
-                            {% if session.get('use_web_search', True) %}
-                            Web Search
-                            {% else %}
-                            Plan
-                            {% endif %}
-                        {% elif i == 4 %}
-                            {% if session.get('use_web_search', True) %}
-                            Plan
-                            {% else %}
-                            Script
-                            {% endif %}
-                        {% elif i == 5 %}
-                            {% if session.get('use_web_search', True) %}
-                            Script
-                            {% else %}
-                            Edit
-                            {% endif %}
-                        {% elif i == 6 %}
-                            {% if session.get('use_web_search', True) %}
-                            Edit
-                            {% else %}
-                            Short Video
-                            {% endif %}
-                        {% elif i == 7 %}
-                            Short Video
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
+<div class="container mt-4">
+    <!-- Wizard Progress -->
+    <div class="wizard mb-4">
+        <div class="wizard-inner">
+            <div class="connecting-line"></div>
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('context') }}" class="nav-link done">
+                        <span class="round-tab">1</span>
+                        <span class="round-tab-label">Context</span>
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('references') }}" class="nav-link done">
+                        <span class="round-tab">2</span>
+                        <span class="round-tab-label">References</span>
+                    </a>
+                </li>
+                {% if session.get('use_web_search', True) %}
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('web_search') }}" class="nav-link done">
+                        <span class="round-tab">3</span>
+                        <span class="round-tab-label">References</span>
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('plan') }}" class="nav-link done">
+                        <span class="round-tab">4</span>
+                        <span class="round-tab-label">Plan</span>
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('script') }}" class="nav-link done">
+                        <span class="round-tab">5</span>
+                        <span class="round-tab-label">Script</span>
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('edit') }}" class="nav-link active">
+                        <span class="round-tab">6</span>
+                        <span class="round-tab-label">Edit</span>
+                    </a>
+                </li>
+                {% else %}
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('web_search') }}" class="nav-link skipped">
+                        <span class="round-tab">3</span>
+                        <span class="round-tab-label">References</span>
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('plan') }}" class="nav-link done">
+                        <span class="round-tab">4</span>
+                        <span class="round-tab-label">Plan</span>
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('script') }}" class="nav-link done">
+                        <span class="round-tab">5</span>
+                        <span class="round-tab-label">Script</span>
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('edit') }}" class="nav-link active">
+                        <span class="round-tab">6</span>
+                        <span class="round-tab-label">Edit</span>
+                    </a>
+                </li>
+                {% endif %}
+                <li role="presentation" class="nav-item">
+                    <a href="{{ url_for('short_video') }}" class="nav-link disabled">
+                        <span class="round-tab">7</span>
+                        <span class="round-tab-label">Short Video</span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card form-card">
-            <div class="card-body">
-                <h2 class="card-title">{% if session.get('use_web_search', True) %}Step 6{% else %}Step 5{% endif %}: Edit Your Script</h2>
-                <p class="card-text text-muted mb-4">
-                    Enhance your script with editing options to make it more engaging and visually appealing.
-                </p>
+    <div class="card form-card">
+        <div class="card-body">
+            <h2 class="card-title">Edit Your Script</h2>
+            <p class="card-text text-muted mb-4">
+                Enhance your script with editing options to make it more engaging and visually appealing.
+            </p>
 
-                <form method="POST" action="{{ url_for('edit') }}" class="needs-validation" novalidate>
-                    <!-- Original Script -->
-                    <div class="card mb-4">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Original Script</h5>
-                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-script-btn">
-                                Edit <i class="bi bi-pencil"></i>
-                            </button>
+            <form method="POST" action="{{ url_for('edit') }}" class="needs-validation" novalidate>
+                <!-- Original Script -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Original Script</h5>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="edit-script-btn">
+                            Edit <i class="bi bi-pencil"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="script-info mb-3">
+                            <strong>Title:</strong> {{ session.get('video_title', '') }}<br>
+                            <strong>Topic:</strong> {{ session.get('topic', '') }}<br>
+                            <strong>Target Audience:</strong> {{ session.get('video_audience', session.get('target_audience', '')) }}<br>
+                            <strong>Duration:</strong> {{ session.get('video_duration', '') }} minutes<br>
+                            <strong>Content Type:</strong> {{ session.get('content_type', '') }}<br>
+                            <strong>Tone:</strong> {{ session.get('tone', '') }}
                         </div>
-                        <div class="card-body">
-                            <div class="script-info mb-3">
-                                <strong>Title:</strong> {{ session.get('video_title', '') }}<br>
-                                <strong>Topic:</strong> {{ session.get('topic', '') }}<br>
-                                <strong>Target Audience:</strong> {{ session.get('video_audience', session.get('target_audience', '')) }}<br>
-                                <strong>Duration:</strong> {{ session.get('video_duration', '') }} minutes<br>
-                                <strong>Content Type:</strong> {{ session.get('content_type', '') }}<br>
-                                <strong>Tone:</strong> {{ session.get('tone', '') }}
+                        
+                        <div class="original-script">
+                            {% if session.get('script_sections') %}
+                                {% for section in session.get('script_sections') %}
+                                    **[{{ section.title }}]**
+                                    
+                                    {{ section.content }}
+                                    
+                                {% endfor %}
+                            {% else %}
+                                No script content available.
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Editing Options -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Editing Options</h5>
+                        <button type="button" class="btn btn-primary" id="generate-edit-btn">
+                            <i class="bi bi-magic"></i> Generate Edited Script
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            Select the editing options you want to apply to your script.
+                        </p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Script Enhancements</h6>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="conversational" name="edit_options[]" value="conversational">
+                                    <label class="form-check-label" for="conversational">
+                                        Add more conversational elements and natural speech patterns
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="rhetorical" name="edit_options[]" value="rhetorical">
+                                    <label class="form-check-label" for="rhetorical">
+                                        Include rhetorical questions to engage the audience
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="humor" name="edit_options[]" value="humor">
+                                    <label class="form-check-label" for="humor">
+                                        Add humor where appropriate
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="transitions" name="edit_options[]" value="transitions">
+                                    <label class="form-check-label" for="transitions">
+                                        Improve transitions between sections
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="flow" name="edit_options[]" value="flow">
+                                    <label class="form-check-label" for="flow">
+                                        Ensure the script flows naturally when read aloud
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="analogies" name="edit_options[]" value="analogies">
+                                    <label class="form-check-label" for="analogies">
+                                        Add analogies where appropriate
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="simplify" name="edit_options[]" value="simplify">
+                                    <label class="form-check-label" for="simplify">
+                                        Simplify the language to make it more accessible
+                                    </label>
+                                </div>
                             </div>
                             
-                            <div class="original-script">
-                                {% if session.get('script_sections') %}
-                                    {% for section in session.get('script_sections') %}
-                                        **[{{ section.title }}]**
-                                        
-                                        {{ section.content }}
-                                        
+                            <div class="col-md-6">
+                                <h6>Visual Elements</h6>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="scene_descriptions" name="edit_options[]" value="scene_descriptions">
+                                    <label class="form-check-label" for="scene_descriptions">
+                                        Add scene descriptions
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="visuals" name="edit_options[]" value="visuals">
+                                    <label class="form-check-label" for="visuals">
+                                        Add visual cues and suggestions
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="cuts" name="edit_options[]" value="cuts">
+                                    <label class="form-check-label" for="cuts">
+                                        Add camera cuts and transitions
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="b_roll" name="edit_options[]" value="b_roll">
+                                    <label class="form-check-label" for="b_roll">
+                                        Suggest B-roll footage
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="graphics" name="edit_options[]" value="graphics">
+                                    <label class="form-check-label" for="graphics">
+                                        Add on-screen text and graphics suggestions
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <h6>Additional Instructions</h6>
+                            <textarea class="form-control" id="additional_instructions" name="additional_instructions" rows="3" placeholder="Add any specific editing instructions or notes...">{{ session.get('additional_instructions', '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edited Script Preview -->
+                <div id="edited-script-section" class="mt-4 {% if not session.get('edited_script') %}d-none{% endif %}">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Edited Script Preview</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="edited-script-container" class="script-content-readonly">
+                                {% if session.get('edited_script') %}
+                                    {% set script_text = session.get('edited_script') %}
+                                    {% set sections = script_text.split('**[') %}
+                                    {% for section in sections %}
+                                        {% if section and ']**' in section %}
+                                            {% set section_parts = section.split(']**', 1) %}
+                                            {% if section_parts|length > 1 %}
+                                                <h5 class="section-title">{{ section_parts[0] }}</h5>
+                                                <div class="section-content">
+                                                    {% for line in section_parts[1].split('\n') %}
+                                                        {% if line.strip() %}
+                                                            <p>{{ line }}</p>
+                                                        {% else %}
+                                                            <br>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
                                     {% endfor %}
-                                {% else %}
-                                    No script content available.
                                 {% endif %}
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Editing Options -->
-                    <div class="card mb-4">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Editing Options</h5>
-                            <button type="button" class="btn btn-primary" id="generate-edit-btn">
-                                <i class="bi bi-magic"></i> Generate Edited Script
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <p class="text-muted mb-3">
-                                Select the editing options you want to apply to your script.
-                            </p>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6>Script Enhancements</h6>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="conversational" name="edit_options[]" value="conversational">
-                                        <label class="form-check-label" for="conversational">
-                                            Add more conversational elements and natural speech patterns
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="rhetorical" name="edit_options[]" value="rhetorical">
-                                        <label class="form-check-label" for="rhetorical">
-                                            Include rhetorical questions to engage the audience
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="humor" name="edit_options[]" value="humor">
-                                        <label class="form-check-label" for="humor">
-                                            Add humor where appropriate
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="transitions" name="edit_options[]" value="transitions">
-                                        <label class="form-check-label" for="transitions">
-                                            Improve transitions between sections
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="flow" name="edit_options[]" value="flow">
-                                        <label class="form-check-label" for="flow">
-                                            Ensure the script flows naturally when read aloud
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="analogies" name="edit_options[]" value="analogies">
-                                        <label class="form-check-label" for="analogies">
-                                            Add analogies where appropriate
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="simplify" name="edit_options[]" value="simplify">
-                                        <label class="form-check-label" for="simplify">
-                                            Simplify the language to make it more accessible
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <h6>Visual Elements</h6>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="scene_descriptions" name="edit_options[]" value="scene_descriptions">
-                                        <label class="form-check-label" for="scene_descriptions">
-                                            Add scene descriptions
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="visuals" name="edit_options[]" value="visuals">
-                                        <label class="form-check-label" for="visuals">
-                                            Add visual cues and suggestions
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="cuts" name="edit_options[]" value="cuts">
-                                        <label class="form-check-label" for="cuts">
-                                            Add camera cuts and transitions
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="b_roll" name="edit_options[]" value="b_roll">
-                                        <label class="form-check-label" for="b_roll">
-                                            Suggest B-roll footage
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="graphics" name="edit_options[]" value="graphics">
-                                        <label class="form-check-label" for="graphics">
-                                            Add on-screen text and graphics suggestions
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-3">
-                                <h6>Additional Instructions</h6>
-                                <textarea class="form-control" id="additional_instructions" name="additional_instructions" rows="3" placeholder="Add any specific editing instructions or notes...">{{ session.get('additional_instructions', '') }}</textarea>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Hidden textarea for form submission -->
+                <textarea class="form-control d-none" id="edited_script" name="edited_script" rows="15">{{ session.get('edited_script', '') }}</textarea>
 
-                    <!-- Edited Script Preview -->
-                    <div id="edited-script-section" class="mt-4 {% if not session.get('edited_script') %}d-none{% endif %}">
-                        <div class="card">
-                            <div class="card-header bg-success text-white">
-                                <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Edited Script Preview</h5>
-                            </div>
-                            <div class="card-body">
-                                <div id="edited-script-container" class="script-content-readonly">
-                                    {% if session.get('edited_script') %}
-                                        {% set script_text = session.get('edited_script') %}
-                                        {% set sections = script_text.split('**[') %}
-                                        {% for section in sections %}
-                                            {% if section and ']**' in section %}
-                                                {% set section_parts = section.split(']**', 1) %}
-                                                {% if section_parts|length > 1 %}
-                                                    <h5 class="section-title">{{ section_parts[0] }}</h5>
-                                                    <div class="section-content">
-                                                        {% for line in section_parts[1].split('\n') %}
-                                                            {% if line.strip() %}
-                                                                <p>{{ line }}</p>
-                                                            {% else %}
-                                                                <br>
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                    </div>
-                                                {% endif %}
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Hidden textarea for form submission -->
-                    <textarea class="form-control d-none" id="edited_script" name="edited_script" rows="15">{{ session.get('edited_script', '') }}</textarea>
-
-                    <div class="wizard-buttons">
-                        <button type="button" class="btn btn-outline-secondary" id="previous-btn">
-                            <i class="bi bi-arrow-left"></i> Previous
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            Next <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <div class="wizard-buttons">
+                    <button type="button" class="btn btn-outline-secondary" id="previous-btn">
+                        <i class="bi bi-arrow-left"></i> Previous
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Next <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

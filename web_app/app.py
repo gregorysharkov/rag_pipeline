@@ -164,6 +164,7 @@ def web_search():
 
     # Skip this step if web search is disabled
     if not session.get("use_web_search", True):
+        flash("Web search step skipped as requested.", "info")
         return redirect(url_for("plan"))
 
     if request.method == "POST":
@@ -210,7 +211,12 @@ def web_search():
             if "selected_search_results" in session:
                 session.pop("selected_search_results")
 
-    return render_template("web_search.html", step=3, total_steps=len(WIZARD_STEPS) - 1)
+    # Mark web search as viewed even if no results are selected
+    session["web_search_viewed"] = True
+
+    return render_template(
+        "web_search.html", step=3, total_steps=len(WIZARD_STEPS) - 1, is_web_search_skipped=False
+    )
 
 
 @app.route("/plan", methods=["GET", "POST"])
@@ -219,6 +225,9 @@ def plan():
     if "topic" not in session:
         flash("Please complete the context step first.", "warning")
         return redirect(url_for("context"))
+
+    # Check if web search is skipped
+    is_web_search_skipped = not session.get("use_web_search", True)
 
     if request.method == "POST":
         # Get selected references from session
@@ -236,7 +245,7 @@ def plan():
                     )
 
         # Check if we have any references
-        if not selected_refs:
+        if not selected_refs and not is_web_search_skipped:
             flash("Please select at least one reference before generating a plan.", "warning")
             return redirect(url_for("web_search"))
 
@@ -260,7 +269,12 @@ def plan():
             if not plan_result or not plan_result.get("sections"):
                 logger.error("Plan result is empty or missing sections")
                 flash("Failed to generate a plan. Please try again or check your inputs.", "error")
-                return render_template("plan.html", step=3, total_steps=len(WIZARD_STEPS) - 1)
+                return render_template(
+                    "plan.html",
+                    step=3 if is_web_search_skipped else 4,
+                    total_steps=len(WIZARD_STEPS) - 1,
+                    is_web_search_skipped=is_web_search_skipped,
+                )
 
             # Extract essential details for cookie-based session
             session["video_title"] = plan_result["title"]
@@ -279,19 +293,25 @@ def plan():
         except Exception as e:
             logger.error(f"Error generating plan: {str(e)}", exc_info=True)
             flash(f"Error generating plan: {str(e)}", "error")
-            return render_template("plan.html", step=3, total_steps=len(WIZARD_STEPS) - 1)
+            return render_template(
+                "plan.html",
+                step=3 if is_web_search_skipped else 4,
+                total_steps=len(WIZARD_STEPS) - 1,
+                is_web_search_skipped=is_web_search_skipped,
+            )
 
     # For GET requests, check if we have plan data to display
     plan_data = session.get("plan")
 
     return render_template(
         "plan.html",
-        step=3,
+        step=3 if is_web_search_skipped else 4,
         total_steps=len(WIZARD_STEPS) - 1,
         plan_data=plan_data,
         video_title=session.get("video_title", ""),
         target_audience=session.get("target_audience", ""),
         duration=session.get("duration", ""),
+        is_web_search_skipped=is_web_search_skipped,
     )
 
 
@@ -308,6 +328,9 @@ def script():
     if not plan_data or not plan_data.get("sections"):
         flash("Please create a script plan first.", "warning")
         return redirect(url_for("plan"))
+
+    # Check if web search is skipped
+    is_web_search_skipped = not session.get("use_web_search", True)
 
     if request.method == "POST":
         # Save script sections
@@ -340,12 +363,13 @@ def script():
 
     return render_template(
         "script.html",
-        step=4,
+        step=4 if is_web_search_skipped else 5,
         total_steps=len(WIZARD_STEPS) - 1,
         sections=sections,
         video_title=session.get("video_title", ""),
         target_audience=session.get("target_audience", ""),
         duration=session.get("duration", ""),
+        is_web_search_skipped=is_web_search_skipped,
     )
 
 
