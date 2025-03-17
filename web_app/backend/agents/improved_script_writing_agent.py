@@ -16,7 +16,7 @@ class ImprovedScriptWritingAgent(BaseAgent):
         super().__init__(
             name="ImprovedScriptWritingAgent",
             description="Writes scripts with enhanced section-specific capabilities.",
-            model="o1-2024-12-17",  # Using a more advanced model for better quality
+            model="o1",  # Using a more advanced model for better quality
             client=client,
         )
 

@@ -172,19 +172,25 @@ def references():
 @app.route("/web_search", methods=["GET", "POST"])
 def web_search():
     """Web search step: Show search results from the web."""
+    print("Web search route called")
+
     # Check if previous steps were completed
     if "topic" not in session:
+        print("Topic not in session, redirecting to context")
         flash("Please complete the context step first.", "warning")
         return redirect(url_for("context"))
 
     # Skip this step if web search is disabled
     if not session.get("use_web_search", True):
+        print("Web search disabled, skipping to plan")
         return redirect(url_for("plan"))
 
     if request.method == "POST":
+        print("POST request to web_search")
         # Save selected search results
         selected_results = request.form.getlist("selected_results[]")
         if selected_results:
+            print(f"Selected results: {selected_results}")
             session["selected_search_results"] = selected_results
             flash(
                 f"Selected {len(selected_results)} search results to include in your script.",
@@ -196,34 +202,61 @@ def web_search():
 
     # For GET requests, perform the web search if not already done or if refresh requested
     refresh_requested = request.args.get("refresh", "0") == "1"
+    print(f"GET request to web_search. Refresh requested: {refresh_requested}")
+
     if "search_results" not in session or refresh_requested:
-        # Initialize the WebSearchAgent and perform the search
-        web_search_agent = WebSearchAgent(client)
-        topic = session.get("topic", "")
+        print("Performing web search or refreshing results")
+        try:
+            # Initialize the WebSearchAgent and perform the search
+            print("Initializing WebSearchAgent")
+            web_search_agent = WebSearchAgent(client)
+            topic = session.get("topic", "")
+            print(f"Topic: {topic}")
 
-        # Add additional context if available
-        if session.get("additional_context"):
-            topic += f". {session.get('additional_context')}"
+            # Add additional context if available
+            if session.get("additional_context"):
+                topic += f". {session.get('additional_context')}"
+                print(f"Added additional context. New topic: {topic}")
 
-        # Add target audience if available
-        if session.get("target_audience"):
-            topic += f". Target audience: {session.get('target_audience')}"
+            # Add target audience if available
+            if session.get("target_audience"):
+                topic += f". Target audience: {session.get('target_audience')}"
+                print(f"Added target audience. New topic: {topic}")
 
-        # Perform the search
-        search_results = web_search_agent.run(topic)
+            # Perform the search
+            print("Running web search...")
+            search_results = web_search_agent.run(topic)
+            print(f"Search completed. Results: {len(search_results) if search_results else 0}")
 
-        # Add IDs to the search results for selection
-        for i, result in enumerate(search_results):
-            result["id"] = str(i + 1)
+            # Add IDs to the search results for selection
+            for i, result in enumerate(search_results):
+                result["id"] = str(i + 1)
 
-        session["search_results"] = search_results
+            session["search_results"] = search_results
+            print(f"Search results added to session: {search_results}")
 
-        if refresh_requested:
-            flash("Search results refreshed successfully!", "success")
-            # Clear previous selections when refreshing
-            if "selected_search_results" in session:
-                session.pop("selected_search_results")
+            if refresh_requested:
+                print("Refresh requested, clearing previous selections")
+                flash("Search results refreshed successfully!", "success")
+                # Clear previous selections when refreshing
+                if "selected_search_results" in session:
+                    session.pop("selected_search_results")
+        except Exception as e:
+            import traceback
 
+            print(f"Error in web search: {str(e)}")
+            print(f"Error type: {type(e).__name__}")
+            print(f"Traceback: {traceback.format_exc()}")
+            flash(f"Error performing web search: {str(e)}", "danger")
+            # Create empty search results to avoid errors in the template
+            session["search_results"] = []
+
+    # Ensure search_results exists in the session to avoid template errors
+    if "search_results" not in session:
+        print("Initializing empty search_results list in session")
+        session["search_results"] = []
+
+    print(f"Rendering web_search.html with step: 3, total_steps: {len(WIZARD_STEPS) - 1}")
     return render_template("web_search.html", step=3, total_steps=len(WIZARD_STEPS) - 1)
 
 

@@ -2,6 +2,7 @@ import re
 import datetime
 import json
 import logging
+import os
 from typing import Optional
 
 from openai import OpenAI
@@ -14,13 +15,19 @@ logger = logging.getLogger(__name__)
 class WebSearchAgent(BaseAgent):
     """Agent responsible for performing web searches and retrieving references."""
 
-    def __init__(self, client: OpenAI):
+    def __init__(self, client: OpenAI, debug_mode: bool = False):
         super().__init__(
             name="WebSearchAgent",
             model="gpt-4o-search-preview",  # Default to search-enabled model
             description="Performs web searches to find relevant references on a given topic.",
             client=client,
         )
+        self.debug_mode = debug_mode
+        self.debug_dir = "debug_outputs"
+
+        # Create debug directory if in debug mode
+        if self.debug_mode:
+            os.makedirs(self.debug_dir, exist_ok=True)
 
     def run(self, topic: str, additional_context: Optional[str] = None) -> list[dict[str, str]]:
         """
@@ -47,6 +54,11 @@ class WebSearchAgent(BaseAgent):
             references = self._search_web(topic, current_date, additional_context)
             if references:
                 logger.info(f"Successfully retrieved {len(references)} references using web search")
+                if self.debug_mode:
+                    self._save_debug_output(
+                        json.dumps(references, indent=2),
+                        f"search_results_{topic.replace(' ', '_')[:30]}.json",
+                    )
                 return references
         except Exception as e:
             logger.error(f"Web search failed with error: {str(e)}")
@@ -54,6 +66,25 @@ class WebSearchAgent(BaseAgent):
             import traceback
 
             logger.error(f"Traceback: {traceback.format_exc()}")
+
+            # Try the direct approach without the agent wrapper
+            try:
+                logger.info("Trying direct API approach as fallback...")
+                references = self._direct_search(topic, current_date, additional_context)
+                if references:
+                    logger.info(
+                        f"Successfully retrieved {len(references)} references using direct API call"
+                    )
+                    if self.debug_mode:
+                        self._save_debug_output(
+                            json.dumps(references, indent=2),
+                            f"direct_search_results_{topic.replace(' ', '_')[:30]}.json",
+                        )
+                    return references
+            except Exception as direct_e:
+                logger.error(f"Direct search fallback failed: {str(direct_e)}")
+                logger.error(f"Error type: {type(direct_e).__name__}")
+                logger.error(f"Traceback: {traceback.format_exc()}")
 
         # If we get here, web search failed or returned no results, so fall back to generation
         logger.warning("Web search failed or returned no results")
@@ -80,15 +111,25 @@ class WebSearchAgent(BaseAgent):
         - Ensure all URLs are from legitimate websites
         - If you cannot find enough results, return fewer than 5 rather than making up results
         
-        Format each result as follows:
+        YOU MUST RETURN THE RESULTS IN THE FOLLOWING JSON FORMAT:
+        ```json
+        [
+          {{
+            "title": "Title of the webpage",
+            "url": "URL of the webpage",
+            "summary": "Brief summary of the content"
+          }},
+          {{
+            "title": "Title of the second webpage",
+            "url": "URL of the second webpage",
+            "summary": "Brief summary of the second content"
+          }},
+          ...
+        ]
+        ```
         
-        ## Result 1
-        Title: [Title of the webpage]
-        URL: [URL of the webpage]
-        Summary: [Brief summary of the content]
-        
-        ## Result 2
-        ...and so on
+        DO NOT include any explanatory text or other formatting outside of the JSON structure.
+        The response should be valid JSON that can be parsed directly.
         """
 
         # Prepare the user message with topic and additional context if provided
@@ -112,8 +153,20 @@ class WebSearchAgent(BaseAgent):
             )
 
             logger.info("Search request successful")
+
+            # Log the entire response structure for debugging
             logger.info(f"Response model: {response.model}")
             logger.info(f"Response ID: {response.id}")
+
+            # Get and log raw content
+            raw_content = response.choices[0].message.content
+            logger.info(f"RAW CONTENT PREVIEW: {raw_content[:200]}...")
+
+            # Save raw response if in debug mode
+            if self.debug_mode:
+                self._save_debug_output(
+                    raw_content, f"raw_response_{topic.replace(' ', '_')[:30]}.txt"
+                )
 
             # Process the response
             return self._process_response(response, topic)
@@ -132,8 +185,16 @@ class WebSearchAgent(BaseAgent):
             content = response.choices[0].message.content
             logger.info(f"Raw response content: {content[:100]}...")  # Log first 100 chars
 
-            # Extract structured data from the text response
-            references = self._extract_results_from_text(content)
+            # Parse as JSON
+            try:
+                references = self._parse_json_response(content)
+                logger.info(
+                    f"Successfully extracted {len(references)} references using JSON parser"
+                )
+            except Exception as json_e:
+                logger.warning(f"JSON parsing failed: {str(json_e)}")
+                logger.warning("Returning empty results as fallback")
+                return []
 
             # Format and filter the references
             formatted_references = []
@@ -157,130 +218,114 @@ class WebSearchAgent(BaseAgent):
             logger.error(f"Error processing response: {e}")
             return []
 
-    def _extract_results_from_text(self, text: str) -> list[dict[str, str]]:
-        """Extract structured results from the text response."""
-        results = []
+    def _parse_json_response(self, text: str) -> list[dict[str, str]]:
+        """Extract JSON from the response text."""
+        logger.info("Parsing response as JSON")
 
-        # Try to find results using regex pattern matching
-        # Look for sections that start with "## Result" or just "Result"
-        result_sections = re.split(r"##\s*Result\s+\d+", text)
+        # Remove any markdown code block indicators
+        text = re.sub(r"```json\s*", "", text)
+        text = re.sub(r"```\s*", "", text)
 
-        # Remove the first section if it's empty or just introductory text
-        if result_sections and (
-            not result_sections[0].strip() or "below are" in result_sections[0].lower()
-        ):
-            result_sections = result_sections[1:]
+        # Try to find JSON array pattern
+        json_match = re.search(r"\[\s*\{.*\}\s*\]", text, re.DOTALL)
+        if json_match:
+            json_text = json_match.group(0)
+            return json.loads(json_text)
 
-        # If we couldn't split by "## Result", try another approach
-        if len(result_sections) <= 1:
-            # Try to split by numbered items or other formats
-            result_sections = re.split(r"Result\s+\d+:|^\d+\.\s+", text, flags=re.MULTILINE)
-            # Remove the first section if it's empty or introductory
-            if result_sections and (
-                not result_sections[0].strip() or "below are" in result_sections[0].lower()
-            ):
-                result_sections = result_sections[1:]
+        # If no JSON array found, try to parse the whole text
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            logger.warning("Could not find valid JSON in the response")
+            raise ValueError("Could not find valid JSON in the response")
 
-        for section in result_sections:
-            if not section.strip():
-                continue
+    def _save_debug_output(self, content: str, filename: str) -> None:
+        """Save debug output to file if in debug mode."""
+        if not self.debug_mode:
+            return
 
-            result = {}
+        try:
+            filepath = os.path.join(self.debug_dir, filename)
+            with open(filepath, "w") as f:
+                f.write(content)
+            logger.info(f"Debug output saved to {filepath}")
+        except Exception as e:
+            logger.error(f"Error saving debug output: {str(e)}")
 
-            # Extract title - handle both "Title:" and "**Title:**" formats
-            title_match = re.search(
-                r"\*?\*?Title:?\*?\*?\s*(?:\*?\*?)?(.*?)(?:\*?\*?)?\s*(?:\n|$)",
-                section,
-                re.IGNORECASE,
+    def _direct_search(
+        self, topic: str, current_date: str, additional_context: Optional[str] = None
+    ) -> list[dict[str, str]]:
+        """Direct API call as fallback without the agent wrapper."""
+        prompt = f"""
+        You are a web search specialist with access to the latest information up to {current_date}.
+        Your task is to search the web for the most relevant and up-to-date information on the given topic.
+        Return exactly 5 high-quality search results that would be most helpful for someone creating content on this topic.
+
+        For each result, provide:
+        1. A title - use the actual title from the webpage
+        2. The URL - use the actual URL of the webpage, never create fictional URLs
+        3. A brief summary of the content (100-150 words) based on the actual content of the page
+
+        IMPORTANT:
+        - Only return results from real websites that you've actually found through search
+        - Do not generate fictional or example results
+        - Do not use example.com or any placeholder domains
+        - Ensure all URLs are from legitimate websites
+        - If you cannot find enough results, return fewer than 5 rather than making up results
+        
+        YOU MUST RETURN THE RESULTS IN THE FOLLOWING JSON FORMAT:
+        ```json
+        [
+          {{
+            "title": "Title of the webpage",
+            "url": "URL of the webpage",
+            "summary": "Brief summary of the content"
+          }},
+          {{
+            "title": "Title of the second webpage",
+            "url": "URL of the second webpage",
+            "summary": "Brief summary of the second content"
+          }},
+          ...
+        ]
+        ```
+        
+        DO NOT include any explanatory text or other formatting outside of the JSON structure.
+        The response should be valid JSON that can be parsed directly.
+        """
+
+        # Prepare the user message with topic and additional context if provided
+        user_message = f"Search the web for information about: {topic}"
+        if additional_context:
+            user_message += f"\n\nAdditional context to guide the search: {additional_context}"
+
+        logger.info(f"Making direct API call with model: {self.model}")
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": prompt,
+                    },
+                    {"role": "user", "content": user_message},
+                ],
             )
-            if not title_match:
-                # Try to find quoted title
-                title_match = re.search(r'\*?\*?"([^"]+)"', section)
 
-            if title_match:
-                result["title"] = title_match.group(1).strip().strip('"')
-
-            # Extract URL - handle both "URL:" and "**URL:**" formats
-            url_match = re.search(
-                r"\*?\*?URL:?\*?\*?\s*(?:\*?\*?)?(.*?)(?:\*?\*?)?\s*(?:\n|$)",
-                section,
-                re.IGNORECASE,
-            )
-            if not url_match:
-                # Try to find a URL directly
-                url_match = re.search(r"https?://[^\s\n]+", section)
-
-            if url_match:
-                result["url"] = (
-                    url_match.group(1).strip()
-                    if ":" in url_match.group(0)
-                    else url_match.group(0).strip()
+            # Save raw response if in debug mode
+            if self.debug_mode:
+                raw_content = response.choices[0].message.content
+                self._save_debug_output(
+                    raw_content, f"direct_raw_response_{topic.replace(' ', '_')[:30]}.txt"
                 )
 
-            # Extract summary - handle both "Summary:" and "**Summary:**" formats
-            summary_match = re.search(
-                r"\*?\*?Summary:?\*?\*?\s*(?:\*?\*?)?(.*?)(?:\n\n|\n##|$)",
-                section,
-                re.DOTALL | re.IGNORECASE,
-            )
-            if summary_match:
-                result["summary"] = summary_match.group(1).strip()
-            elif "title" in result or "url" in result:
-                # If we have a title or URL but no explicit summary, use the remaining text
-                # Remove the title and URL parts from the section
-                remaining_text = section
-                if "title" in result:
-                    remaining_text = re.sub(
-                        r"\*?\*?Title:?\*?\*?\s*(?:\*?\*?)?.*?(?:\*?\*?)?\s*\n",
-                        "",
-                        remaining_text,
-                        flags=re.IGNORECASE,
-                    )
-                if "url" in result:
-                    remaining_text = re.sub(
-                        r"\*?\*?URL:?\*?\*?\s*(?:\*?\*?)?.*?(?:\*?\*?)?\s*\n",
-                        "",
-                        remaining_text,
-                        flags=re.IGNORECASE,
-                    )
-                # Clean up the remaining text
-                remaining_text = remaining_text.strip()
-                if remaining_text:
-                    result["summary"] = remaining_text
+            # Process the response
+            return self._process_response(response, topic)
+        except Exception as e:
+            logger.error(f"Error during direct API call: {str(e)}")
+            logger.error(f"Error type: {type(e).__name__}")
+            import traceback
 
-            # Only add if we have at least a title or URL
-            if result.get("title") or result.get("url"):
-                # Clean up any remaining ** markers
-                for key in result:
-                    if isinstance(result[key], str):
-                        result[key] = result[key].replace("**", "").strip()
-
-                results.append(result)
-
-        # If we still couldn't extract results, try a more general approach
-        if not results:
-            # Look for URLs in the text
-            urls = re.findall(r"https?://[^\s\n]+", text)
-            for url in urls:
-                # Find the surrounding text (up to 500 chars before and after)
-                start = max(0, text.find(url) - 500)
-                end = min(len(text), text.find(url) + len(url) + 500)
-                context = text[start:end]
-
-                # Try to extract a title (text before the URL)
-                title_match = re.search(
-                    r'"([^"]+)".*?' + re.escape(url), context, re.DOTALL
-                ) or re.search(r"([^\n.!?]+).*?" + re.escape(url), context, re.DOTALL)
-                title = title_match.group(1).strip() if title_match else "Unknown Title"
-
-                # Try to extract a summary (text after the URL)
-                summary_match = re.search(
-                    re.escape(url) + r".*?([^\n]+\n[^\n]+)", context, re.DOTALL
-                )
-                summary = (
-                    summary_match.group(1).strip() if summary_match else "No summary available"
-                )
-
-                results.append({"title": title, "url": url, "summary": summary})
-
-        return results
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            raise

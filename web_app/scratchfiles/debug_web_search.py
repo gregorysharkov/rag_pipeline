@@ -28,9 +28,9 @@ def main():
 
     Graph Neural Networks (GNNs) are revolutionizing fraud prevention. Instead of analyzing single transactions, GNNs map global connections between accounts, devices, and actions.
 
-    🔥 Banks are turning to cloud platforms and advanced computing systems. For example, AWS and NVIDIA’s collaboration uses Amazon Neptune ML with GNNs to map complex relationships, boosting prediction accuracy by 50%. Tests show banks can train models 14x faster and cut costs 8x.
+    🔥 Banks are turning to cloud platforms and advanced computing systems. For example, AWS and NVIDIA's collaboration uses Amazon Neptune ML with GNNs to map complex relationships, boosting prediction accuracy by 50%. Tests show banks can train models 14x faster and cut costs 8x.
 
-    As online fraud grows more sophisticated, outdated systems can’t keep up. Financial institutions that adopt AI will protect clients, safeguard their reputation, and gain a competitive edge.
+    As online fraud grows more sophisticated, outdated systems can't keep up. Financial institutions that adopt AI will protect clients, safeguard their reputation, and gain a competitive edge.
     """
 
     current_date = datetime.now().strftime(r"%Y-%m-%d")
@@ -50,20 +50,30 @@ def main():
     - Do not use example.com or any placeholder domains
     - Ensure all URLs are from legitimate websites
     - If you cannot find enough results, return fewer than 5 rather than making up results
-
-    Format each result as follows:
-
-    ## Result 1
-    Title: [Title of the webpage]
-    URL: [URL of the webpage]
-    Summary: [Brief summary of the content]
-
-    ## Result 2
-    ...and so on
+    
+    YOU MUST RETURN THE RESULTS IN THE FOLLOWING JSON FORMAT:
+    ```json
+    [
+      {{
+        "title": "Title of the webpage",
+        "url": "URL of the webpage",
+        "summary": "Brief summary of the content"
+      }},
+      {{
+        "title": "Title of the second webpage",
+        "url": "URL of the second webpage",
+        "summary": "Brief summary of the second content"
+      }},
+      ...
+    ]
+    ```
+    
+    DO NOT include any explanatory text or other formatting outside of the JSON structure.
+    The response should be valid JSON that can be parsed directly.
     """
 
     # The gpt-4o-search-preview model has built-in web search capabilities
-    # but doesn't support response_format with web_search
+    print("Sending request to search API...")
     response = client.chat.completions.create(
         model="gpt-4o-search-preview",
         messages=[
@@ -79,145 +89,52 @@ def main():
     )
 
     generated_response = response.choices[0].message.content
-    # print("Raw response:")
-    # print(generated_response)
+    print("\nRaw response from API:")
+    print("-" * 50)
+    print(generated_response[:500] + "..." if len(generated_response) > 500 else generated_response)
+    print("-" * 50)
 
-    # Extract structured data from the text response
-    results = extract_results_from_text(generated_response)
+    # Save the raw response to a file for inspection
+    with open("raw_search_response.txt", "w") as f:
+        f.write(generated_response)
+    print("Full raw response saved to raw_search_response.txt")
 
-    # Print the extracted results
-    # print("\nExtracted results:")
-    # for i, result in enumerate(results, 1):
-    #     print(f"\nResult {i}:")
-    #     print(f"Title: {result.get('title')}")
-    #     print(f"URL: {result.get('url')}")
-    #     print(f"Summary: {result.get('summary')}")
+    # Parse the response as JSON
+    try:
+        results = parse_json_response(generated_response)
+        print(f"Successfully extracted {len(results)} results using JSON parser")
 
-    # Convert to JSON for further processing if needed
-    results_json = json.dumps(results, indent=2)
-    print(f"\n{"*"*100}\nJSON format:")
-    print(results_json)
+        # Convert to JSON for further processing
+        results_json = json.dumps(results, indent=2)
+        print(f"\n{'*' * 100}\nProcessed JSON format:")
+        print(results_json)
+
+        # Save the processed results to a file
+        with open("processed_search_results.json", "w") as f:
+            f.write(results_json)
+        print("Processed results saved to processed_search_results.json")
+    except Exception as e:
+        print(f"JSON parsing failed: {str(e)}")
+        print("No results could be extracted from the response")
 
 
-def extract_results_from_text(text):
-    """Extract structured results from the text response."""
-    results = []
+def parse_json_response(text):
+    """Extract JSON from the response text."""
+    # Remove any markdown code block indicators
+    text = re.sub(r"```json\s*", "", text)
+    text = re.sub(r"```\s*", "", text)
 
-    # Try to find results using regex pattern matching
-    # Look for sections that start with "## Result" or just "Result"
-    result_sections = re.split(r"##\s*Result\s+\d+", text)
+    # Try to find JSON array pattern
+    json_match = re.search(r"\[\s*\{.*\}\s*\]", text, re.DOTALL)
+    if json_match:
+        json_text = json_match.group(0)
+        return json.loads(json_text)
 
-    # Remove the first section if it's empty or just introductory text
-    if result_sections and (
-        not result_sections[0].strip() or "below are" in result_sections[0].lower()
-    ):
-        result_sections = result_sections[1:]
-
-    # If we couldn't split by "## Result", try another approach
-    if len(result_sections) <= 1:
-        # Try to split by numbered items or other formats
-        result_sections = re.split(r"Result\s+\d+:|^\d+\.\s+", text, flags=re.MULTILINE)
-        # Remove the first section if it's empty or introductory
-        if result_sections and (
-            not result_sections[0].strip() or "below are" in result_sections[0].lower()
-        ):
-            result_sections = result_sections[1:]
-
-    for section in result_sections:
-        if not section.strip():
-            continue
-
-        result = {}
-
-        # Extract title - handle both "Title:" and "**Title:**" formats
-        title_match = re.search(
-            r"\*?\*?Title:?\*?\*?\s*(?:\*?\*?)?(.*?)(?:\*?\*?)?\s*(?:\n|$)", section, re.IGNORECASE
-        )
-        if not title_match:
-            # Try to find quoted title
-            title_match = re.search(r'\*?\*?"([^"]+)"', section)
-
-        if title_match:
-            result["title"] = title_match.group(1).strip().strip('"')
-
-        # Extract URL - handle both "URL:" and "**URL:**" formats
-        url_match = re.search(
-            r"\*?\*?URL:?\*?\*?\s*(?:\*?\*?)?(.*?)(?:\*?\*?)?\s*(?:\n|$)", section, re.IGNORECASE
-        )
-        if not url_match:
-            # Try to find a URL directly
-            url_match = re.search(r"https?://[^\s\n]+", section)
-
-        if url_match:
-            result["url"] = (
-                url_match.group(1).strip()
-                if ":" in url_match.group(0)
-                else url_match.group(0).strip()
-            )
-
-        # Extract summary - handle both "Summary:" and "**Summary:**" formats
-        summary_match = re.search(
-            r"\*?\*?Summary:?\*?\*?\s*(?:\*?\*?)?(.*?)(?:\n\n|\n##|$)",
-            section,
-            re.DOTALL | re.IGNORECASE,
-        )
-        if summary_match:
-            result["summary"] = summary_match.group(1).strip()
-        elif "title" in result or "url" in result:
-            # If we have a title or URL but no explicit summary, use the remaining text
-            # Remove the title and URL parts from the section
-            remaining_text = section
-            if "title" in result:
-                remaining_text = re.sub(
-                    r"\*?\*?Title:?\*?\*?\s*(?:\*?\*?)?.*?(?:\*?\*?)?\s*\n",
-                    "",
-                    remaining_text,
-                    flags=re.IGNORECASE,
-                )
-            if "url" in result:
-                remaining_text = re.sub(
-                    r"\*?\*?URL:?\*?\*?\s*(?:\*?\*?)?.*?(?:\*?\*?)?\s*\n",
-                    "",
-                    remaining_text,
-                    flags=re.IGNORECASE,
-                )
-            # Clean up the remaining text
-            remaining_text = remaining_text.strip()
-            if remaining_text:
-                result["summary"] = remaining_text
-
-        # Only add if we have at least a title or URL
-        if result.get("title") or result.get("url"):
-            # Clean up any remaining ** markers
-            for key, item_value in result.items():
-                if isinstance(item_value, str):
-                    result[key] = item_value.replace("**", "").strip()
-
-            results.append(result)
-
-    # If we still couldn't extract results, try a more general approach
-    if not results:
-        # Look for URLs in the text
-        urls = re.findall(r"https?://[^\s\n]+", text)
-        for url in urls:
-            # Find the surrounding text (up to 500 chars before and after)
-            start = max(0, text.find(url) - 500)
-            end = min(len(text), text.find(url) + len(url) + 500)
-            context = text[start:end]
-
-            # Try to extract a title (text before the URL)
-            title_match = re.search(
-                r'"([^"]+)".*?' + re.escape(url), context, re.DOTALL
-            ) or re.search(r"([^\n.!?]+).*?" + re.escape(url), context, re.DOTALL)
-            title = title_match.group(1).strip() if title_match else "Unknown Title"
-
-            # Try to extract a summary (text after the URL)
-            summary_match = re.search(re.escape(url) + r".*?([^\n]+\n[^\n]+)", context, re.DOTALL)
-            summary = summary_match.group(1).strip() if summary_match else "No summary available"
-
-            results.append({"title": title, "url": url, "summary": summary})
-
-    return results
+    # If no JSON array found, try to parse the whole text
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        raise ValueError("Could not find valid JSON in the response")
 
 
 if __name__ == "__main__":

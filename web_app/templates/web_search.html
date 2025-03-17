@@ -3,6 +3,23 @@
 {% block title %}Step 3: Web Search - YouTube Script Generator{% endblock %}
 
 {% block content %}
+<!-- Debug Information (only visible during development) -->
+<div class="card mb-3 bg-light">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Debug Information</h5>
+    </div>
+    <div class="card-body">
+        <h6>Session Data:</h6>
+        <ul>
+            <li>Topic: {{ session.get('topic', 'Not set') }}</li>
+            <li>Additional Context: {{ session.get('additional_context', 'Not set') }}</li>
+            <li>Target Audience: {{ session.get('target_audience', 'Not set') }}</li>
+            <li>Web Search Enabled: {{ session.get('use_web_search', 'Not set') }}</li>
+            <li>Search Results Length: {{ session.get('search_results')|length if session.get('search_results') else 'No results' }}</li>
+        </ul>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
         <!-- Wizard Progress Bar -->

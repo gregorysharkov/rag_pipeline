@@ -1,0 +1,29 @@
+```json
+[
+  {
+    "title": "Supercharging Fraud Detection in Financial Services with Graph Neural Networks",
+    "url": "https://developer.nvidia.com/blog/supercharging-fraud-detection-in-financial-services-with-graph-neural-networks/",
+    "summary": "This article discusses the limitations of traditional fraud detection methods and introduces Graph Neural Networks (GNNs) as a solution. GNNs analyze complex relationships between accounts, transactions, and devices, enhancing the detection of sophisticated fraud patterns. The piece also highlights a collaboration between AWS and NVIDIA, utilizing Amazon Neptune ML with GNNs to improve prediction accuracy by 50%, train models 14 times faster, and reduce costs by 8%."
+  },
+  {
+    "title": "Optimizing Fraud Detection in Financial Services with Graph Neural Networks and NVIDIA GPUs",
+    "url": "https://developer.nvidia.com/blog/optimizing-fraud-detection-in-financial-services-with-graph-neural-networks-and-nvidia-gpus/",
+    "summary": "This blog post explores the application of Graph Neural Networks (GNNs) in fraud detection within financial services. It addresses challenges such as evolving fraud patterns, data imbalance, and the need for model explainability. The article provides an end-to-end workflow for credit card fraud detection using GNNs, demonstrating how these models can effectively identify complex fraud schemes by analyzing the relationships between transactions and accounts."
+  },
+  {
+    "title": "Exclusive: Visa sets up new team to take down all scammers",
+    "url": "https://www.axios.com/2025/03/11/visa-scam-disruption-practice-fraud",
+    "summary": "Visa has established a new initiative aimed at detecting and dismantling online scammers to protect customers, addressing the growing scam ecosystem. This effort arises as consumers lost over $1 trillion to scams globally last year, and law enforcement struggles to manage the sheer volume of online scams. Modeled after threat intelligence units in cybersecurity, Visa's team proactively studies and disrupts scam operations, having already thwarted over $350 million in attempted fraud in 2024. The team focuses on expanding intelligence-gathering, accelerating scam takedowns, and investing in AI and automation to enhance detection capabilities. This initiative underscores Visa's commitment to safeguarding its customers and platforms against fraud."
+  },
+  {
+    "title": "Are you protected by the UK's new fraud rules?",
+    "url": "https://www.ft.com/content/cc1bf03a-7a7b-4977-b74a-c97f54ee8601",
+    "summary": "The UK's new fraud rules, effective from October 7, promise faster reimbursements for victims of push payment fraud, aiming to return money within five working days. This initiative shifts the burden of fraud prevention to banks, compelling them to invest significantly in detection and prevention. Last year, nearly 3 million Britons lost over £1.1 billion to fraud. While the new regulations cap automatic reimbursements at £85,000, cases above this will be dealt with individually, potentially causing delays in high-value cases. Banks are now required to share responsibility for fraudulent transactions, urging all financial institutions to heighten their fraud prevention measures. There are concerns about new risks and \"moral hazard\" if customers become complacent about security. Banks will also begin using AI technology to better detect and prevent fraud. A year-long review of the system's effectiveness is planned, as the industry adjusts to these significant changes."
+  },
+  {
+    "title": "AI-generated content raises risks of more bank runs, UK study shows",
+    "url": "https://www.reuters.com/technology/artificial-intelligence/ai-generated-content-raises-risks-more-bank-runs-uk-study-shows-2025-02-14/",
+    "summary": "A UK study has highlighted the increased risk of bank runs due to AI-generated disinformation spread on social media. The study, conducted by Say No to Disinfo and Fenimore Harper, warns that AI can create fake news and memes about bank security, leading to significant withdrawals. This follows concerns raised after the 2023 Silicon Valley Bank collapse, where $42 billion was withdrawn in 24 hours, exacerbated by social media. The G20’s Financial Stability Board previously noted that generative AI could cause financial crises. The UK study showed that a significant portion of bank customers would consider moving their money after viewing AI-generated fake content. Banks are urged to enhance media and social media monitoring to identify and mitigate the impact of disinformation. The report estimated that £10 spent on social media ads could lead to the movement of up to £1 million in deposits. Financial institutions and regulators are increasingly attentive to the risks, and the study calls for greater involvement from social media platforms in addressing these threats."
+  }
+]
+``` 
