@@ -1,12 +1,14 @@
 import os
 import logging
 import tempfile
+import json
 from datetime import datetime, timedelta
 
 from backend.agents.web_search_agent import WebSearchAgent
 from backend.agents.planning_agent import PlanningAgent
+from backend.agents.improved_script_writing_agent import ImprovedScriptWritingAgent
 from dotenv import load_dotenv
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, flash, redirect, render_template, request, session, url_for, jsonify
 from flask_session import Session
 from openai import OpenAI
 from utils.file_utils import remove_files, save_files
@@ -459,6 +461,120 @@ def save_workflow():
     """Save the current workflow data to a file."""
     # TODO: Implement saving logic
     return redirect(url_for("index"))
+
+
+@app.route("/api/generate-script-section", methods=["POST"])
+def generate_script_section():
+    """API endpoint to generate content for a specific script section."""
+    # Check if the user is logged in and has a valid session
+    if "topic" not in session or "plan" not in session:
+        return jsonify({"error": "Missing session data. Please complete the previous steps."}), 400
+
+    # Parse the request
+    try:
+        data = request.get_json()
+        section_index = int(data.get("section_index", -1))
+
+        if section_index < 0:
+            return jsonify({"error": "Invalid section index."}), 400
+    except Exception as e:
+        logger.error(f"Error parsing request: {str(e)}")
+        return jsonify({"error": f"Invalid request: {str(e)}"}), 400
+
+    # Get required data from session
+    topic = session.get("topic", "")
+    plan = session.get("plan", {})
+
+    # Get references
+    references = []
+    if session.get("selected_search_results") and session.get("search_results"):
+        for result in session.get("search_results", []):
+            if result.get("id") in session.get("selected_search_results", []):
+                references.append(result)
+
+    # Additional context
+    additional_context = session.get("additional_context", "")
+
+    # Validate plan and section index
+    if not plan or "sections" not in plan or section_index >= len(plan["sections"]):
+        return jsonify({"error": "Invalid plan or section index."}), 400
+
+    try:
+        # Initialize the script writing agent
+        script_writing_agent = ImprovedScriptWritingAgent(client)
+
+        # Generate content for the specific section
+        section_content = script_writing_agent.generate_section_content(
+            topic=topic,
+            plan=plan,
+            section_index=section_index,
+            references=references,
+            additional_context=additional_context,
+        )
+
+        return jsonify(
+            {
+                "section_index": section_index,
+                "section_name": plan["sections"][section_index]["name"],
+                "content": section_content,
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error generating script section: {str(e)}")
+        return jsonify({"error": f"Error generating script: {str(e)}"}), 500
+
+
+@app.route("/api/generate-all-sections", methods=["POST"])
+def generate_all_sections():
+    """API endpoint to generate content for all script sections."""
+    # Check if the user is logged in and has a valid session
+    if "topic" not in session or "plan" not in session:
+        return jsonify({"error": "Missing session data. Please complete the previous steps."}), 400
+
+    # Get required data from session
+    topic = session.get("topic", "")
+    plan = session.get("plan", {})
+
+    # Get references
+    references = []
+    if session.get("selected_search_results") and session.get("search_results"):
+        for result in session.get("search_results", []):
+            if result.get("id") in session.get("selected_search_results", []):
+                references.append(result)
+
+    # Additional context
+    additional_context = session.get("additional_context", "")
+
+    # Validate plan
+    if not plan or "sections" not in plan or not plan["sections"]:
+        return jsonify({"error": "Invalid plan structure or no sections available."}), 400
+
+    try:
+        # Initialize the script writing agent
+        script_writing_agent = ImprovedScriptWritingAgent(client)
+
+        # Generate content for all sections
+        all_sections_content = script_writing_agent.generate_all_section_contents(
+            topic=topic, plan=plan, references=references, additional_context=additional_context
+        )
+
+        # Format the response
+        response_data = {"sections": []}
+
+        for i, content in all_sections_content.items():
+            if i < len(plan["sections"]):
+                response_data["sections"].append(
+                    {
+                        "section_index": i,
+                        "section_name": plan["sections"][i]["name"],
+                        "content": content,
+                    }
+                )
+
+        return jsonify(response_data)
+    except Exception as e:
+        logger.error(f"Error generating all script sections: {str(e)}")
+        return jsonify({"error": f"Error generating script: {str(e)}"}), 500
 
 
 if __name__ == "__main__":
