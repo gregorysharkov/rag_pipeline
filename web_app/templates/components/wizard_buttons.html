@@ -1,0 +1,20 @@
+<!-- Wizard Navigation Buttons 
+     Parameters:
+     - current_step: The current step number (1-based)
+     - total_steps: Total number of steps in the wizard
+     - previous_url: URL for the previous step (set in JS)
+     - next_url: URL for the next step (set in JS)
+     - is_last_step: Boolean indicating if this is the last step (optional)
+-->
+<div class="wizard-buttons">
+    <button type="button" class="btn btn-outline-secondary" id="previous-btn">
+        <i class="bi bi-arrow-left"></i> Previous
+    </button>
+    <button type="submit" class="btn btn-primary" id="next-btn">
+        {% if is_last_step|default(false) %}
+            Finish <i class="bi bi-check-lg"></i>
+        {% else %}
+            Next <i class="bi bi-arrow-right"></i>
+        {% endif %}
+    </button>
+</div> 

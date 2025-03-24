@@ -3,37 +3,7 @@
 {% block title %}Step 3: Web Search - YouTube Script Generator{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <!-- Wizard Progress Bar -->
-        <div class="wizard-progress mb-4">
-            {% for i in range(1, total_steps + 1) %}
-                <div class="wizard-step">
-                    <div class="step-number {% if i < step %}completed{% elif i == step %}active{% endif %}">
-                        {{ i }}
-                    </div>
-                    <div class="step-label">
-                        {% if i == 1 %}
-                            Context
-                        {% elif i == 2 %}
-                            References
-                        {% elif i == 3 %}
-                            Web Search
-                        {% elif i == 4 %}
-                            Plan
-                        {% elif i == 5 %}
-                            Script
-                        {% elif i == 6 %}
-                            Edit
-                        {% elif i == 7 %}
-                            Short Video
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
+{% include "components/wizard_progress.html" %}
 
 <div class="row">
     <div class="col-12">
@@ -44,63 +14,12 @@
                     Review and select web search results to include in your script. These resources will help the AI generate more accurate and relevant content.
                 </p>
 
-                <form method="POST" action="{{ url_for('web_search') }}" class="needs-validation" novalidate>
-                    <!-- Context Information from Previous Steps (Disabled) -->
-                    <div class="card mb-4">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Context Information</h5>
-                            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-context-btn">
-                                Edit <i class="bi bi-pencil"></i>
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <label class="form-label">Topic</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" value="{{ session.get('topic', '') }}" disabled>
-                                </div>
-                            </div>
-                            
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <label class="form-label">Additional Context</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <textarea class="form-control" rows="3" disabled>{{ session.get('additional_context', '') }}</textarea>
-                                </div>
-                            </div>
-                            
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <label class="form-label">Target Audience</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" value="{{ session.get('target_audience', '') }}" disabled>
-                                </div>
-                            </div>
-                            
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <label class="form-label">Content Type</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" value="{{ session.get('content_type', '') }}" disabled>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label class="form-label">Tone</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" value="{{ session.get('tone', '') }}" disabled>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Previous Steps Context Information -->
+                {% with script_session=script_session, current_step=3 %}
+                    {% include "components/session_context.html" %}
+                {% endwith %}
 
+                <form method="POST" action="{{ url_for('web_search') }}" class="needs-validation" novalidate>
                     <!-- References Information -->
                     <div class="card mb-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -161,7 +80,7 @@
                             </a>
                         </div>
                         <p class="text-muted mb-3">
-                            Based on your topic "{{ session.get('topic', 'your topic') }}", we found the following resources. 
+                            Based on your topic "{{ script_session.topic }}", we found the following resources. 
                             Select the ones you want to include in your script.
                         </p>
                         
@@ -173,15 +92,15 @@
                         </div>
                         
                         <div class="search-results-container">
-                            {% if session.get('search_results') %}
-                                {% for result in session.get('search_results') %}
+                            {% if script_session.web_search_results %}
+                                {% for result in script_session.web_search_results %}
                                 <div class="card mb-3 search-result-card">
                                     <div class="card-body">
                                         <div class="form-check mb-2">
                                             <input class="form-check-input result-checkbox" type="checkbox" 
                                                    name="selected_results[]" value="{{ result.id }}" 
                                                    id="result-{{ result.id }}"
-                                                   {% if session.get('selected_search_results') and result.id in session.get('selected_search_results') %}checked{% endif %}>
+                                                   {% if script_session.selected_search_results and result.id in script_session.selected_search_results %}checked{% endif %}>
                                             <label class="form-check-label" for="result-{{ result.id }}">
                                                 <h5 class="card-title mb-1">{{ result.title }}</h5>
                                             </label>
@@ -191,7 +110,7 @@
                                                 {{ result.url }}
                                             </a>
                                         </h6>
-                                        <p class="card-text">{{ result.summary }}</p>
+                                        <p class="card-text">{{ result.snippet }}</p>
                                     </div>
                                 </div>
                                 {% endfor %}
@@ -203,14 +122,7 @@
                         </div>
                     </div>
 
-                    <div class="wizard-buttons">
-                        <button type="button" class="btn btn-outline-secondary" id="previous-btn">
-                            <i class="bi bi-arrow-left"></i> Previous
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            Next <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
+                    {% include "components/wizard_buttons.html" %}
                 </form>
             </div>
         </div>
@@ -240,17 +152,12 @@
 
 {% block extra_js %}
 <script>
+    // Set previous URL for wizard buttons
+    const PREVIOUS_URL = '{{ url_for('references') }}';
+    
     document.addEventListener('DOMContentLoaded', function() {
         // Navigation buttons
-        document.getElementById('edit-context-btn').addEventListener('click', function() {
-            window.location.href = '{{ url_for('context') }}';
-        });
-        
         document.getElementById('edit-references-btn').addEventListener('click', function() {
-            window.location.href = '{{ url_for('references') }}';
-        });
-        
-        document.getElementById('previous-btn').addEventListener('click', function() {
             window.location.href = '{{ url_for('references') }}';
         });
         
@@ -294,4 +201,6 @@
         }
     });
 </script>
+<script src="{{ url_for('static', filename='js/wizard_buttons.js') }}"></script>
+<script src="{{ url_for('static', filename='js/session_context.js') }}"></script>
 {% endblock %} 

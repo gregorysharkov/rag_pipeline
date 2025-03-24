@@ -1,242 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Step 4: Script - YouTube Script Generator{% endblock %}
+{% block title %}Step {% if is_web_search_skipped %}4{% else %}5{% endif %}: Script - YouTube Script Generator{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <!-- Wizard Progress -->
-    <div class="wizard mb-4">
-        <div class="wizard-inner">
-            <div class="connecting-line"></div>
-            <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('context') }}" class="nav-link done">
-                        <span class="round-tab">1</span>
-                        <span class="round-tab-label">Context</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('references') }}" class="nav-link done">
-                        <span class="round-tab">2</span>
-                        <span class="round-tab-label">References</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('web_search') }}" class="nav-link {% if is_web_search_skipped %}skipped{% else %}done{% endif %}">
-                        <span class="round-tab">3</span>
-                        <span class="round-tab-label">Web Search</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('plan') }}" class="nav-link done">
-                        <span class="round-tab">4</span>
-                        <span class="round-tab-label">Plan</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('script') }}" class="nav-link active">
-                        <span class="round-tab">5</span>
-                        <span class="round-tab-label">Script</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('edit') }}" class="nav-link disabled">
-                        <span class="round-tab">6</span>
-                        <span class="round-tab-label">Edit</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('short_video') }}" class="nav-link disabled">
-                        <span class="round-tab">7</span>
-                        <span class="round-tab-label">Short Video</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    {% include "components/wizard_progress.html" %}
 
-    <!-- Context Information (Read-only) -->
-    <div class="card mb-4 collapsible-section">
-        <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#contextInfo" aria-expanded="false">
-            <h5 class="mb-0">
-                <i class="fas fa-chevron-down collapse-icon me-2"></i>
-                Context Information
-            </h5>
-            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-context-btn">
-                <i class="fas fa-edit"></i> Edit
-            </button>
-        </div>
-        <div class="card-body collapse" id="contextInfo">
-            <div class="mb-3">
-                <label class="form-label">Topic</label>
-                <input type="text" class="form-control" value="{{ session.get('topic', '') }}" disabled>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Additional Context</label>
-                <textarea class="form-control" rows="3" disabled>{{ session.get('additional_context', '') }}</textarea>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Target Audience</label>
-                <input type="text" class="form-control" value="{{ session.get('target_audience', '') }}" disabled>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Content Type</label>
-                <input type="text" class="form-control" value="{{ session.get('content_type', '') }}" disabled>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Tone</label>
-                <input type="text" class="form-control" value="{{ session.get('tone', '') }}" disabled>
-            </div>
-        </div>
-    </div>
-
-    <!-- References & Resources -->
-    <div class="card mb-4 collapsible-section">
-        <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#referencesResources" aria-expanded="false">
-            <h5 class="mb-0">
-                <i class="fas fa-chevron-down collapse-icon me-2"></i>
-                References & Resources
-            </h5>
-            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-resources-btn">
-                <i class="fas fa-edit"></i> Edit
-            </button>
-        </div>
-        <div class="card-body collapse" id="referencesResources">
-            <!-- Web Links -->
-            {% if session.get('web_links') %}
-            <div class="mb-3">
-                <h6>Web Links</h6>
-                <div class="list-group">
-                    {% for link in session.get('web_links', []) %}
-                    <div class="list-group-item">
-                        <div class="d-flex w-100 justify-content-between">
-                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.url }}</a>
-                        </div>
-                        {% if link.description %}
-                        <p class="mb-1">{{ link.description }}</p>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-            
-            <!-- Uploaded Files -->
-            {% if session.get('reference_files') %}
-            <div class="mb-3">
-                <h6>Uploaded Files</h6>
-                <div class="list-group">
-                    {% for file in session.get('reference_files', []) %}
-                    <div class="list-group-item">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">{{ file.filename }}</h6>
-                            <small>{{ file.size_display }}</small>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-            
-            {% if not session.get('web_links') and not session.get('reference_files') %}
-            <p class="text-muted">No references or resources added.</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Selected Web Search Results (Read-only) -->
-    <div class="card mb-4 collapsible-section">
-        <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#webSearchResults" aria-expanded="false">
-            <h5 class="mb-0">
-                <i class="fas fa-chevron-down collapse-icon me-2"></i>
-                Web Search Results
-            </h5>
-            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-references-btn">
-                <i class="fas fa-edit"></i> Edit
-            </button>
-        </div>
-        <div class="card-body collapse" id="webSearchResults">
-            {% if session.get('selected_search_results') and session.get('search_results') %}
-            <div class="list-group">
-                {% for result in session.get('search_results') %}
-                {% if result.id in session.get('selected_search_results') %}
-                <div class="list-group-item">
-                    <h6 class="mb-1">{{ result.title }}</h6>
-                    <p class="mb-1"><small>{{ result.url }}</small></p>
-                    <p class="mb-0">{{ result.summary }}</p>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="text-muted">No web search results selected.</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Video Details (Read-only from Plan) -->
-    <div class="card mb-4 collapsible-section">
-        <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#videoDetails" aria-expanded="false">
-            <h5 class="mb-0">
-                <i class="fas fa-chevron-down collapse-icon me-2"></i>
-                Video Details
-            </h5>
-            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-plan-btn">
-                <i class="fas fa-edit"></i> Edit
-            </button>
-        </div>
-        <div class="card-body collapse" id="videoDetails">
-            <div class="mb-3">
-                <label class="form-label">Title</label>
-                <input type="text" class="form-control" value="{{ session.get('video_title', '') }}" disabled>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Target Audience</label>
-                <input type="text" class="form-control" value="{{ session.get('target_audience', '') }}" disabled>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Duration</label>
-                <input type="text" class="form-control" value="{{ session.get('duration', '') }}" disabled>
-            </div>
-        </div>
-    </div>
-
-    <!-- Plan Sections (Read-only) -->
-    <div class="card mb-4 collapsible-section">
-        <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#scriptPlan" aria-expanded="false">
-            <h5 class="mb-0">
-                <i class="fas fa-chevron-down collapse-icon me-2"></i>
-                Script Plan
-            </h5>
-            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-plan-sections-btn">
-                <i class="fas fa-edit"></i> Edit
-            </button>
-        </div>
-        <div class="card-body collapse" id="scriptPlan">
-            {% if session.get('plan') and session.get('plan').get('sections') %}
-            <div class="list-group">
-                {% for section in session.get('plan').get('sections') %}
-                <div class="list-group-item">
-                    <h6 class="mb-1">{{ section.name }}</h6>
-                    <div class="mb-2">
-                        <strong>Key Message:</strong> {{ section.key_message }}
-                    </div>
-                    <div>
-                        <strong>Key Points:</strong>
-                        <ul class="mb-0">
-                            {% for point in section.points %}
-                            <li>{{ point }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="text-muted">No script plan available.</p>
-            {% endif %}
-        </div>
-    </div>
+    <!-- Previous Steps Context Information -->
+    {% with script_session=script_session, current_step=5 %}
+        {% include "components/session_context.html" %}
+    {% endwith %}
 
     <!-- Script Sections -->
     <form method="POST" action="{{ url_for('script') }}" class="needs-validation" novalidate>
@@ -279,11 +52,18 @@
                     {% endfor %}
                 </div>
 
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-arrow-right"></i> Continue to Edit
+                <div class="d-grid gap-2 mb-3">
+                    <button type="button" class="btn btn-primary" id="generate-script-btn">
+                        <i class="fas fa-magic"></i> Generate All Sections
                     </button>
                 </div>
+
+                <!-- Script generation status -->
+                <div id="script-generation-status" class="alert alert-info d-none mb-3">
+                    <i class="fas fa-spinner fa-spin"></i> Generating script content...
+                </div>
+
+                {% include "components/wizard_buttons.html" %}
             </div>
         </div>
     </form>
@@ -291,213 +71,174 @@
 
 {% block scripts %}
 <script>
-document.getElementById('edit-context-btn').addEventListener('click', function() {
-    window.location.href = '{{ url_for('context') }}';
-});
-
-document.getElementById('edit-references-btn').addEventListener('click', function() {
-    window.location.href = '{{ url_for('web_search') }}';
-});
-
-document.getElementById('edit-plan-btn').addEventListener('click', function() {
-    window.location.href = '{{ url_for('plan') }}';
-});
-
-document.getElementById('edit-plan-sections-btn').addEventListener('click', function() {
-    window.location.href = '{{ url_for('plan') }}';
-});
-
-document.getElementById('edit-resources-btn').addEventListener('click', function() {
-    window.location.href = '{{ url_for('references') }}';
-});
-
-// Handle collapsible sections
-document.addEventListener('DOMContentLoaded', function() {
-    const collapsibleHeaders = document.querySelectorAll('.collapsible-section .card-header');
+    // Set previous URL for wizard buttons
+    const PREVIOUS_URL = '{{ url_for('plan') }}';
+    const NEXT_URL = '{{ url_for('edit') }}';
     
-    collapsibleHeaders.forEach(header => {
-        const icon = header.querySelector('.collapse-icon');
-        const targetId = header.getAttribute('data-bs-target');
-        const targetElement = document.querySelector(targetId);
-        
-        header.addEventListener('click', function(e) {
-            // Don't toggle if they clicked on the edit button
-            if (e.target.closest('.btn')) {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Generate All Sections Button
+        document.getElementById('generate-script-btn').addEventListener('click', function() {
+            if (!confirm('This will generate content for all script sections. Continue?')) {
                 return;
             }
             
-            // Toggle the collapse state
-            const bsCollapse = new bootstrap.Collapse(targetElement, {
-                toggle: true
-            });
-            
-            // Toggle the icon rotation
-            if (icon) {
-                icon.classList.toggle('collapsed');
-            }
-        });
-    });
-});
-
-document.getElementById('generate-script-btn').addEventListener('click', function() {
-    if (!confirm('This will generate content for all script sections. Continue?')) {
-        return;
-    }
-    
-    // Show loading state
-    const generateBtn = this;
-    const originalBtnText = generateBtn.innerHTML;
-    generateBtn.disabled = true;
-    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
-    
-    // Add a status message
-    const scriptSectionsEl = document.querySelector('.script-section').closest('.mb-4');
-    let statusEl = document.getElementById('generation-status');
-    if (!statusEl) {
-        statusEl = document.createElement('div');
-        statusEl.id = 'generation-status';
-        statusEl.className = 'alert alert-info';
-        statusEl.innerHTML = 'Starting content generation for all sections...';
-        scriptSectionsEl.insertBefore(statusEl, scriptSectionsEl.firstChild);
-    } else {
-        statusEl.className = 'alert alert-info';
-        statusEl.innerHTML = 'Starting content generation for all sections...';
-    }
-    
-    // Get all section textareas
-    const textareas = document.querySelectorAll('.script-section');
-    
-    // Call the API endpoint for each section independently
-    const sectionPromises = Array.from(textareas).map((textarea, index) => {
-        return fetch('{{ url_for("generate_script_section") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                section_index: index
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error for section ${index}: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log(`Section ${index} generated:`, data);
-            statusEl.innerHTML = `Generating: ${index + 1} of ${textareas.length} sections completed`;
-            return {index, data};
-        })
-        .catch(error => {
-            console.error(`Error generating section ${index}:`, error);
-            return {index, error: error.message};
-        });
-    });
-    
-    // Process all sections
-    Promise.all(sectionPromises)
-        .then(results => {
-            // Update textareas with generated content
-            results.forEach(result => {
-                if (result.data && !result.error) {
-                    textareas[result.index].value = result.data.content;
-                } else {
-                    textareas[result.index].value = `Error generating content: ${result.error}`;
-                }
-            });
-            
-            // Update status
-            statusEl.className = 'alert alert-success';
-            statusEl.innerHTML = 'Content generation complete for all sections!';
-            
-            // Restore button
-            generateBtn.disabled = false;
-            generateBtn.innerHTML = originalBtnText;
-        })
-        .catch(error => {
-            console.error('Error processing sections:', error);
-            
-            // Update status
-            statusEl.className = 'alert alert-danger';
-            statusEl.innerHTML = `Error generating content: ${error.message}`;
-            
-            // Restore button
-            generateBtn.disabled = false;
-            generateBtn.innerHTML = originalBtnText;
-        });
-});
-
-// Add individual section generation buttons
-document.addEventListener('DOMContentLoaded', function() {
-    const sectionCards = document.querySelectorAll('.script-section');
-    
-    sectionCards.forEach((textarea, index) => {
-        const container = textarea.closest('.card-body');
-        const label = textarea.previousElementSibling;
-        
-        // Create a button container
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'd-flex justify-content-end mb-2';
-        
-        // Create the generate button for this section
-        const generateBtn = document.createElement('button');
-        generateBtn.type = 'button';
-        generateBtn.className = 'btn btn-sm btn-outline-primary generate-section-btn';
-        generateBtn.dataset.sectionIndex = index;
-        generateBtn.innerHTML = '<i class="fas fa-magic"></i> Generate This Section';
-        
-        buttonContainer.appendChild(generateBtn);
-        
-        // Insert the button after the label
-        if (label) {
-            label.after(buttonContainer);
-        } else {
-            container.insertBefore(buttonContainer, textarea);
-        }
-        
-        // Add click event listener
-        generateBtn.addEventListener('click', function() {
             // Show loading state
-            const originalBtnText = this.innerHTML;
-            this.disabled = true;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            const generateBtn = this;
+            const originalBtnText = generateBtn.innerHTML;
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
             
-            // Call the API endpoint
-            fetch('{{ url_for("generate_script_section") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    section_index: index
+            // Add a status message
+            const scriptSectionsEl = document.querySelector('.script-section').closest('.mb-4');
+            let statusEl = document.getElementById('generation-status');
+            if (!statusEl) {
+                statusEl = document.createElement('div');
+                statusEl.id = 'generation-status';
+                statusEl.className = 'alert alert-info';
+                statusEl.innerHTML = 'Starting content generation for all sections...';
+                scriptSectionsEl.insertBefore(statusEl, scriptSectionsEl.firstChild);
+            } else {
+                statusEl.className = 'alert alert-info';
+                statusEl.innerHTML = 'Starting content generation for all sections...';
+            }
+            
+            // Get all section textareas
+            const textareas = document.querySelectorAll('.script-section');
+            
+            // Call the API endpoint for each section independently
+            const sectionPromises = Array.from(textareas).map((textarea, index) => {
+                return fetch('{{ url_for("generate_script_section") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        section_index: index
+                    })
                 })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log(`Section ${index} generated:`, data);
-                textarea.value = data.content;
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error for section ${index}: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(`Section ${index} generated:`, data);
+                    statusEl.innerHTML = `Generating: ${index + 1} of ${textareas.length} sections completed`;
+                    return {index, data};
+                })
+                .catch(error => {
+                    console.error(`Error generating section ${index}:`, error);
+                    return {index, error: error.message};
+                });
+            });
+            
+            // Process all sections
+            Promise.all(sectionPromises)
+                .then(results => {
+                    // Update textareas with generated content
+                    results.forEach(result => {
+                        if (result.data && !result.error) {
+                            textareas[result.index].value = result.data.content;
+                        } else {
+                            textareas[result.index].value = `Error generating content: ${result.error}`;
+                        }
+                    });
+                    
+                    // Update status
+                    statusEl.className = 'alert alert-success';
+                    statusEl.innerHTML = 'Content generation complete for all sections!';
+                    
+                    // Restore button
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = originalBtnText;
+                })
+                .catch(error => {
+                    console.error('Error processing sections:', error);
+                    
+                    // Update status
+                    statusEl.className = 'alert alert-danger';
+                    statusEl.innerHTML = `Error generating content: ${error.message}`;
+                    
+                    // Restore button
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = originalBtnText;
+                });
+        });
+    });
+
+    // Add individual section generation buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        const sectionCards = document.querySelectorAll('.script-section');
+        
+        sectionCards.forEach((textarea, index) => {
+            const container = textarea.closest('.card-body');
+            const label = textarea.previousElementSibling;
+            
+            // Create a button container
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'd-flex justify-content-end mb-2';
+            
+            // Create the generate button for this section
+            const generateBtn = document.createElement('button');
+            generateBtn.type = 'button';
+            generateBtn.className = 'btn btn-sm btn-outline-primary generate-section-btn';
+            generateBtn.dataset.sectionIndex = index;
+            generateBtn.innerHTML = '<i class="fas fa-magic"></i> Generate This Section';
+            
+            buttonContainer.appendChild(generateBtn);
+            
+            // Insert the button after the label
+            if (label) {
+                label.after(buttonContainer);
+            } else {
+                container.insertBefore(buttonContainer, textarea);
+            }
+            
+            // Add click event listener
+            generateBtn.addEventListener('click', function() {
+                // Show loading state
+                const originalBtnText = this.innerHTML;
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
                 
-                // Restore button
-                this.disabled = false;
-                this.innerHTML = originalBtnText;
-            })
-            .catch(error => {
-                console.error(`Error generating section ${index}:`, error);
-                textarea.value = `Error generating content: ${error.message}`;
-                
-                // Restore button
-                this.disabled = false;
-                this.innerHTML = originalBtnText;
+                // Call the API endpoint
+                fetch('{{ url_for("generate_script_section") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        section_index: index
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(`Section ${index} generated:`, data);
+                    textarea.value = data.content;
+                    
+                    // Restore button
+                    this.disabled = false;
+                    this.innerHTML = originalBtnText;
+                })
+                .catch(error => {
+                    console.error(`Error generating section ${index}:`, error);
+                    textarea.value = `Error generating content: ${error.message}`;
+                    
+                    // Restore button
+                    this.disabled = false;
+                    this.innerHTML = originalBtnText;
+                });
             });
         });
     });
-});
 </script>
+<script src="{{ url_for('static', filename='js/wizard_buttons.js') }}"></script>
+<script src="{{ url_for('static', filename='js/session_context.js') }}"></script>
 {% endblock %}
 {% endblock %} 

@@ -1,216 +1,38 @@
 {% extends "base.html" %}
 
-{% block title %}Step 3: Plan - YouTube Script Generator{% endblock %}
+{% block title %}{% if is_web_search_skipped %}Step 3{% else %}Step 4{% endif %}: Plan - YouTube Script Generator{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <!-- Wizard Progress -->
-    <div class="wizard mb-4">
-        <div class="wizard-inner">
-            <div class="connecting-line"></div>
-            <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('context') }}" class="nav-link done">
-                        <span class="round-tab">1</span>
-                        <span class="round-tab-label">Context</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('references') }}" class="nav-link done">
-                        <span class="round-tab">2</span>
-                        <span class="round-tab-label">References</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('web_search') }}" class="nav-link {% if is_web_search_skipped %}skipped{% else %}done{% endif %}">
-                        <span class="round-tab">3</span>
-                        <span class="round-tab-label">Web Search</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('plan') }}" class="nav-link active">
-                        <span class="round-tab">4</span>
-                        <span class="round-tab-label">Plan</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('script') }}" class="nav-link {% if session.get('sections') %}enabled{% else %}disabled{% endif %}">
-                        <span class="round-tab">5</span>
-                        <span class="round-tab-label">Script</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('edit') }}" class="nav-link disabled">
-                        <span class="round-tab">6</span>
-                        <span class="round-tab-label">Edit</span>
-                    </a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a href="{{ url_for('short_video') }}" class="nav-link disabled">
-                        <span class="round-tab">7</span>
-                        <span class="round-tab-label">Short Video</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    {% include "components/wizard_progress.html" %}
 
-    <!-- Context Information (Read-only) -->
-    <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Context Information</h5>
-            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-context-btn">
-                <i class="fas fa-edit"></i> Edit
-            </button>
-        </div>
-        <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label">Topic</label>
-                <input type="text" class="form-control" value="{{ session.get('topic', '') }}" disabled>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Additional Context</label>
-                <textarea class="form-control" rows="3" disabled>{{ session.get('additional_context', '') }}</textarea>
-            </div>
-        </div>
-    </div>
+    <!-- Previous Steps Context Information -->
+    {% with script_session=script_session, current_step=4 %}
+        {% include "components/session_context.html" %}
+    {% endwith %}
 
-    <!-- Selected References (Read-only) -->
-    <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Selected References</h5>
-            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-references-btn">
-                <i class="fas fa-edit"></i> Edit
-            </button>
-        </div>
-        <div class="card-body">
-            {% if session.get('selected_search_results') and session.get('search_results') %}
-            <div class="list-group">
-                {% for result in session.get('search_results') %}
-                {% if result.id in session.get('selected_search_results') %}
-                <div class="list-group-item">
-                    <h6 class="mb-1">{{ result.title }}</h6>
-                    <p class="mb-1"><small>{{ result.url }}</small></p>
-                    <p class="mb-0">{{ result.summary }}</p>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="text-muted">No references selected.</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Generate Plan Form -->
-    <div class="card mb-4">
+    <div class="card">
         <div class="card-header">
-            <h5 class="mb-0">Generate Script Plan</h5>
+            <h4 class="mb-0">Script Plan</h4>
         </div>
         <div class="card-body">
-            {% if not plan_data %}
-            <form method="POST" action="{{ url_for('plan') }}">
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-magic"></i> Generate Plan
-                    </button>
-                </div>
-            </form>
-            
-            <!-- Placeholder sections -->
-            <div class="mt-4">
-                <div class="mb-3">
-                    <label class="form-label">Video Title</label>
-                    <input type="text" class="form-control" placeholder="Title will appear here after generation" disabled>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Target Audience</label>
-                    <input type="text" class="form-control" placeholder="Target audience will appear here after generation" disabled>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Estimated Duration</label>
-                    <input type="text" class="form-control" placeholder="Duration will appear here after generation" disabled>
-                </div>
-                
-                <h6 class="mt-4 mb-3">Script Sections</h6>
-                
-                <div class="card mb-3 placeholder-glow">
-                    <div class="card-header">
-                        <h6 class="mb-0 placeholder col-6"></h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">Key Message</label>
-                            <p class="mb-0 placeholder col-10"></p>
-                        </div>
-                        <div>
-                            <label class="form-label">Key Points</label>
-                            <ul class="mb-0">
-                                <li><span class="placeholder col-8"></span></li>
-                                <li><span class="placeholder col-7"></span></li>
-                                <li><span class="placeholder col-9"></span></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card mb-3 placeholder-glow">
-                    <div class="card-header">
-                        <h6 class="mb-0 placeholder col-4"></h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">Key Message</label>
-                            <p class="mb-0 placeholder col-10"></p>
-                        </div>
-                        <div>
-                            <label class="form-label">Key Points</label>
-                            <ul class="mb-0">
-                                <li><span class="placeholder col-6"></span></li>
-                                <li><span class="placeholder col-8"></span></li>
-                                <li><span class="placeholder col-7"></span></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="d-flex justify-content-between mt-4">
-                <a href="{{ url_for('web_search') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left"></i> Previous
-                </a>
-                <a href="{{ url_for('script') }}" class="btn btn-outline-secondary disabled">
-                    Next <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-            {% else %}
-            <!-- Generated Plan Display -->
-            <div class="mb-3">
-                <label class="form-label">Video Title</label>
-                <input type="text" class="form-control" value="{{ video_title }}" disabled>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Target Audience</label>
-                <input type="text" class="form-control" value="{{ target_audience }}" disabled>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Estimated Duration</label>
-                <input type="text" class="form-control" value="{{ duration }}" disabled>
-            </div>
-            
-            <h6 class="mt-4 mb-3">Script Sections</h6>
-            {% for section in plan_data.sections %}
+            {% if script_session.plan %}
+            <p class="text-muted mb-4">
+                Review the generated plan for your script. Each section includes key messages and points to cover.
+            </p>
+
+            <!-- Show plan sections -->
+            {% for section in script_session.plan.sections %}
             <div class="card mb-3">
                 <div class="card-header">
-                    <h6 class="mb-0">{{ section.name }}</h6>
+                    <h5 class="mb-0">{{ section.name }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">Key Message</label>
-                        <p class="mb-0">{{ section.key_message }}</p>
+                        <strong>Key Message:</strong> {{ section.key_message }}
                     </div>
                     <div>
-                        <label class="form-label">Key Points</label>
+                        <strong>Key Points:</strong>
                         <ul class="mb-0">
                             {% for point in section.points %}
                             <li>{{ point }}</li>
@@ -221,35 +43,45 @@
             </div>
             {% endfor %}
 
-            <div class="d-grid gap-2">
+            <!-- Service Action Button -->
+            <div class="d-grid gap-2 mb-4">
                 <form method="POST" action="{{ url_for('plan') }}">
                     <button type="submit" class="btn btn-outline-primary w-100">
-                        <i class="fas fa-sync"></i> Regenerate Plan
+                        <i class="bi bi-arrow-clockwise"></i> Regenerate Plan
                     </button>
                 </form>
-                <div class="d-flex justify-content-between mt-3">
-                    <a href="{{ url_for('web_search') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </a>
-                    <a href="{{ url_for('script') }}" class="btn btn-primary">
-                        Next <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
             </div>
+            
+            <!-- Navigation Buttons -->
+            {% include "components/wizard_buttons.html" %}
+            {% else %}
+            <div class="alert alert-info">
+                No plan has been generated yet. Click the button below to create a plan.
+            </div>
+            
+            <!-- Service Action Button -->
+            <div class="d-grid gap-2 mb-4">
+                <form method="POST" action="{{ url_for('plan') }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-magic"></i> Generate Plan
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            {% include "components/wizard_buttons.html" %}
             {% endif %}
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block scripts %}
 <script>
-document.getElementById('edit-context-btn').addEventListener('click', function() {
-    window.location.href = '{{ url_for('context') }}';
-});
-
-document.getElementById('edit-references-btn').addEventListener('click', function() {
-    window.location.href = '{{ url_for('web_search') }}';
-});
+// Set previous and next URL for wizard buttons
+const PREVIOUS_URL = '{% if script_session.use_web_search %}{{ url_for('web_search') }}{% else %}{{ url_for('references') }}{% endif %}';
+const NEXT_URL = '{{ url_for('script') }}';
 </script>
-{% endblock %}
+<script src="{{ url_for('static', filename='js/wizard_buttons.js') }}"></script>
+<script src="{{ url_for('static', filename='js/session_context.js') }}"></script>
 {% endblock %} 

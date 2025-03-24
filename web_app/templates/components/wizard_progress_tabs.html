@@ -1,0 +1,50 @@
+<!-- Wizard Progress Tabs Style -->
+<div class="wizard mb-4">
+    <div class="wizard-inner">
+        <div class="connecting-line"></div>
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="nav-item">
+                <a href="{{ url_for('context') }}" class="nav-link {% if step > 1 %}done{% elif step == 1 %}active{% endif %}">
+                    <span class="round-tab">1</span>
+                    <span class="round-tab-label">Context</span>
+                </a>
+            </li>
+            <li role="presentation" class="nav-item">
+                <a href="{{ url_for('references') }}" class="nav-link {% if step > 2 %}done{% elif step == 2 %}active{% else %}disabled{% endif %}">
+                    <span class="round-tab">2</span>
+                    <span class="round-tab-label">References</span>
+                </a>
+            </li>
+            <li role="presentation" class="nav-item">
+                <a href="{{ url_for('web_search') }}" class="nav-link {% if is_web_search_skipped %}skipped{% elif step > 3 %}done{% elif step == 3 %}active{% else %}disabled{% endif %}">
+                    <span class="round-tab">3</span>
+                    <span class="round-tab-label">Web Search</span>
+                </a>
+            </li>
+            <li role="presentation" class="nav-item">
+                <a href="{{ url_for('plan') }}" class="nav-link {% if step > 4 %}done{% elif step == 4 %}active{% else %}disabled{% endif %}">
+                    <span class="round-tab">4</span>
+                    <span class="round-tab-label">Plan</span>
+                </a>
+            </li>
+            <li role="presentation" class="nav-item">
+                <a href="{{ url_for('script') }}" class="nav-link {% if step > 5 %}done{% elif step == 5 %}active{% else %}disabled{% endif %}">
+                    <span class="round-tab">5</span>
+                    <span class="round-tab-label">Script</span>
+                </a>
+            </li>
+            <li role="presentation" class="nav-item">
+                <a href="{{ url_for('edit') }}" class="nav-link {% if step > 6 %}done{% elif step == 6 %}active{% else %}disabled{% endif %}">
+                    <span class="round-tab">6</span>
+                    <span class="round-tab-label">Edit</span>
+                </a>
+            </li>
+            <li role="presentation" class="nav-item">
+                <a href="{{ url_for('short_video') }}" class="nav-link {% if step == 7 %}active{% else %}disabled{% endif %}">
+                    <span class="round-tab">7</span>
+                    <span class="round-tab-label">Short Video</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div> 
