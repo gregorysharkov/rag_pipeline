@@ -1,0 +1,89 @@
+/* Common styles for the YouTube Script Generator app */
+
+/* Wizard Progress Bar */
+.wizard-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.wizard-progress:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    height: 2px;
+    width: 100%;
+    background-color: #e9ecef;
+    z-index: 0;
+}
+
+.wizard-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.step-number.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.step-number.completed {
+    background-color: #198754;
+    color: white;
+}
+
+.step-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-align: center;
+}
+
+/* Form styles */
+.form-card {
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Wizard Buttons */
+.wizard-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+}
+
+/* Collapsible Sections */
+.collapsible-section .card-header {
+    cursor: pointer;
+}
+
+.collapsible-section .collapse-icon {
+    transition: transform 0.3s ease;
+}
+
+.collapsible-section .collapse-icon.bi-chevron-up {
+    transform: rotate(180deg);
+}
+
+.card-header a.btn {
+    z-index: 2;
+} 

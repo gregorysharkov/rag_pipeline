@@ -3,35 +3,7 @@
 {% block title %}Step 1: Context - YouTube Script Generator{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <!-- Wizard Progress Bar -->
-        <div class="wizard-progress mb-4">
-            {% for i in range(1, total_steps + 1) %}
-                <div class="wizard-step">
-                    <div class="step-number {% if i < step %}completed{% elif i == step %}active{% endif %}">
-                        {{ i }}
-                    </div>
-                    <div class="step-label">
-                        {% if i == 1 %}
-                            Context
-                        {% elif i == 2 %}
-                            References
-                        {% elif i == 3 %}
-                            Plan
-                        {% elif i == 4 %}
-                            Script
-                        {% elif i == 5 %}
-                            Edit
-                        {% elif i == 6 %}
-                            Short Video
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
+{% include "components/wizard_progress.html" %}
 
 <div class="row">
     <div class="col-12">
@@ -47,7 +19,7 @@
                         <label for="topic" class="form-label">Topic *</label>
                         <input type="text" class="form-control" id="topic" name="topic" 
                                placeholder="e.g., The impact of artificial intelligence on healthcare" 
-                               value="{{ session.get('topic', '') }}"
+                               value="{{ script_session.topic }}"
                                required>
                         <div class="form-text">
                             Enter the main topic for your YouTube video.
@@ -61,12 +33,12 @@
                         <label for="additional_context" class="form-label">Additional Context</label>
                         <textarea class="form-control" id="additional_context" name="additional_context" 
                                   rows="6" placeholder="e.g., Focus on recent advancements and ethical considerations"
-                                  data-max-chars="2000">{{ session.get('additional_context', '') }}</textarea>
+                                  data-max-chars="2000">{{ script_session.additional_context }}</textarea>
                         <div class="form-text">
                             Provide any additional information or specific aspects you want to include (up to 2000 characters).
                         </div>
                         <div id="additional_context-counter" class="form-text text-end">
-                            {{ 2000 - (session.get('additional_context', '') | length) }} characters remaining
+                            {{ 2000 - (script_session.additional_context | length) }} characters remaining
                         </div>
                     </div>
 
@@ -74,19 +46,23 @@
                         <label for="target_audience" class="form-label">Target Audience</label>
                         <div class="input-group">
                             <select class="form-select" id="audience_select" onchange="updateTargetAudience(this.value)">
-                                <option value="" {% if not session.get('target_audience') %}selected{% endif %}>Select target audience</option>
-                                <option value="general" {% if session.get('target_audience') == 'general' %}selected{% endif %}>General audience</option>
-                                <option value="beginners" {% if session.get('target_audience') == 'beginners' %}selected{% endif %}>Beginners</option>
-                                <option value="intermediate" {% if session.get('target_audience') == 'intermediate' %}selected{% endif %}>Intermediate knowledge</option>
-                                <option value="experts" {% if session.get('target_audience') == 'experts' %}selected{% endif %}>Experts</option>
-                                <option value="students" {% if session.get('target_audience') == 'students' %}selected{% endif %}>Students</option>
-                                <option value="professionals" {% if session.get('target_audience') == 'professionals' %}selected{% endif %}>Professionals</option>
-                                <option value="custom" {% if session.get('target_audience') and session.get('target_audience') not in ['general', 'beginners', 'intermediate', 'experts', 'students', 'professionals'] %}selected{% endif %}>Custom (enter your own)</option>
+                                <option value="" {% if not script_session.target_audience %}selected{% endif %}>Select target audience</option>
+                                <option value="general" {% if script_session.target_audience == 'general' %}selected{% endif %}>General audience</option>
+                                <option value="beginners" {% if script_session.target_audience == 'beginners' %}selected{% endif %}>Beginners</option>
+                                <option value="intermediate" {% if script_session.target_audience == 'intermediate' %}selected{% endif %}>Intermediate knowledge</option>
+                                <option value="experts" {% if script_session.target_audience == 'experts' %}selected{% endif %}>Experts</option>
+                                <option value="students" {% if script_session.target_audience == 'students' %}selected{% endif %}>Students</option>
+                                <option value="professionals" {% if script_session.target_audience == 'professionals' %}selected{% endif %}>Professionals</option>
+                                <option value="custom" {% if script_session.target_audience and script_session.target_audience not in ['general', 'beginners', 'intermediate', 'experts', 'students', 'professionals'] %}selected{% endif %}>Custom (enter your own)</option>
                             </select>
                             <input type="text" class="form-control" id="target_audience" name="target_audience" 
                                    placeholder="Enter custom audience" 
-                                   value="{{ session.get('target_audience', '') }}"
-                                   style="display: {% if session.get('target_audience') and session.get('target_audience') not in ['general', 'beginners', 'intermediate', 'experts', 'students', 'professionals'] %}block{% else %}none{% endif %}">
+                                   value="{{ script_session.target_audience }}"
+                                   {% if script_session.target_audience and script_session.target_audience not in ['general', 'beginners', 'intermediate', 'experts', 'students', 'professionals'] %}
+                                   style="display: block"
+                                   {% else %}
+                                   style="display: none"
+                                   {% endif %}>
                         </div>
                         <div class="form-text">
                             Select from the list or choose "Custom" to enter your own target audience.
@@ -96,13 +72,13 @@
                     <div class="mb-4">
                         <label for="content_type" class="form-label">Content Type</label>
                         <select class="form-select" id="content_type" name="content_type">
-                            <option value="" {% if not session.get('content_type') %}selected{% endif %}>Select content type</option>
-                            <option value="educational" {% if session.get('content_type') == 'educational' %}selected{% endif %}>Educational</option>
-                            <option value="tutorial" {% if session.get('content_type') == 'tutorial' %}selected{% endif %}>Tutorial</option>
-                            <option value="explainer" {% if session.get('content_type') == 'explainer' %}selected{% endif %}>Explainer</option>
-                            <option value="review" {% if session.get('content_type') == 'review' %}selected{% endif %}>Review</option>
-                            <option value="opinion" {% if session.get('content_type') == 'opinion' %}selected{% endif %}>Opinion/Commentary</option>
-                            <option value="entertainment" {% if session.get('content_type') == 'entertainment' %}selected{% endif %}>Entertainment</option>
+                            <option value="" {% if not script_session.content_type %}selected{% endif %}>Select content type</option>
+                            <option value="educational" {% if script_session.content_type == 'educational' %}selected{% endif %}>Educational</option>
+                            <option value="tutorial" {% if script_session.content_type == 'tutorial' %}selected{% endif %}>Tutorial</option>
+                            <option value="explainer" {% if script_session.content_type == 'explainer' %}selected{% endif %}>Explainer</option>
+                            <option value="review" {% if script_session.content_type == 'review' %}selected{% endif %}>Review</option>
+                            <option value="opinion" {% if script_session.content_type == 'opinion' %}selected{% endif %}>Opinion/Commentary</option>
+                            <option value="entertainment" {% if script_session.content_type == 'entertainment' %}selected{% endif %}>Entertainment</option>
                         </select>
                         <div class="form-text">
                             Select the type of content you want to create.
@@ -112,13 +88,13 @@
                     <div class="mb-4">
                         <label for="tone" class="form-label">Tone</label>
                         <select class="form-select" id="tone" name="tone">
-                            <option value="" {% if not session.get('tone') %}selected{% endif %}>Select tone</option>
-                            <option value="formal" {% if session.get('tone') == 'formal' %}selected{% endif %}>Formal</option>
-                            <option value="conversational" {% if session.get('tone') == 'conversational' %}selected{% endif %}>Conversational</option>
-                            <option value="enthusiastic" {% if session.get('tone') == 'enthusiastic' %}selected{% endif %}>Enthusiastic</option>
-                            <option value="humorous" {% if session.get('tone') == 'humorous' %}selected{% endif %}>Humorous</option>
-                            <option value="serious" {% if session.get('tone') == 'serious' %}selected{% endif %}>Serious</option>
-                            <option value="inspirational" {% if session.get('tone') == 'inspirational' %}selected{% endif %}>Inspirational</option>
+                            <option value="" {% if not script_session.tone %}selected{% endif %}>Select tone</option>
+                            <option value="formal" {% if script_session.tone == 'formal' %}selected{% endif %}>Formal</option>
+                            <option value="conversational" {% if script_session.tone == 'conversational' %}selected{% endif %}>Conversational</option>
+                            <option value="enthusiastic" {% if script_session.tone == 'enthusiastic' %}selected{% endif %}>Enthusiastic</option>
+                            <option value="humorous" {% if script_session.tone == 'humorous' %}selected{% endif %}>Humorous</option>
+                            <option value="serious" {% if script_session.tone == 'serious' %}selected{% endif %}>Serious</option>
+                            <option value="inspirational" {% if script_session.tone == 'inspirational' %}selected{% endif %}>Inspirational</option>
                         </select>
                         <div class="form-text">
                             Select the tone you want for your content.
@@ -126,7 +102,7 @@
                     </div>
 
                     <div class="wizard-buttons">
-                        <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('index') }}'">
+                        <button type="button" class="btn btn-outline-secondary" id="cancel-btn">
                             Cancel
                         </button>
                         <button type="submit" class="btn btn-primary">
@@ -142,56 +118,14 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    function updateTargetAudience(value) {
-        const customInput = document.getElementById('target_audience');
-        
-        if (value === 'custom') {
-            // Show the custom input field
-            customInput.style.display = 'block';
-            customInput.focus();
-            customInput.value = '';
-        } else {
-            // Hide the custom input field and set its value to the selected option
-            customInput.style.display = 'none';
-            customInput.value = value;
-        }
-    }
-
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        // Check if there's a previously selected value
-        const audienceSelect = document.getElementById('audience_select');
-        const targetAudience = document.getElementById('target_audience');
-        
-        // If there's a value in the hidden input that doesn't match any option,
-        // select "custom" and show the input
-        const audienceValue = targetAudience.value;
-        if (audienceValue) {
-            let found = false;
-            for (let i = 0; i < audienceSelect.options.length; i++) {
-                if (audienceSelect.options[i].value === audienceValue) {
-                    audienceSelect.selectedIndex = i;
-                    found = true;
-                    break;
-                }
-            }
-            
-            if (!found && audienceValue !== '') {
-                // Select the "custom" option
-                for (let i = 0; i < audienceSelect.options.length; i++) {
-                    if (audienceSelect.options[i].value === 'custom') {
-                        audienceSelect.selectedIndex = i;
-                        break;
-                    }
-                }
-                // Show the custom input
-                targetAudience.style.display = 'block';
-            }
-        }
-    });
+    // Pass Flask URL routes to JavaScript
+    const INDEX_URL = "{{ url_for('index') }}";
 </script>
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/context.js') }}"></script>
 {% endblock %} 

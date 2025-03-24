@@ -1,0 +1,169 @@
+<!-- Script Session Context Component
+     Parameters:
+     - script_session: The current script session
+     - current_step: The current step number (1-based)
+     
+     This component displays relevant context information from previous steps
+     based on which step the user is currently on.
+-->
+
+{% if script_session %}
+<!-- Context Information (always shown after step 1) -->
+{% if current_step > 1 %}
+<div class="card mb-4 collapsible-section">
+    <div class="card-header d-flex justify-content-between align-items-center" 
+         data-bs-toggle="collapse" data-bs-target="#contextInfo" aria-expanded="false">
+        <h5 class="mb-0">
+            <i class="bi bi-chevron-down collapse-icon me-2"></i>
+            Context Information
+        </h5>
+        <a href="{{ url_for('context') }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+    </div>
+    <div class="card-body collapse" id="contextInfo">
+        <div class="mb-3">
+            <strong>Topic:</strong> {{ script_session.topic }}
+        </div>
+        {% if script_session.additional_context %}
+        <div class="mb-3">
+            <strong>Additional Context:</strong> {{ script_session.additional_context }}
+        </div>
+        {% endif %}
+        {% if script_session.target_audience %}
+        <div class="mb-3">
+            <strong>Target Audience:</strong> {{ script_session.target_audience }}
+        </div>
+        {% endif %}
+        {% if script_session.video_length %}
+        <div class="mb-3">
+            <strong>Video Length:</strong> {{ script_session.video_length }}
+        </div>
+        {% endif %}
+        {% if script_session.tone %}
+        <div class="mb-3">
+            <strong>Content Tone:</strong> {{ script_session.tone }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- References and Resources (shown after step 2) -->
+{% if current_step > 2 %}
+<div class="card mb-4 collapsible-section">
+    <div class="card-header d-flex justify-content-between align-items-center" 
+         data-bs-toggle="collapse" data-bs-target="#referencesInfo" aria-expanded="false">
+        <h5 class="mb-0">
+            <i class="bi bi-chevron-down collapse-icon me-2"></i>
+            References & Resources
+        </h5>
+        <a href="{{ url_for('references') }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+    </div>
+    <div class="card-body collapse" id="referencesInfo">
+        <!-- File Uploads -->
+        {% if script_session.reference_files and script_session.reference_files|length > 0 %}
+        <div class="mb-3">
+            <strong>Uploaded Files:</strong>
+            <ul>
+                {% for file in script_session.reference_files %}
+                <li>{{ file.original_filename }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Web Links -->
+        {% if script_session.web_links and script_session.web_links|length > 0 %}
+        <div class="mb-3">
+            <strong>Web Links:</strong>
+            <ul>
+                {% for link in script_session.web_links %}
+                <li>
+                    <a href="{{ link.url }}" target="_blank">{{ link.url }}</a>
+                    {% if link.description %} - {{ link.description }}{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Web Search Usage -->
+        <div class="mb-3">
+            <strong>Web Search:</strong> 
+            {% if script_session.use_web_search %}Enabled{% else %}Disabled{% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Selected Web Search Results (shown after step 3, if web search was used) -->
+{% if current_step > 3 and script_session.use_web_search and script_session.selected_search_results %}
+<div class="card mb-4 collapsible-section">
+    <div class="card-header d-flex justify-content-between align-items-center" 
+         data-bs-toggle="collapse" data-bs-target="#selectedResultsInfo" aria-expanded="false">
+        <h5 class="mb-0">
+            <i class="bi bi-chevron-down collapse-icon me-2"></i>
+            Selected Web Results
+        </h5>
+        <a href="{{ url_for('web_search') }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+    </div>
+    <div class="card-body collapse" id="selectedResultsInfo">
+        <ul>
+            {% for result in script_session.web_search_results %}
+                {% if script_session.selected_search_results and result.id in script_session.selected_search_results %}
+                <li>
+                    <strong>{{ result.title }}</strong><br>
+                    <a href="{{ result.url }}" target="_blank" class="text-truncate">{{ result.url }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+<!-- Script Plan (shown after step 4) -->
+{% if current_step > 4 and script_session.plan %}
+<div class="card mb-4 collapsible-section">
+    <div class="card-header d-flex justify-content-between align-items-center" 
+         data-bs-toggle="collapse" data-bs-target="#planInfo" aria-expanded="false">
+        <h5 class="mb-0">
+            <i class="bi bi-chevron-down collapse-icon me-2"></i>
+            Script Plan
+        </h5>
+        <a href="{{ url_for('plan') }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+    </div>
+    <div class="card-body collapse" id="planInfo">
+        {% if script_session.plan and script_session.plan.sections %}
+        <div class="list-group">
+            {% for section in script_session.plan.sections %}
+            <div class="list-group-item">
+                <h6 class="mb-1">{{ section.name }}</h6>
+                <div class="mb-2">
+                    <strong>Key Message:</strong> {{ section.key_message }}
+                </div>
+                <div>
+                    <strong>Key Points:</strong>
+                    <ul class="mb-0">
+                        {% for point in section.points %}
+                        <li>{{ point }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted">No script plan available.</p>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endif %} 

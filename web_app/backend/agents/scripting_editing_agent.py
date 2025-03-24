@@ -6,14 +6,31 @@ import re
 class ScriptEditingAgent:
     """Agent responsible for editing and enhancing scripts based on user preferences."""
 
-    def __init__(self, client: OpenAI):
+    def __init__(self, client=None):
         """Initialize the ScriptEditingAgent.
 
         Args:
-            client: An instance of the OpenAI client.
+            client: An instance of the OpenAI client (optional).
         """
         self.client = client
         self.logger = logging.getLogger(__name__)
+
+    def edit_script(
+        self, original_script: str, edit_options: list, additional_instructions: str = ""
+    ) -> str:
+        """Edit the script based on the selected options and instructions.
+
+        This is a convenience method that calls run() internally.
+
+        Args:
+            original_script: The original script content to edit.
+            edit_options: A list of editing options selected by the user.
+            additional_instructions: Any additional user instructions.
+
+        Returns:
+            str: The edited script content.
+        """
+        return self.run(original_script, edit_options, additional_instructions)
 
     def run(
         self, original_script: str, edit_options: list, additional_instructions: str = ""
@@ -35,6 +52,17 @@ class ScriptEditingAgent:
         prompt = self._create_editing_prompt(original_script, edit_options, additional_instructions)
 
         try:
+            # If client is not provided, create a mock response
+            if not self.client:
+                self.logger.warning(
+                    "No OpenAI client provided. Returning original script with minimal edits."
+                )
+                # Simple simulation of editing with section headers preserved
+                edited_script = original_script
+                if "ADD MOCK EDITING CHANGES" not in edited_script:
+                    edited_script += "\n\nADD MOCK EDITING CHANGES: This is a placeholder for actual AI-generated edits."
+                return edited_script
+
             # Call the LLM to edit the script
             self.logger.info("Calling LLM to edit script")
             response = self.client.chat.completions.create(
@@ -47,7 +75,7 @@ class ScriptEditingAgent:
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.7,
-                max_tokens=4000,
+                max_tokens=10000,
             )
 
             # Extract the edited script from the response
