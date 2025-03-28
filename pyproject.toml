@@ -11,17 +11,12 @@ dependencies = [
     "ipython>=8.10",
     "jupyterlab>=3.0",
     "notebook",
-    "kedro[jupyter]~=0.19.11",
-    "kedro-datasets[pandas-csvdataset, pandas-exceldataset, pandas-parquetdataset, plotly-plotlydataset, plotly-jsondataset, matplotlib-matplotlibwriter]>=3.0",
-    "kedro-viz>=6.7.0",
     "scikit-learn~=1.5.1",
     "seaborn~=0.12.1"
 ]
 
 [project.scripts]
 "rag-pipeline" = "rag_pipeline.__main__:main"
-
-[project.entry-points."kedro.hooks"]
 
 [project.optional-dependencies]
 docs = [
@@ -48,14 +43,6 @@ version = {attr = "rag_pipeline.__version__"}
 [tool.setuptools.packages.find]
 where = ["src"]
 namespaces = false
-
-[tool.kedro]
-package_name = "rag_pipeline"
-project_name = "rag_pipeline"
-kedro_init_version = "0.19.11"
-tools = "['Linting', 'Testing', 'Custom Logging', 'Documentation', 'Data Structure', 'Kedro Viz']"
-example_pipeline = "False"
-source_dir = "src"
 
 [tool.pytest.ini_options]
 addopts = """
@@ -87,6 +74,3 @@ select = [
     "T201", # Print Statement
 ]
 ignore = ["E501"]  # Ruff format takes care of line-too-long
-
-[tool.kedro_telemetry]
-project_id = "8a8334201c9e40188fa5bd36167846f3"
