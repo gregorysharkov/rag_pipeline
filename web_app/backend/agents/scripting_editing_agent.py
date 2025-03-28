@@ -1,6 +1,8 @@
 import logging
 from openai import OpenAI
 import re
+import os
+from dotenv import load_dotenv
 
 
 class ScriptEditingAgent:
@@ -12,8 +14,35 @@ class ScriptEditingAgent:
         Args:
             client: An instance of the OpenAI client (optional).
         """
-        self.client = client
         self.logger = logging.getLogger(__name__)
+        
+        # Load environment variables
+        load_dotenv()
+        
+        # Initialize client if not provided
+        if client is None:
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                raise ValueError("OpenAI API key not found in environment variables")
+            self.client = OpenAI(api_key=api_key)
+        else:
+            self.client = client
+
+        # Define the available editing options and their descriptions
+        self.edit_options = {
+            "conversational": "Make the script more conversational and natural-sounding for speech",
+            "rhetorical": "Add rhetorical questions to engage the audience",
+            "humor": "Add appropriate humor where it fits naturally",
+            "transitions": "Improve transitions between sections to make the flow smoother",
+            "flow": "Ensure the script flows naturally when read aloud",
+            "analogies": "Add relevant analogies to explain complex concepts",
+            "simplify": "Simplify language to make it more accessible to the target audience",
+            "scene_descriptions": "Add scene descriptions in [SCENE: description] format",
+            "visuals": "Add visual cues and suggestions in [VISUAL: description] format",
+            "cuts": "Add camera cuts and transitions in [CUT TO: description] format",
+            "b_roll": "Suggest B-roll footage in [B-ROLL: description] format",
+            "graphics": "Add on-screen text and graphics suggestions in [GRAPHIC: description] format",
+        }
 
     def edit_script(
         self, original_script: str, edit_options: list, additional_instructions: str = ""
@@ -52,17 +81,6 @@ class ScriptEditingAgent:
         prompt = self._create_editing_prompt(original_script, edit_options, additional_instructions)
 
         try:
-            # If client is not provided, create a mock response
-            if not self.client:
-                self.logger.warning(
-                    "No OpenAI client provided. Returning original script with minimal edits."
-                )
-                # Simple simulation of editing with section headers preserved
-                edited_script = original_script
-                if "ADD MOCK EDITING CHANGES" not in edited_script:
-                    edited_script += "\n\nADD MOCK EDITING CHANGES: This is a placeholder for actual AI-generated edits."
-                return edited_script
-
             # Call the LLM to edit the script
             self.logger.info("Calling LLM to edit script")
             response = self.client.chat.completions.create(
@@ -70,12 +88,12 @@ class ScriptEditingAgent:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a professional YouTube script editor who enhances scripts to make them more engaging, entertaining, and visually appealing.",
+                        "content": "You are a professional script editor who enhances scripts to make them more engaging and effective.",
                     },
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.7,
-                max_tokens=10000,
+                max_tokens=4000,
             )
 
             # Extract the edited script from the response
@@ -129,7 +147,8 @@ class ScriptEditingAgent:
             str: The prompt to send to the LLM.
         """
         # Base prompt
-        prompt = f"""Please edit and enhance the following YouTube script according to these specifications:
+        prompt = f"""You are an expert script editor. Your task is to edit the following script according to provided instructions.
+The script is separated in sections using the following pattern `**section_name**`, please edit each section separately.
 
 ORIGINAL SCRIPT:
 {original_script}
@@ -137,32 +156,12 @@ ORIGINAL SCRIPT:
 EDITING REQUIREMENTS:
 """
 
-        # Define option dictionaries with their corresponding instructions
-        script_enhancements = {
-            "conversational": "Make the script more conversational and natural-sounding for speech",
-            "rhetorical": "Add rhetorical questions to engage the audience",
-            "humor": "Add appropriate humor where it fits naturally",
-            "transitions": "Improve transitions between sections to make the flow smoother",
-            "flow": "Ensure the script flows naturally when read aloud",
-            "analogies": "Add relevant analogies to explain complex concepts",
-            "simplify": "Simplify language to make it more accessible to the target audience",
-        }
-
-        visual_elements = {
-            "scene_descriptions": "Add scene descriptions in [SCENE: description] format",
-            "visuals": "Add visual cues and suggestions in [VISUAL: description] format",
-            "cuts": "Add camera cuts and transitions in [CUT TO: description] format",
-            "b_roll": "Suggest B-roll footage in [B-ROLL: description] format",
-            "graphics": "Add on-screen text and graphics suggestions in [GRAPHIC: description] format",
-        }
-
-        # Combine all options into a single dictionary
-        all_options = {**script_enhancements, **visual_elements}
-
-        # Add selected options to the prompt
+        # Add selected options to the prompt with their descriptions
         for option in edit_options:
-            if option in all_options:
-                prompt += f"- {all_options[option]}\n"
+            if option in self.edit_options:
+                prompt += f"- {self.edit_options[option]}\n"
+            else:
+                prompt += f"- {option}\n"
 
         # Add additional instructions
         if additional_instructions:

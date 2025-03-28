@@ -111,7 +111,8 @@
                         <!-- Shorts will be displayed here after generation -->
                     </div>
 
-                    {% include "components/wizard_buttons.html" with is_last_step=true %}
+                    {% set context = {'is_last_step': true} %}
+                    {% include "components/wizard_buttons.html" %}
                 </form>
             </div>
         </div>
