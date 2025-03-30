@@ -82,12 +82,13 @@ IMPORTANT:
 - If you cannot find enough results, return fewer than 5 rather than making up results
 
 YOUR RESPONSE MUST BE IN THIS EXACT JSON FORMAT WITH NOTHING ELSE:
+If additional context contains questions, make sure that the summary contains answers to the questions.
 {{
     "results": [
         {{
             "title": "The Actual Title of the Webpage",
             "url": "https://real-website.com/actual-page",
-            "summary": "Actual summary of the content from the page..."
+            "summary": "Actual summary of the content from the page, facts that are relevant to the topic and can be used to create content on the topic."
         }},
         ...
     ]

@@ -8,16 +8,23 @@ from .plan import Plan
 from .edit_options import EditOptions
 from .shorts_options import ShortsOptions
 
+ADDITIONAL_CONTEXT = """
+I want to create an expert-level video about technologies used to build modern ai agents.
+Which tools are used to build ai agents? What are the best practices for building ai agents?
+What are the latest trends in ai agent development? What are the future trends in ai agent development?
+
+Do it in a way that is easy to understand for a technical audience (people who are interested in starting building ai agents).
+"""
 
 @dataclass
 class ScriptSession:
     """Class for storing session data."""
 
-    topic: str = field(default="")
-    additional_context: str = field(default="")
-    target_audience: str = field(default="")
-    content_type: str = field(default="")
-    tone: str = field(default="")
+    topic: str = field(default="The Iceberg Secret Behind Building AI Agents (What No One Tells You)")
+    additional_context: str = field(default=ADDITIONAL_CONTEXT)
+    target_audience: str = field(default="Professionals")
+    content_type: str = field(default="Explainer")
+    tone: str = field(default="Conversational")
     use_web_search: bool = field(default=True)
     reference_files: List[dict] = field(default_factory=list)
     web_links: List[WebLink] = field(default_factory=list)

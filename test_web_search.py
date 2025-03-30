@@ -4,6 +4,11 @@ import sys
 from dotenv import load_dotenv
 from openai import OpenAI
 
+
+"""
+Make it as natural as possible. This will be an expert talking to the camera, so propose to add visuals every 10-15 seconds. Add timestamp next to each section header.
+"""
+
 # Configure logging
 logging.basicConfig(
     level=logging.DEBUG,

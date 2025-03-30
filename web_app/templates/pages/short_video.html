@@ -1,0 +1,98 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Generate Short Videos{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Wizard Progress -->
+    {% include "components/wizard_progress.html" %}
+
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4">Generate YouTube Shorts</h2>
+            
+            <!-- Display the edited script -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-2">Edited Script</h3>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    {% if edited_script %}
+                        {{ edited_script | safe }}
+                    {% else %}
+                        <p class="text-gray-500">No edited script content has been created yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Shorts Generation Form -->
+            <form method="POST" class="space-y-6">
+                <!-- Number of Shorts -->
+                <div>
+                    <label for="shorts_count" class="block text-sm font-medium text-gray-700">Number of Shorts</label>
+                    <select name="shorts_count" id="shorts_count" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        {% for i in range(1, 6) %}
+                            <option value="{{ i }}" {% if shorts_count == i %}selected{% endif %}>{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Duration of Shorts -->
+                <div>
+                    <label for="shorts_duration" class="block text-sm font-medium text-gray-700">Duration of Each Short (seconds)</label>
+                    <select name="shorts_duration" id="shorts_duration" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="15" {% if shorts_duration == 15 %}selected{% endif %}>15 seconds</option>
+                        <option value="30" {% if shorts_duration == 30 %}selected{% endif %}>30 seconds</option>
+                        <option value="45" {% if shorts_duration == 45 %}selected{% endif %}>45 seconds</option>
+                        <option value="60" {% if shorts_duration == 60 %}selected{% endif %}>60 seconds</option>
+                    </select>
+                </div>
+
+                <!-- Focus Areas -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Focus Areas</label>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <input type="checkbox" name="shorts_focus[]" value="hook" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" {% if "hook" in shorts_focus %}checked{% endif %}>
+                            <label class="ml-2 block text-sm text-gray-900">Strong Hook</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" name="shorts_focus[]" value="engagement" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" {% if "engagement" in shorts_focus %}checked{% endif %}>
+                            <label class="ml-2 block text-sm text-gray-900">High Engagement</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" name="shorts_focus[]" value="call_to_action" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" {% if "call_to_action" in shorts_focus %}checked{% endif %}>
+                            <label class="ml-2 block text-sm text-gray-900">Call to Action</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generated Shorts Preview -->
+                {% if generated_shorts %}
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold mb-2">Generated Shorts</h3>
+                    <div class="space-y-4">
+                        {% for short in generated_shorts %}
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-medium mb-2">{{ short.title }}</h4>
+                            <p class="text-gray-600">{{ short.content }}</p>
+                            <p class="text-sm text-gray-500 mt-2">Duration: {{ short.duration }} seconds</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Navigation Buttons -->
+                {% include "components/wizard_buttons.html" %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any JavaScript functionality here
+});
+</script>
+{% endblock %} 

@@ -478,16 +478,21 @@ def edit():
         logger.debug(f"Received edited_script: {edited_script[:100]}...")  # Print first 100 chars
         logger.debug(f"Form keys: {list(request.form.keys())}")
 
-        # Prepare combined script content
-        combined_script = ""
-        if current_session.script_sections:
-            for section in current_session.script_sections:
-                combined_script += f"**[{section.get('title', '')}]**\n\n"
-                combined_script += f"{section.get('content', '')}\n\n"
+        # Prepare combined script content if no edited script was provided
+        if not edited_script:
+            combined_script = ""
+            if current_session.script_sections:
+                for section in current_session.script_sections:
+                    combined_script += f"**[{section.get('title', '')}]**\n\n"
+                    combined_script += f"{section.get('content', '')}\n\n"
 
-        # Use the script editing agent to generate the edited script
-        agent = ScriptEditingAgent()
-        edited_script = agent.edit_script(combined_script, edit_options, additional_instructions)
+            # Use the script editing agent to generate the edited script
+            agent = ScriptEditingAgent()
+            edited_script = agent.edit_script(combined_script, edit_options, additional_instructions)
+
+        # Debug logging
+        logger.debug(f"Final edited_script length: {len(edited_script)}")
+        logger.debug(f"Final edited_script preview: {edited_script[:100]}...")
 
         # Save the edited script and options to session
         try:
@@ -553,18 +558,26 @@ def short_video():
         flash("Please create a script first.", "warning")
         return redirect(url_for("script"))
 
-    # Check if editing step is completed
+    # Check if editing step is completed and get the edited script
+    edited_script = ""
     try:
         if not current_session.edit_options.is_complete:
             flash("Please complete the editing step first.", "warning")
             return redirect(url_for("edit"))
 
-        # Get the edited script
+        # Get the edited script from edit_options
         edited_script = current_session.edit_options.edited_script
     except (AttributeError, TypeError):
         # Handle case where edit_options is not an EditOptions object
         flash("Please complete the editing step first.", "warning")
         return redirect(url_for("edit"))
+
+    # If no edited script is available, create one from script sections
+    if not edited_script:
+        edited_script = ""
+        for section in current_session.script_sections:
+            edited_script += f"**[{section.get('title', '')}]**\n\n"
+            edited_script += f"{section.get('content', '')}\n\n"
 
     # Ensure shorts_options is a ShortsOptions object
     try:
@@ -589,14 +602,6 @@ def short_video():
             is_complete=bool(shorts_data),
         )
         session["script_session"] = current_session
-
-    # Get the edited script or build from script sections
-    if not edited_script:
-        # Create a combined script from the sections
-        edited_script = ""
-        for section in current_session.script_sections:
-            edited_script += f"**[{section.get('title', '')}]**\n\n"
-            edited_script += f"{section.get('content', '')}\n\n"
 
     # Check if web search is skipped
     is_web_search_skipped = not current_session.use_web_search
@@ -627,6 +632,10 @@ def short_video():
         # Proceed to completion
         flash("Congratulations! You've completed the YouTube Script Generator wizard.", "success")
         return redirect(url_for("index"))
+
+    # Debug logging
+    logger.debug(f"Edited script length: {len(edited_script)}")
+    logger.debug(f"Edited script preview: {edited_script[:100]}...")
 
     return render_template(
         "short_video.html",
