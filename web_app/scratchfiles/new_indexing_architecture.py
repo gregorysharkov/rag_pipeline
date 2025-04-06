@@ -143,7 +143,7 @@ def process_search_results(
                         d.summary = $summary,
                         d.content = $content,
                         d.created_at = datetime()
-                """,
+                    """,
                     url=url,
                     title=result["title"],
                     summary=result["summary"],
