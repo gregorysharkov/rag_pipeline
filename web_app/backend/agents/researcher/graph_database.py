@@ -7,6 +7,7 @@ from web_app.backend.agents.researcher.graph_store import DeduplicatingNeo4jGrap
 
 logger = logging.getLogger(__name__)
 
+
 def get_or_create_graph_store() -> DeduplicatingNeo4jGraphStore:
     """Get or create a Neo4j graph store with deduplication."""
     try:
@@ -14,13 +15,10 @@ def get_or_create_graph_store() -> DeduplicatingNeo4jGraphStore:
         driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
         driver.verify_connectivity()
         driver.close()
-        
+
         logger.info("Connected to existing Neo4j database")
         return DeduplicatingNeo4jGraphStore(
-            username=NEO4J_USER,
-            password=NEO4J_PASSWORD,
-            url=NEO4J_URI,
-            database="neo4j"
+            username=NEO4J_USER, password=NEO4J_PASSWORD, url=NEO4J_URI, database="neo4j"
         )
     except Exception as e:
         logger.error(f"Error connecting to Neo4j: {str(e)}")
