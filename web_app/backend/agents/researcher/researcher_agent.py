@@ -23,10 +23,13 @@ import json
 import logging
 import os
 import re
+import asyncio
+import concurrent.futures
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Callable, Optional
+from typing import Callable, Optional, List
+from functools import partial
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -106,20 +109,39 @@ class ContextResearcherAgent:
             ),
         ]
 
-    @cached_property
-    def collected_items(self) -> list[CollectedInformation]:
+    def process_agents_parallel(self) -> list[CollectedInformation]:
+        """Process all agents in parallel."""
         collected_items = []
-        for agent in self.agents:
-            collected_items.extend(agent.collected_items)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(self.agents)) as executor:
+            # Submit all agents for processing
+            future_to_agent = {
+                executor.submit(lambda a: a.collected_items, agent): agent for agent in self.agents
+            }
+
+            # Process results as they complete
+            for future in concurrent.futures.as_completed(future_to_agent):
+                agent = future_to_agent[future]
+                try:
+                    items = future.result()
+                    collected_items.extend(items)
+                except Exception as e:
+                    logger.error(f"Error processing agent {type(agent).__name__}: {str(e)}")
 
         return collected_items
 
+    @property
+    def collected_items(self) -> list[CollectedInformation]:
+        """Get all collected items from all agents in parallel."""
+        return self.process_agents_parallel()
+
     def run(self) -> None:
-        for item in self.collected_items:
-            item.fetch_content()
+        """Run the research process."""
+        items = self.collected_items
+        for item in items:
             logger.info(item)
 
     def dump_collected_items(self, base_path: str) -> None:
+        """Dump all collected items to files."""
         for item in self.collected_items:
             item.dumps(base_path)
 
@@ -130,22 +152,41 @@ class InformationCollectorAgent(ABC):
     def __init__(self, script_session: ScriptSession, **kwargs):
         self.script_session = script_session
         self.__dict__.update(kwargs)
-        self._items = None  # Add private storage for items
+        self._items = None
+        self.max_workers = 5  # Configurable number of workers
 
     @abstractmethod
     def collect_information(self) -> list[CollectedInformation]:
-        """
-        Collects information given the query and additional context.
-        Returns a list of collected information objects.
-        """
+        """Collects information given the query and additional context."""
         pass
 
     @abstractmethod
     def process_items(self, items: list[CollectedInformation]) -> None:
-        """
-        Processes the response from the LLM and fills the content field of the CollectedInformation objects.
-        """
+        """Processes the response from the LLM and fills the content field."""
         pass
+
+    def process_item_safe(self, item: CollectedInformation) -> None:
+        """Safely process a single item with error handling."""
+        try:
+            item.fetch_content()
+            logger.info(f"Successfully processed item: {item.title}")
+        except Exception as e:
+            logger.error(f"Error processing item {item.url}: {str(e)}")
+
+    def process_items_parallel(self, items: list[CollectedInformation]) -> None:
+        """Process items in parallel using ThreadPoolExecutor."""
+        if not items:
+            return
+
+        logger.info(f"Processing {len(items)} items in parallel...")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            # Submit all items for processing
+            futures = [executor.submit(self.process_item_safe, item) for item in items]
+
+            # Wait for all futures to complete
+            concurrent.futures.wait(futures)
+
+        logger.info("Parallel processing completed")
 
     @property
     def collected_items(self) -> list[CollectedInformation]:
@@ -153,7 +194,7 @@ class InformationCollectorAgent(ABC):
         if self._items is None:
             self._items = self.collect_information()
             if self._items is not None:
-                self.process_items(self._items)
+                self.process_items_parallel(self._items)
         return self._items or []
 
 
@@ -193,12 +234,8 @@ class WebSearchCollectorAgent(InformationCollectorAgent):
         ]
 
     def process_items(self, items: list[CollectedInformation]) -> None:
-        """Process the collected items."""
-        for item in items:
-            try:
-                item.fetch_content()
-            except Exception as e:
-                logger.error(f"Error processing item {item.url}: {str(e)}")
+        """Process web pages in parallel."""
+        self.process_items_parallel(items)
 
 
 class YoutubeSearchCollectorAgent(InformationCollectorAgent):
@@ -210,6 +247,7 @@ class YoutubeSearchCollectorAgent(InformationCollectorAgent):
             r"(?:https?://)?(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})",
             r"(?:https?://)?(?:www\.)?youtube\.com/embed/([a-zA-Z0-9_-]{11})",
         ]
+        self.max_workers = 3  # Limit concurrent YouTube API calls
 
     @property
     def user_message(self):
@@ -248,6 +286,7 @@ class YoutubeSearchCollectorAgent(InformationCollectorAgent):
         return any(re.match(pattern, url) for pattern in self.youtube_url_patterns)
 
     def collect_information(self) -> list[CollectedInformation]:
+        """Collect information about relevant YouTube videos."""
         response = get_openai_response(
             prompt=COMMON_SEARCH_INSTRUCTIONS,
             user_message=self.user_message,
@@ -269,7 +308,7 @@ class YoutubeSearchCollectorAgent(InformationCollectorAgent):
                 valid_items.append(
                     CollectedInformation(
                         title=item.get("title", ""),
-                        url=url.strip("'\""),  # Remove any quotes
+                        url=url.strip("'\""),
                         summary=item.get("summary", ""),
                         collector_func=fetch_youtube_transcript,
                     )
@@ -281,12 +320,8 @@ class YoutubeSearchCollectorAgent(InformationCollectorAgent):
         return valid_items
 
     def process_items(self, items: list[CollectedInformation]) -> None:
-        """Process collected YouTube videos by fetching their transcripts."""
-        for item in items:
-            try:
-                item.fetch_content()
-            except Exception as e:
-                logger.error(f"Error fetching transcript for {item.url}: {str(e)}")
+        """Process collected YouTube videos by fetching their transcripts in parallel."""
+        self.process_items_parallel(items)
 
 
 def setup_script_session() -> ScriptSession:
