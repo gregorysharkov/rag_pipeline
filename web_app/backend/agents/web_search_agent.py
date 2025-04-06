@@ -67,7 +67,7 @@ class WebSearchAgent(BaseAgent):
 
 You are a web search specialist with access to the latest information up to {current_date}.
 Your task is to search the web for the most relevant and up-to-date information on the given topic.
-Return exactly 5 high-quality search results that would be most helpful for someone creating content on this topic.
+Return exactly from 5 to 10 high-quality search results that would be most helpful for someone creating content on this topic.
 
 For each result, provide:
 1. A title - use the actual title from the webpage

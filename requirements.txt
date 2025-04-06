@@ -1,6 +1,12 @@
 python-dotenv
-openai
+openai>=1.0.0
 ipython>=8.10
 jupyterlab>=3.0
 notebook
 pandas
+llama-index>=0.10.0
+llama-index-graph-stores-neo4j
+neo4j>=5.15.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+tqdm>=4.66.0
