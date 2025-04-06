@@ -1,7 +1,12 @@
 import json
+import logging
+
 from openai import OpenAI
 
-from web_app.logging import logger
+from web_app.logging.logger import setup_logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 
 def get_openai_response(prompt: str, user_message: str, model: str, client: OpenAI) -> str:

@@ -1,9 +1,15 @@
+import logging
 import re
 
 from youtube_transcript_api import (
     NoTranscriptFound,
     YouTubeTranscriptApi,
 )
+
+from web_app.logging.logger import setup_logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 
 class YoutubeTranscriptGenerator:
@@ -25,7 +31,7 @@ class YoutubeTranscriptGenerator:
         Raises:
             ValueError: If video ID cannot be extracted from the URL
         """
-        print(f"Extracting video ID from URL: {url}")
+        logger.info(f"Extracting video ID from URL: {url}")
         # Common YouTube URL patterns
         patterns = [
             r"(?:v=|\/)([0-9A-Za-z_-]{11}).*",  # Regular URLs
