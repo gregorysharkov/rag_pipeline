@@ -117,7 +117,7 @@ class ContextResearcherAgent:
     def run(self) -> None:
         for item in self.collected_items:
             item.fetch_content()
-            print(item)
+            logger.info(item)
 
     def dump_collected_items(self, base_path: str) -> None:
         for item in self.collected_items:

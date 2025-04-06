@@ -189,7 +189,7 @@ def query_key_ml_questions(kg_index) -> dict:
 
     # More specific query that focuses on questions to answer when starting ML projects
     query = """
-    What are the 10 most important questions that need to be addressed when starting a complex machine learning project? 
+    What are the 10 most important questions that need to be addressed when starting a complex machine learning project?
     Focus on questions about:
     1. Project scope and requirements
     2. Data collection and quality

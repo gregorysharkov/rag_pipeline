@@ -1,12 +1,11 @@
 from dataclasses import dataclass, field
-from typing import Optional, List, Union, Dict
+from typing import Optional
 
-from .reference_file import ReferenceFile
+from .edit_options import EditOptions
+from .plan import Plan
+from .shorts_options import ShortsOptions
 from .web_link import WebLink
 from .web_search_result import WebSearchResult
-from .plan import Plan
-from .edit_options import EditOptions
-from .shorts_options import ShortsOptions
 
 ADDITIONAL_CONTEXT = """
 I want to create an expert-level video about technologies used to build modern ai agents.
@@ -26,21 +25,21 @@ class ScriptSession:
     content_type: str = field(default="Explainer")
     tone: str = field(default="Conversational")
     use_web_search: bool = field(default=True)
-    reference_files: List[dict] = field(default_factory=list)
-    web_links: List[WebLink] = field(default_factory=list)
-    web_search_results: List[WebSearchResult] = field(default_factory=list)
-    selected_search_results: List[str] = field(default_factory=list)  # IDs of selected results
+    reference_files: list[dict] = field(default_factory=list)
+    web_links: list[WebLink] = field(default_factory=list)
+    web_search_results: list[WebSearchResult] = field(default_factory=list)
+    selected_search_results: list[str] = field(default_factory=list)  # IDs of selected results
     web_search_viewed: bool = field(default=False)
     plan: Optional[Plan] = field(default=None)
     video_title: str = field(default="")
     video_audience: str = field(default="")
     video_duration: str = field(default="")
-    script_sections: List[dict] = field(default_factory=list)
+    script_sections: list[dict] = field(default_factory=list)
     script_complete: bool = field(default=False)
     edit_options: EditOptions = field(default_factory=EditOptions)
     shorts_options: ShortsOptions = field(default_factory=ShortsOptions)
 
-    def as_dict(self) -> Dict:
+    def as_dict(self) -> dict:
         """Convert to dictionary."""
         result = {}
         for field_name, field_value in self.__dict__.items():
