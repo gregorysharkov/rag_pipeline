@@ -12,6 +12,7 @@ from backend.session.web_search_result import WebSearchResult
 from backend.session.plan import Plan, PlanSection
 from backend.session.edit_options import EditOptions
 from backend.session.shorts_options import ShortsOptions
+from backend.session.web_link import WebLink
 from dotenv import load_dotenv
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_session import Session
@@ -70,11 +71,26 @@ def index():
     # Clear session data for a fresh start
     session.clear()
     session["script_session"] = ScriptSession(
-        topic="",
-        additional_context="",
-        target_audience="",
-        content_type="",
-        tone="",
+        topic="Secrets of complex machine learning projects",
+        additional_context="""
+I want to create an expert-level video focusing on how to build complex machine learning projects.
+
+Questions to answer:
+- How to measure complexity of a machine learning project?
+- What are the key ingredients of a complex machine learning project?
+- What are the next steps after building a POC / MVP?
+
+My thoughts on the topic:
+- Machine learning project is a software engineering project.
+- No ML project is built in a day, it is an iterative process, so version control is a must.
+- special focus on building a data cleaning pipeline (garbage in, garbage out).
+- special focus on building a feature store, because over the time you will be adding more and more features, some of them will be usefull some not.
+- special focus on building model training pipeline. Once you add or remove features, you need to retrain the model.
+- special focus on expreiment tracking and model registry.
+""",
+        target_audience="Professionals",
+        content_type="Explainer",
+        tone="Conversational",
         use_web_search=True,
     )
     return redirect(url_for("context"))
@@ -155,7 +171,6 @@ def references():
             new_links_count = 0
             for i in range(len(links)):
                 if links[i].strip():  # Only add non-empty links
-                    from backend.session.web_link import WebLink
 
                     web_links.append(
                         WebLink(

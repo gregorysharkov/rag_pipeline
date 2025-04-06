@@ -1,0 +1,2 @@
+MATCH (n:Document)
+RETURN count(n) as document_count
