@@ -1,5 +1,5 @@
 Collected_item
 	Title: Top 10 Machine Learning Projects For 2024 | ML Projects For Resume | ML Project Ideas | Simplilearn
-	URL: https://www.youtube.com/watch?v=H49MruopZFo
-	Summary: This video presents ten machine learning projects suitable for 2024, covering areas like image recognition with CNNs, sentiment analysis using NLP, reinforcement learning with OpenAI Gym, and time series forecasting with LSTM networks. It emphasizes the skills required for each project, such as Python, TensorFlow, and Keras, providing insights into practical implementations and the latest trends in machine learning.
+	URL: https://youtu.be/H49MruopZFo
+	Summary: This video presents ten machine learning project ideas for 2024, covering areas like image recognition with CNNs, sentiment analysis using NLP, reinforcement learning with OpenAI Gym, and time series forecasting with LSTM networks. Each project includes a brief overview, required skills, and tools, providing insights into various complex machine learning applications.
 	Content: welcome to the world of machine learning as we embrace the Innovations of tomorrow here are the top ...

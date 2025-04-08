@@ -1,5 +1,5 @@
 Collected_item
 	Title: How to Operationalize Machine Learning Projects
-	URL: https://www.youtube.com/watch?v=D3vqATPKvXA
-	Summary: This video explores the key aspects of operationalizing AI and machine learning in business to improve outcomes. It discusses challenges like data infrastructure, collaboration between data science and engineering teams, and aligning projects with business objectives. The video also covers the importance of the 'last mile' in machine learning projects, emphasizing the need for clear objectives and iterative approaches to connect innovation with real-world applications.
+	URL: https://youtu.be/D3vqATPKvXA
+	Summary: This video explores the key aspects of operationalizing AI and machine learning in business to improve outcomes. It discusses challenges such as data infrastructure issues, the importance of aligning projects with business objectives, and the necessity of collaboration between data science and engineering teams. The video also emphasizes the 'last mile' of machine learning projects, focusing on implementing innovations to benefit businesses and individuals.
 	Content: thanks everyone for joining us today for how to operate operationalize machine learning i'm scott ki...

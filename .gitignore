@@ -175,3 +175,5 @@ scripts/
 output/
 web_app/uploads/
 web_app/flask_session/
+storage/
+collected_items/
