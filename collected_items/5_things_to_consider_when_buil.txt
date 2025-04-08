@@ -1,5 +1,5 @@
 Collected_item
 	Title: 5 Things to Consider when Building Machine Learning Projects
 	URL: https://medium.com/@skyl/5-things-to-consider-when-building-machine-learning-projects-b08a6458600c
-	Summary: This article highlights five considerations for building machine learning projects: defining a specific problem, preparing data thoroughly, understanding the necessity of iteration, monitoring models in production, and ensuring scalability. It stresses the importance of a clear problem statement aligned with business goals, meticulous data preparation, embracing iterative development, continuous model monitoring to maintain performance, and designing scalable pipelines to handle growing data volumes and demands.
+	Summary: This article highlights five critical considerations for building machine learning projects: defining a specific problem, preparing data thoroughly, understanding the necessity of iteration, monitoring models post-deployment, and ensuring scalability. It stresses the importance of a clear problem statement aligned with business goals, meticulous data preparation, embracing iterative development, continuous model monitoring to maintain performance, and designing scalable pipelines to accommodate growing data volumes and demands.
 	Content: 5 Things to Consider when Building Machine Learning Projects | by Skyl.ai | MediumOpen in appSign up...
