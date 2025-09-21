@@ -1,0 +1,44 @@
+COMPANY: APPLE
+ARTICLE: 3/3
+GENERATED: 2025-09-14 15:10:07
+================================================================================
+
+TITLE: What would actually make the Apple Watch better?
+SOURCE: The Verge
+AUTHOR: Victoria Song
+PUBLISHED: 2025-09-04T22:09:03Z
+URL: https://www.theverge.com/optimizer-newsletter/772003/apple-watch-iphone-17-optimizer-smartwatch-wearables
+DESCRIPTION: I've been thinking ahead to Apple's big event next Tuesday. I'll be sitting in Apple's Steve Jobs theater, ready to live blog. Tim Cook will pop out for a brief moment to wave hello. I'll probably nod to my colleagues in the theater with me - we've already su…
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+This is Optimizer, a weekly newsletter sent every Friday from Verge Senior Reviewer Victoria Song that dissects and discusses the latest phones, smartwatches, apps, and other gizmos that swear they’re going to change your life. Optimizer arrives in our subscribers’ inboxes at 10AM ET. Opt in for Optimizer here.
+
+I’ve been thinking ahead to Apple’s big event next Tuesday. I’ll be sitting in Apple’s Steve Jobs theater, ready to live blog. Tim Cook will pop out for a brief moment to wave hello. I’ll probably nod to my colleagues in the theater with me — we’ve already sussed out the game plan. My ears will be perked for the Apple Watch announcements, because that’s my beat. Paradoxically, that’s where this visualization exercise leaves me stumped. After a decade of Apple Watches, I’m struggling to envision what would make the world’s most iconic smartwatch better.
+
+You could argue that the Apple Watch doesn’t need to change much because people already love it. It is, after all, the most popular watch in the world. Except market research firm Counterpoint recently reported that 2024 — ironically, the 10th anniversary of the Apple Watch — marked the first-ever decline in the global smartwatch market. It said Apple Watch shipments fell by 19 percent year over year, marking five straight quarters of declines due to decreased consumer demand, fewer models to choose from, and fewer substantial upgrades. In other words, most people didn’t think buying a new watch would improve their lives.
+
+So, what would give the Apple Watch its momentum back? The obvious answer after Galaxy Unpacked and Made by Google would be to stuff AI into the watch. Wear OS has Gemini now, so a truly intelligent Siri would make things even. But that doesn’t feel quite right since, barring a miracle, a smarter Siri likely isn’t materializing this year. Gemini on the wrist has been interesting, as it allows you to make more complex, multistep queries, but it’s also felt a tad unfocused. It makes sense as part of a larger, long-term strategy, but right now, I’d wager many people would have a hard time differentiating what sets it apart from Google Assistant. A juiced-up Siri on the wrist would likely face similar issues.
+
+Listen, TouchID on the crown would be very convenient! Photo by Amelia Holowaty Krales / The Verge
+
+Rumors and reports suggest Apple will introduce satellite communications on the next-gen Apple Watch Ultra, along with a larger screen. No surprise there. Google and Garmin just introduced satellite communication with the Pixel Watch 4 and Fenix 8 Pro series, respectively. The budget Apple Watch SE may get an all-plastic design refresh — though Bloomberg’s Mark Gurman recently noted Apple execs may have scrapped that plan. The Apple Watch Series 11 might get 5G connectivity and high blood pressure warnings. These aren’t updates to be scoffed at, but collectively, they’re not the sort of blow-your-mind updates that immediately convince people to upgrade. (The one exception could be blood pressure, but that would heavily depend on the implementation.)
+
+If we’re talking things that would really make the Apple Watch better, Apple ought to just give the people what they want. And almost all of it is possible.
+
+Take third-party watchfaces, for example, Apple has argued that it puts significant effort into ensuring native watchfaces work “uniformly and simply.” However, fans have wanted truly customizable watchfaces — you know, like they do in Wear OS land — for years. There are currently workarounds, but they’re mostly separate apps that display a clock face versus a true watch face integrated into watchOS.
+
+Also, just let people use their Apple Watch without an iPhone. You can do this via Family Setup, but I mean the real taboo thing: Let people use it with an Android phone. There’s documented evidence that, while Apple toyed with this idea in the past, it ultimately decided against it, as it helps keep people locked to the iPhone. In almost a decade of reviewing wearables, I’ve come across dozens of diehard Android users who would’ve loved to use the Apple Watch. My cousin only uses a Samsung smartwatch because they love foldable phones and Apple doesn’t have one. (Yet?) Given their druthers, they’d rather go back to an Apple Watch, even if they’d lose out on convenient interoperability features with iPhones and Macs.
+
+I don’t need Apple to go all in on AI hardware. That can be Google’s thing. But a new roadmap would help in lieu of giving people what they want. Photo: Allison Johnson / The Verge
+
+You’ll find lots of requests from users on Reddit. Demands for better battery life are ubiquitous and, more ambitiously, noninvasive blood glucose tracking. (The latter is highly unlikely for some time.) Some are asking for better nap recognition within sleep tracking. Others want Touch ID via the digital crown instead of passcodes, to send messages within other apps like Instagram or WhatsApp, an always-on display for the SE, precision-start workout tracking for the regular Series watches, and better app organization. In the comments of my reviews, there’s always someone opining that they’d switch to the Apple Watch if Apple would admit that a round face is aesthetically superior to a rectangle. (While I agree, Apple doesn’t. I’ll eat my right shoe if this ever happens.) When I asked a friend of mine who’s a diehard Apple Watch user, their answer was simple and emphatic: “Just the freakin’ full Health app on the Watch.”
+
+I don’t envy Apple. Its work on the Apple Watch paved the way for the current era of smartwatches. It’s a compliment that it’s genuinely difficult to think of novel innovations that would substantially improve the device. There’s a reason it’s so iconic. Alas, heavy is the head that wears the crown. And while the easiest thing Apple could do is give the people what they want, I’d settle for a revitalized thesis.
+
+The Pixel Watch 4’s updates are intriguing because of how opinionated they are. Alone, none were particularly splashy. Together, they paint a clear picture that Google believes the future of wearable technology lies in AI hardware. That more or less fits Google’s overall ambitions with ambient computing and Gemini.
+
+Apple doesn’t need to go the AI hardware route (though I’m sure its investors are pushing for that). But barring a sparkly “one more thing,” a renewed sense that this is all leading somewhere would go a long, long way. If the present is blah, then having faith that a better future is in the works makes the wait feel worthwhile. Otherwise, it’s just enduring more of the same — and who really gets hyped for the status quo?

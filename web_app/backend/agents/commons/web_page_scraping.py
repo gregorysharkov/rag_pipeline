@@ -3,7 +3,7 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 
-from web_app.backend.agents.researcher.youtube_transcript_generator import (
+from web_app.backend.agents.research_agent.youtube_transcript_generator import (
     YoutubeTranscriptGenerator,
 )
 from web_app.logging.logger import setup_logging

@@ -29,12 +29,12 @@ from dotenv import load_dotenv
 from llama_index.core import KnowledgeGraphIndex
 from openai import OpenAI
 
-from web_app.backend.agents.researcher.collected_information import CollectedInformation
-from web_app.backend.agents.researcher.information_collector_agents import (
+from web_app.backend.agents.research_agent.collected_information import CollectedInformation
+from web_app.backend.agents.research_agent.information_collector_agents import (
     WebSearchCollectorAgent,
     YoutubeSearchCollectorAgent,
 )
-from web_app.backend.agents.researcher.knowledge_graph_manager import KnowledgeGraphManager
+from web_app.backend.agents.research_agent.knowledge_graph_manager import KnowledgeGraphManager
 from web_app.backend.session.session import ScriptSession
 from web_app.logging.logger import setup_logging
 

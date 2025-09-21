@@ -1,0 +1,40 @@
+COMPANY: GOOGLE
+ARTICLE: 3/3
+GENERATED: 2025-09-14 15:10:20
+================================================================================
+
+TITLE: Yes, Google Meet Is Down
+SOURCE: Gizmodo.com
+AUTHOR: Matt Novak
+PUBLISHED: 2025-09-08T18:35:43Z
+URL: https://gizmodo.com/google-meet-widespread-outage-2000655511
+DESCRIPTION: "Our engineering team continues to investigate the issue."
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+Update, 3:55 p.m. ET: Google sent Gizmodo an email after the outage that reads, “Today some users may have experienced a short disruption of service when loading Google Meet. Service has since been restored for any impacted users.”
+
+If you’re trying to use Google Meet and failing, it’s not your fault. Google is reportedly investigating the outage, and DownDetector has seen tens of thousands or reports about Google Meet not working properly since around 1:25 p.m. ET.
+
+“We are experiencing an issue with Google Meet beginning at Monday, 2025-09-08 10:25 PDT,” Google reported on its Workspace updates page.
+
+“Our engineering team continues to investigate the issue. We will provide an update by Monday, 2025-09-08 11:30 PDT with current details,” the tech giant explained.
+
+There is no reportedly workaround, at least according to the company. And while some folks were disappointed with the outage, others seemed to celebrate the disruption to their workday. One person on X included a GIF from the NBC TV show The Office that seemed pretty excited.
+
+Google meet is down I repeat, Google Meet is down pic.twitter.com/UmqohOluUR — WhittingtonCJ (@WhittingtonCJ) September 8, 2025
+
+“Attention: Google Meet is down. Time to catch up on emails or go touch grass,” another X user wrote.
+
+Another user also seemed to take some amount of joy in the outage, reporting in Portuguese, “Google Meet crashed right in the middle of my meeting.”
+
+o google meet caiu bem na hora da minha reunião pic.twitter.com/I846u4wCij — anna (@annaeduardah) September 8, 2025
+
+Google provided an update that noted it was rolling back a recent change, though didn’t give specifics about what happened.
+
+“Our engineers have identified the root cause and rolled back a recent change,” the Workspace page reads. “Current internal telemetry data indicates that the Google Meet service is operating normally as of 11:18 PDT. Our engineers are continuing to monitor the service stability closely.”
+
+Google didn’t immediately respond to questions emailed Monday but its Workspace page promised to provide another update shortly before 3 p.m. ET.

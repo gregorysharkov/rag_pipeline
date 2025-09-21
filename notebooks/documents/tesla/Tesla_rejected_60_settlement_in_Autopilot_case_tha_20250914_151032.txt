@@ -1,0 +1,28 @@
+COMPANY: TESLA
+ARTICLE: 2/3
+GENERATED: 2025-09-14 15:10:32
+================================================================================
+
+TITLE: Tesla rejected $60 settlement in Autopilot case that ultimately cost it 4 times that amount
+SOURCE: The Verge
+AUTHOR: Andrew J. Hawkins
+PUBLISHED: 2025-08-26T15:05:22Z
+URL: https://www.theverge.com/tesla/765907/tesla-rejected-60-settlement-in-autopilot-case-that-ultimately-cost-it-4-times-that-amount
+DESCRIPTION: Tesla rejected a $60 million settlement in the wrongful death case that ended up costing the company $243 million in punitive and compensatory damages, Reuters reported today, citing newly filed legal documents. The proposal stemmed from a lawsuit filed by th…
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+is transportation editor with 10+ years of experience who covers EVs, public transportation, and aviation. His work has appeared in The New York Daily News and City & State.
+
+Posts from this author will be added to your daily email digest and your homepage feed.
+
+The proposal stemmed from a lawsuit filed by the families of the victims in a 2019 crash in which a Tesla Model S driver using Autopilot crashed into a parked vehicle, killing a woman and seriously injuring her boyfriend. The lawyers representing the families revealed the settlement offer as part of a request to the court to force Tesla to pay the families’ legal fees.
+
+Tesla rejected the settlement offer from the plaintiffs’ lawyers, while countering with a much smaller sum as well as a demand for non-disclosure, said Brett Schreiber, the attorney representing the victims’ families.
+
+“In response to our settlement demand of [$60 million] Tesla made a settlement offer that was a fraction of the verdict and a fraction of our demand — but required confidentiality and our clients weren’t interested,” Schreiber said in a statement to The Verge.
+
+Tesla’s rejection in the settlement is a rare glimpse into how the EV maker approaches lawsuits involving its driver assist features like Autopilot and Full Self-Driving. Over the years, there have been hundreds of crashes involving Tesla’s partially autonomous features and dozens of fatalities. But the company has been able to avoid liability, either by settling with victims or convincing courts to dismiss the lawsuits.

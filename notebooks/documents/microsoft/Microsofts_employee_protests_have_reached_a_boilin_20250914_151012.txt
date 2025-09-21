@@ -1,0 +1,72 @@
+COMPANY: MICROSOFT
+ARTICLE: 2/3
+GENERATED: 2025-09-14 15:10:12
+================================================================================
+
+TITLE: Microsoft’s employee protests have reached a boiling point
+SOURCE: The Verge
+AUTHOR: Tom Warren
+PUBLISHED: 2025-08-27T17:26:49Z
+URL: https://www.theverge.com/notepad-microsoft-newsletter/766683/microsoft-employee-protests-boiling-point-notepad
+DESCRIPTION: Some Microsoft employees are willing to risk everything to protest their employer. No Azure for Apartheid, a group led by current and former Microsoft employees, started last year as a petition to Microsoft executives. It demanded that Microsoft end all Azure…
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+Posts from this author will be added to your daily email digest and your homepage feed.
+
+Some Microsoft employees are willing to risk everything to protest their employer. No Azure for Apartheid, a group led by current and former Microsoft employees, started last year as a petition to Microsoft executives. It demanded that Microsoft end all Azure contracts and partnerships with the Israeli military and government, disclose all ties, call for a ceasefire in Gaza, and protect pro-Palestinian speech.
+
+Microsoft hasn’t met any of these bold demands, so the group has turned to increasingly brazen actions at Microsoft events, the company’s headquarters, and now the homes and offices of Microsoft executives to get results. Microsoft downplays how many employees are involved, but many are quietly working behind the scenes to help get the message out.
+
+While the petition failed to have an impact, a louder protest outside Microsoft’s headquarters kickstarted a wave of public activism. Two of the organizers of No Azure for Apartheid — Abdo Mohamed and Hossam Nasr — were fired for disrupting colleagues with “bullhorns and speakers.” They’ve been recruiting Microsoft employees, other tech workers, and community members ever since. The group has since made headlines for interrupting Microsoft executives during a 50th anniversary celebration and at the company’s Build developer conference earlier this year.
+
+The protests have escalated dramatically in recent weeks. Microsoft executive Teresa Hutson was targeted on August 7th by the group, which gathered more than 30 people carrying Palestinian flags and signs reading “WANTED for PROFITING from GENOCIDE” outside her house. The group covered the sidewalk in front of her home in red paint and scrawled “Teresa Hutson kills” in chalk on the road.
+
+The chalk and red paint outside a Microsoft executive’s home (blurred and cropped to remove identifying details). Image: No Azure for Apartheid
+
+Hutson is Microsoft’s CVP of the Trusted Technology Group, and not an EVP or senior executive at the company. “She publicly describes herself as the owner of the human rights work at Microsoft and delivers the Responsible AI Transparency Report, making her one of the key complicit executives,” says Abdo Mohamed in a message to The Verge.
+
+The group had previously targeted Hutson on June 18th at an ethics and tech conference at Seattle University, where she was due to speak. “When no Azure for Apartheid disrupted the first Microsoft speaker, she ended up leaving the conference to avoid us,” says Mohamed.
+
+The rally outside Hutson’s house — which included speeches and protesters carrying wanted signs with the executive’s headshot — marked a serious escalation in what the group was willing to do to get Microsoft to respond to its demands.
+
+Protesters also carried wanted signs and banners (blurred to remove identifying details). Image: No Azure for Apartheid
+
+Days later, protesters arrived at Microsoft’s headquarters to start an encampment. A group of current and former Microsoft employees, as well as community members, took over a plaza at Microsoft’s headquarters. Protesters were moved to a public area outside of Microsoft’s campus on the first day of those protests last week, but things got heated when they returned on the second day.
+
+A current Microsoft employee was arrested in an ugly scene at the company’s headquarters on day two, where red paint was spilled over a Microsoft sign and there were struggles with police. Redmond police ended up arresting 20 people after some protesters allegedly “became aggressive.” Mohamed disputes that and says police “violently dismantled” the encampment at Microsoft’s headquarters. The group distributed footage of a cop using a pepper ball gun at point blank on a protester who appeared to already be restrained on the floor.
+
+Microsoft’s approach to the protests also changed after this incident. This spring, Microsoft issued the brief type of corporate statement you’d expect at any sign of trouble. But in recent weeks, Microsoft has begun to hit back at protesters with its own footage and images, released to members of the media hours after the disruption at the company’s headquarters in an attempt to upend the narrative. The company provided CCTV footage of protesters dragging a security fence and briefly ensnaring a cop inside it, as well as protesters confronting a DJ and disconnecting equipment. Microsoft also released images of a fake Microsoft ID used by at least one protester, as well as an arrest list for the day.
+
+Anna Hattle, a software engineer in Microsoft’s cloud and AI team, was arrested at last week’s protests, alongside former Microsoft employees Hossam Nasr, Vaniya Agrawal, and Joe Lopez. All three former employees helped disrupt Microsoft’s Build conference, and Agrawal was the Microsoft worker who interrupted cofounder Bill Gates, former CEO Steve Ballmer, and Microsoft CEO Satya Nadella on stage at the company’s 50th anniversary event.
+
+Protesters also targeted Nadella’s and vice chair and president Brad Smith’s houses during a rally on Lake Washington over the weekend. The group used around 20 kayaks to unfurl banners reading “Microsoft kills kids” and “Satya + Brad = War Criminals” on waters close to Nadella’s and Smith’s homes. Former Microsoft employee Ibtihal Aboussad was also part of the lake protest, after disrupting Microsoft’s 50th anniversary event in April and calling Microsoft AI CEO Mustafa Suleyman a “war profiteer.”
+
+Protesters used kayaks outside Satya Nadella and Brad Smith’s homes. Image: No Azure for Apartheid
+
+While the protests on Lake Washington were carried out on public waters, things reached a boiling point this week after a group of seven activists “stormed a building” and managed to get access to Brad Smith’s office inside Building 34 at the company’s headquarters. Current and former Microsoft employees performed a sit-in protest in Smith’s office, and Microsoft was forced to temporarily lock down its executive building.
+
+Microsoft employees Riki Fameli and Anna Hattle were part of the protest, alongside former employees Vaniya Agrawal, Hossam Nasr, and Joe Lopez. They were also joined by a former Google employee and another tech worker.
+
+Smith then hastily held an emergency press conference in his office, just hours after protesters had barricaded themselves inside with chairs before they were arrested. Smith said that Microsoft is “committed to ensuring its human rights principles and contractual terms of service are upheld in the Middle East.” He said the company launched an investigation earlier this month after The Guardian and others reported that Microsoft’s Azure cloud platform was being used for surveillance of Palestinians.
+
+Microsoft said in May that it had found no evidence through an internal and external review that the Israeli military has used its Azure and AI technology to harm Palestinian civilians or anyone else in Gaza. Microsoft’s previous review was delivered just days before its Build conference was disrupted multiple times.
+
+Bloomberg reported earlier this week that Microsoft asked the FBI for help tracking the protesters after the disruptions to its 50th anniversary. Microsoft also coordinated with local officials and ramped up security for its annual Build developer conference in Seattle, but protesters were still able to disrupt Satya Nadella and other executives.
+
+Sources tell me Microsoft is ramping up security across its campus in response to the escalation in protester tactics. Microsoft employees were told last week not to take a pedestrian bridge on its headquarters nearby the protests, and I’m told that a big event at its new campus that was supposed to take place last Thursday was canceled. Redmond police were on the scene instead.
+
+Microsoft acknowledged the Building 34 lockdown in a message to all employees late last night, reassuring them that the “safety of employees is our top priority” at every Microsoft building worldwide. “Enhanced security measures are now in place across campus, including increased patrols and monitoring to ensure the safety of all employees and visitors,” says an announcement posted last night on Microsoft’s internal news and events page.
+
+Microsoft isn’t sharing a statement beyond Brad Smith’s latest press conference, but I’m sure that these employee protests won’t be the last we see, especially as we’re just months away from Microsoft’s big Ignite conference in San Francisco. Microsoft has tried to downplay these latest protests as just a handful of current and former employees, but there are many Microsoft workers anonymously helping to organize the direct actions we’ve seen over the past week.
+
+Microsoft’s response will be important, particularly because the company has stumbled in the past by blocking emails that contain “Palestine,” and not properly addressing worker concerns. Smith’s hasty press conference was highly unusual, but it’s the type of transparency that Microsoft needs more of right now, before things get out of control.
+
+The pad:
+
+I’m always keen to hear from readers, so please drop a comment here, or you can reach me at [email protected] if you want to discuss anything else. If you’ve heard about any of Microsoft’s secret projects, you can reach me via email at [email protected] or speak to me confidentially on the Signal messaging app, where I’m tomwarren.01. I’m also tomwarren on Telegram, if you’d prefer to chat there.
+
+Thanks for subscribing to Notepad.

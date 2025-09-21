@@ -1,0 +1,20 @@
+COMPANY: APPLE
+ARTICLE: 2/3
+GENERATED: 2025-09-14 15:10:07
+================================================================================
+
+TITLE: Apple Event Live Blog: Updates on iPhone 17, iPhone Air, Apple Watch 11, AirPods Pro 3
+SOURCE: Wired
+AUTHOR: WIRED
+PUBLISHED: 2025-09-09T10:00:00Z
+URL: https://www.wired.com/live/apple-event-iphone-17-iphone-air/
+DESCRIPTION: Join us for live coverage of the launch of the iPhone 17, iPhone Air, and Apple Watch Series 11. We'll be reporting from Apple headquarters in Cupertino, California.
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+The cross-body strap pairs with all of Apple's new cases, including the new Techwoven case for Pro, which has a micro fabric design.
+
+There are also clear cases and rubber cases for the Pro.

@@ -1,0 +1,27 @@
+NEWS ARTICLES INDEX FOR MICROSOFT
+Generated on: 2025-09-14 15:10:12
+Total articles: 3
+Directory: notebooks/documents/microsoft
+================================================================================
+
+ 1. Windows_developers_can_now_publish_apps_to_Microso_20250914_151012.txt
+    Title: Windows developers can now publish apps to Microsoft’s store without fees
+    Source: The Verge
+    Published: 2025-09-10T17:38:54Z
+    Extraction: ✅
+    File: Windows_developers_can_now_publish_apps_to_Microso_20250914_151012.txt
+
+ 2. Microsofts_employee_protests_have_reached_a_boilin_20250914_151012.txt
+    Title: Microsoft’s employee protests have reached a boiling point
+    Source: The Verge
+    Published: 2025-08-27T17:26:49Z
+    Extraction: ✅
+    File: Microsofts_employee_protests_have_reached_a_boilin_20250914_151012.txt
+
+ 3. Microsoftavoids_EU_fine_after_Slack_complained_abo_20250914_151012.txt
+    Title: Microsoft avoids EU fine after Slack complained about Teams bundling
+    Source: The Verge
+    Published: 2025-09-12T08:46:50Z
+    Extraction: ✅
+    File: Microsoftavoids_EU_fine_after_Slack_complained_abo_20250914_151012.txt
+

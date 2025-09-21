@@ -1,0 +1,27 @@
+NEWS ARTICLES INDEX FOR APPLE
+Generated on: 2025-09-14 15:10:07
+Total articles: 3
+Directory: notebooks/documents/apple
+================================================================================
+
+ 1. Apple_has_announced_the_Apple_Watch_Series_11_20250914_151007.txt
+    Title: Apple has announced the Apple Watch Series 11
+    Source: The Verge
+    Published: 2025-09-09T17:19:36Z
+    Extraction: ✅
+    File: Apple_has_announced_the_Apple_Watch_Series_11_20250914_151007.txt
+
+ 2. Apple_Event_Live_Blog_Updates_on_iPhone_17_iPhone__20250914_151007.txt
+    Title: Apple Event Live Blog: Updates on iPhone 17, iPhone Air, Apple Watch 11, AirPods Pro 3
+    Source: Wired
+    Published: 2025-09-09T10:00:00Z
+    Extraction: ✅
+    File: Apple_Event_Live_Blog_Updates_on_iPhone_17_iPhone__20250914_151007.txt
+
+ 3. What_would_actually_make_the_Apple_Watch_better_20250914_151007.txt
+    Title: What would actually make the Apple Watch better?
+    Source: The Verge
+    Published: 2025-09-04T22:09:03Z
+    Extraction: ✅
+    File: What_would_actually_make_the_Apple_Watch_better_20250914_151007.txt
+

@@ -1,0 +1,30 @@
+COMPANY: AMAZON
+ARTICLE: 3/3
+GENERATED: 2025-09-14 15:10:26
+================================================================================
+
+TITLE: Amazon’s Lens Live AI shops for anything you can see
+SOURCE: The Verge
+AUTHOR: Emma Roth
+PUBLISHED: 2025-09-02T21:01:13Z
+URL: https://www.theverge.com/news/769585/amazon-lens-live-ai-real-time-shopping
+DESCRIPTION: Amazon will now let you shop for products by pointing your camera at them. On Thursday, the company announced Lens Live, a new feature that uses your camera to scan things in the environment around you, while surfacing matching product listings. This feature,…
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+is a news writer who covers the streaming wars, consumer tech, crypto, social media, and much more. Previously, she was a writer and editor at MUO.
+
+Posts from this author will be added to your daily email digest and your homepage feed.
+
+Amazon will now let you shop for products by pointing your camera at them. On Thursday, the company announced Lens Live, a new feature that uses your camera to scan things in the environment around you, while surfacing matching product listings.
+
+This feature, which is only rolling out to the Amazon Shopping app on iOS for now, lets you pan your camera around a room or focus on a specific product. Amazon says Lens Live will use an object detection model to identify the products shown on your camera in real-time, and then compare them against the billions of products on its marketplace.
+
+Lens Live will show you a carousel of similar products. GIF: Amazon
+
+Once it finds similar items, Lens Live will display them in a swipeable carousel, where it will also show options to add products to your cart or wishlist. It sounds like Amazon’s take on Google’s Gemini Live, an AI-powered assistant that similarly lets you scan things in your environment and ask questions about them. The difference is that Amazon’s AI tool puts a big “buy” button on everything you see.
+
+Lens Live also integrates Amazon’s AI assistant Rufus to summarize product descriptions and answer questions about them. The feature builds upon the existing capabilities of Amazon’s visual search features, which let you search for products by uploading an image, scanning a barcode, or snapping a picture in the Amazon Shopping app. Amazon plans on bringing Lens Live to more customers in the “coming weeks.”

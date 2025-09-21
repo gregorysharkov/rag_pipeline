@@ -5,7 +5,7 @@ from typing import Any
 from llama_index.graph_stores.neo4j import Neo4jGraphStore
 from neo4j import GraphDatabase
 
-from web_app.backend.agents.researcher.constants import NEO4J_PASSWORD, NEO4J_URI, NEO4J_USER
+from web_app.backend.agents.research_agent.constants import NEO4J_PASSWORD, NEO4J_URI, NEO4J_USER
 
 logger = logging.getLogger(__name__)
 

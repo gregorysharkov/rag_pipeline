@@ -10,9 +10,9 @@ from llama_index.llms.openai import OpenAI as LlamaOpenAI
 from neo4j import Session
 from tqdm import tqdm
 
-from web_app.backend.agents.researcher.collected_information import CollectedInformation
-from web_app.backend.agents.researcher.graph_database import get_or_create_graph_store
-from web_app.backend.agents.researcher.graph_store import DeduplicatingNeo4jGraphStore
+from web_app.backend.agents.research_agent.collected_information import CollectedInformation
+from web_app.backend.agents.research_agent.graph_database import get_or_create_graph_store
+from web_app.backend.agents.research_agent.graph_store import DeduplicatingNeo4jGraphStore
 from web_app.logging.logger import setup_logging
 
 setup_logging()

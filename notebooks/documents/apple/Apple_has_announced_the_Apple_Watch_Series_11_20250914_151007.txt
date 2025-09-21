@@ -1,0 +1,46 @@
+COMPANY: APPLE
+ARTICLE: 1/3
+GENERATED: 2025-09-14 15:10:07
+================================================================================
+
+TITLE: Apple has announced the Apple Watch Series 11
+SOURCE: The Verge
+AUTHOR: Andrew Liszewski
+PUBLISHED: 2025-09-09T17:19:36Z
+URL: https://www.theverge.com/news/772872/apple-watch-series-11-specs-features-price-release-date
+DESCRIPTION: Apple announced the next version of the Apple Watch today and while the Series 11 looks similar to its predecessors it’s launching with new features that could make it a compelling upgrade. The new Series 11 follows the 10th version of the Apple Watch that th…
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+is a senior reporter who’s been covering and reviewing the latest gadgets and tech since 2006, but has loved all things electronic since he was a kid.
+
+Posts from this author will be added to your daily email digest and your homepage feed.
+
+Apple just announced the Apple Watch Series 11, which looks similar to its predecessors but is the slimmest watch to date and includes new features like 5G cellular connectivity and stronger glass.
+
+The Series 11 is the first Apple Watch with 5G connectivity and has a redesigned cellular antenna that will provide better coverage in areas with weak signal. Like the AirPods Pro 3, the Series 11 will have live translation capabilities.
+
+Screenshot: Apple
+
+It is also the first Apple Watch with the ability to monitor for a serious medical condition called hypertension, or high blood pressure. The feature uses the Series 11’s optical heart rate sensor, but instead of providing an assessment on demand, it works in the background using data collected over 30 days and a new algorithm to look for signs that indicate your blood pressure is potentially too high.
+
+A new sleep score feature uses metrics like how long you’ve been asleep and your sleep stages to help you better understand the quality of your rest.
+
+Previous Next
+
+
+
+
+
+
+
+1 / 5 The color options for the new Apple Watch Series 11. Screenshot: Apple
+
+Apple says the Series 11 will get “up to 24 hours” of battery life. The aluminum version will come in jet black, space gray, rose gold, and silver; the polished titanium one will come in natural, gold, and slate. The watch also comes with Ion-X glass, which Apple says has a ceramic coating bonded at the atomic level, making it twice as scratch-resistant as the previous glass, though it’s not clear how it compares to sapphire watch crystals.
+
+Pricing starts at $399 for the GPS-only version of the 42mm Series 11 (the same price as the entry-level Apple Watch Series 10). It will be available for preorder starting today and start shipping on September 19th.
+
+The Apple Watch Series 11 will launch alongside watchOS 26, the latest version of Apple’s smartwatch operating system, which includes new features like a wrist-flick gesture that can be used to dismiss calls, notifications, and alarms, as well as take you back to your watchface. It also has an improved Smart Stack, a Workout Buddy feature that leverages Apple Intelligence to provide personalized insights and even pep talks, and Apple’s new Liquid Glass design language that’s also heading to other Apple devices.

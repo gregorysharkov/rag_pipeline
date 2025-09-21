@@ -13,9 +13,9 @@ from llama_index.llms.openai import OpenAI as LlamaOpenAI
 from openai import OpenAI
 from tqdm import tqdm
 
-from web_app.backend.agents.researcher.graph_database import get_or_create_graph_store
-from web_app.backend.agents.researcher.graph_store import DeduplicatingNeo4jGraphStore
-from web_app.backend.agents.researcher.web_page_scraping import fetch_webpage_content
+from web_app.backend.agents.commons.graph_database import get_or_create_graph_store
+from web_app.backend.agents.commons.graph_store import DeduplicatingNeo4jGraphStore
+from web_app.backend.agents.commons.web_page_scraping import fetch_webpage_content
 from web_app.backend.agents.web_search_agent import WebSearchAgent
 from web_app.backend.session.session import ScriptSession
 from web_app.logging.logger import setup_logging

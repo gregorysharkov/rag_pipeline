@@ -1,0 +1,27 @@
+NEWS ARTICLES INDEX FOR TESLA
+Generated on: 2025-09-14 15:10:32
+Total articles: 3
+Directory: notebooks/documents/tesla
+================================================================================
+
+ 1. Tesla_says_its_new_Megablock_can_cut_costs_for_ren_20250914_151032.txt
+    Title: Tesla says its new Megablock can cut costs for renewable energy storage.
+    Source: The Verge
+    Published: 2025-09-09T15:43:03Z
+    Extraction: ✅
+    File: Tesla_says_its_new_Megablock_can_cut_costs_for_ren_20250914_151032.txt
+
+ 2. Tesla_rejected_60_settlement_in_Autopilot_case_tha_20250914_151032.txt
+    Title: Tesla rejected $60 settlement in Autopilot case that ultimately cost it 4 times that amount
+    Source: The Verge
+    Published: 2025-08-26T15:05:22Z
+    Extraction: ✅
+    File: Tesla_rejected_60_settlement_in_Autopilot_case_tha_20250914_151032.txt
+
+ 3. Even_Elon_Musks_Fans_Are_Making_Fun_of_Him_Now_20250914_151032.txt
+    Title: Even Elon Musk’s Fans Are Making Fun of Him Now
+    Source: Gizmodo.com
+    Published: 2025-08-22T13:15:02Z
+    Extraction: ✅
+    File: Even_Elon_Musks_Fans_Are_Making_Fun_of_Him_Now_20250914_151032.txt
+

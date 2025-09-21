@@ -1,0 +1,38 @@
+COMPANY: MICROSOFT
+ARTICLE: 3/3
+GENERATED: 2025-09-14 15:10:12
+================================================================================
+
+TITLE: Microsoft avoids EU fine after Slack complained about Teams bundling
+SOURCE: The Verge
+AUTHOR: Tom Warren
+PUBLISHED: 2025-09-12T08:46:50Z
+URL: https://www.theverge.com/news/776968/microsoft-teams-eu-commitments-avoid-fine
+DESCRIPTION: Microsoft has avoided a fine from the European Commission after it was charged with EU antitrust violations for bundling its Teams app with Office 365 and Microsoft 365 subscriptions. The European Commission says it has accepted commitments from Microsoft to …
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+Posts from this author will be added to your daily email digest and your homepage feed.
+
+Microsoft has avoided a fine from the European Commission after it was charged with EU antitrust violations for bundling its Teams app with Office 365 and Microsoft 365 subscriptions. The European Commission says it has accepted commitments from Microsoft to address competition concerns related to Microsoft Teams, following an anti-competitive complaint filed by Slack in July 2020.
+
+“The commitments address the Commission’s concerns related to the tying of Microsoft Teams to the company’s popular productivity applications Word, Excel, PowerPoint, Outlook, included in its Office 365 and Microsoft 365 suites for business customers,” says the European Commission.
+
+Microsoft has committed to do the following:
+
+Make available versions of its Office suites without Teams and at a reduced price
+
+Allow customers with long-term licenses to switch to suites without Teams
+
+Provide interoperability for key functionalities between communication and collaboration tools that compete with Teams and certain Microsoft products
+
+Allow customers to move their data out of Teams to facilitate the use of competing solutions
+
+Most of the commitments from Microsoft will be enforced by EU lawmakers for seven years, with the interoperability and data portability ones in force for 10 years. Microsoft originally unbundled Teams from Office in Europe in 2023 in an attempt to address regulator concerns, and then spun off Teams from Office 365 as its own separate app globally last year.
+
+“Organizations big and small across Europe and around the world rely heavily on videoconferencing, chat and collaboration tools, especially since the coronavirus pandemic,” says Teresa Ribera, executive vice president for Clean, Just and Competitive Transition at the European Commission. “Today’s decision therefore opens up competition in this crucial market, and ensures that businesses can freely choose the communication and collaboration product that best suits their needs.”
+
+EU lawmakers first opened a Microsoft antitrust investigation into Teams bundling in 2023, after Slack filed its anti-competitive complaint amid intense competition with Microsoft that developed after the covid-19 pandemic began. Slack’s original complaint alleged that Microsoft had “illegally tied” its Microsoft Teams product to Office and is “force installing it for millions, blocking its removal, and hiding the true cost to enterprise customers.”

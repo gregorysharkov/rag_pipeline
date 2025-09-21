@@ -4,9 +4,11 @@ import re
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from web_app.backend.agents.researcher.collected_information import CollectedInformation
-from web_app.backend.agents.researcher.common_search_instructions import COMMON_SEARCH_INSTRUCTIONS
-from web_app.backend.agents.researcher.web_page_scraping import (
+from web_app.backend.agents.commons.collected_information import CollectedInformation
+from web_app.backend.agents.commons.common_search_instructions import (
+    COMMON_SEARCH_INSTRUCTIONS,
+)
+from web_app.backend.agents.commons.web_page_scraping import (
     fetch_webpage_content,
     fetch_youtube_transcript,
 )

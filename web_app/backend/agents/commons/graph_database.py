@@ -2,8 +2,8 @@ import logging
 
 from neo4j import GraphDatabase
 
-from web_app.backend.agents.researcher.constants import NEO4J_PASSWORD, NEO4J_URI, NEO4J_USER
-from web_app.backend.agents.researcher.graph_store import DeduplicatingNeo4jGraphStore
+from web_app.backend.agents.research_agent.constants import NEO4J_PASSWORD, NEO4J_URI, NEO4J_USER
+from web_app.backend.agents.research_agent.graph_store import DeduplicatingNeo4jGraphStore
 
 logger = logging.getLogger(__name__)
 

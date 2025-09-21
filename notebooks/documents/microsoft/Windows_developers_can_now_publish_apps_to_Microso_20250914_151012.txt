@@ -1,0 +1,28 @@
+COMPANY: MICROSOFT
+ARTICLE: 1/3
+GENERATED: 2025-09-14 15:10:12
+================================================================================
+
+TITLE: Windows developers can now publish apps to Microsoft’s store without fees
+SOURCE: The Verge
+AUTHOR: Tom Warren
+PUBLISHED: 2025-09-10T17:38:54Z
+URL: https://www.theverge.com/news/775877/windows-developers-microsoft-store-publishing-free
+DESCRIPTION: Microsoft is allowing developers to submit apps to its Windows store without having to pay any onboarding fees. Individual developers in nearly 200 countries can now sign up to publish apps on the Microsoft Store with just a personal Microsoft account, and no…
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+Posts from this author will be added to your daily email digest and your homepage feed.
+
+Microsoft is allowing developers to submit apps to its Windows store without having to pay any onboarding fees. Individual developers in nearly 200 countries can now sign up to publish apps on the Microsoft Store with just a personal Microsoft account, and no more one-time fees.
+
+Microsoft started cutting its $19 one-time fee to publish apps to its Windows store in June in certain markets, and it’s now essentially removing this fee for all developers worldwide. Apple still charges an annual $99 fee to developers, and Google charges a one-time registration fee of $25.
+
+“Developers will no longer need a credit card to get started, removing a key point of friction that has affected many creators around the world,” explains Chetna Das, senior product manager at Microsoft. “By eliminating these one-time fees, Microsoft is creating a more inclusive and accessible platform that empowers more developers to innovate, share and thrive on the Windows ecosystem.”
+
+Microsoft has been gradually upgrading its Windows store over the past few years, with standalone installers, an updated web version, and improvements to the user experience of downloading and installing apps. The Microsoft Store is now used by more than 250 million monthly active users, according to Microsoft.
+
+Microsoft is now encouraging more developers to make use of the store, where they can publish a variety of Win32, UWP, PWA, .NET, MAUI, or Electron apps. Developers can even use their own in-app commerce system to keep 100 percent of their revenues on non-gaming apps.

@@ -1,0 +1,26 @@
+COMPANY: TESLA
+ARTICLE: 1/3
+GENERATED: 2025-09-14 15:10:32
+================================================================================
+
+TITLE: Tesla says its new Megablock can cut costs for renewable energy storage.
+SOURCE: The Verge
+AUTHOR: Justine Calma
+PUBLISHED: 2025-09-09T15:43:03Z
+URL: https://www.theverge.com/news/774410/tesla-battery-energy-storage-megablock-megapack
+DESCRIPTION: At an event in Las Vegas yesterday, Tesla revealed a new utility-scale battery configuration that it claims can significantly lower construction costs for utilities, along with faster installation. Its new “Megablock” is pre-engineered; more assembly done in …
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+Posts from this author will be added to your daily email digest and your homepage feed.
+
+At an event in Las Vegas yesterday, Tesla revealed a new utility-scale battery configuration that it claims can significantly lower construction costs for utilities, along with faster installation. Its new “Megablock” is pre-engineered; more assembly done in a factory allows for 23 percent faster installation, according to Tesla. That’s supposed to translate to up to 40 percent lower construction costs.
+
+It’s essentially supposed to be a plug-and-play platform, incorporating hardware and software services, to help utilities quickly meet rising electricity demands from data centers, electrified homes and vehicles, and manufacturing.
+
+The Megablock incorporates Megapack 3, the latest iteration of Tesla’s battery storage system that the company also debuted at the same event. The latest Megapack has a “drastically simplified” thermal bay with 78 percent fewer connections to minimize failure points, Tesla said at the event and on X, and uses “the Tesla Model Y heat pump essentially on steroids.”
+
+The Megapack 3 will be manufactured in Houston starting late next year, the company added. But Tesla still relies on BYD and CATL to supply battery cells, Electrek notes.

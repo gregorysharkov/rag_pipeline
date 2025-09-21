@@ -1,0 +1,98 @@
+COMPANY: GOOGLE
+ARTICLE: 1/3
+GENERATED: 2025-09-14 15:10:20
+================================================================================
+
+TITLE: Google Pixel 10 review: perfectly fine
+SOURCE: The Verge
+AUTHOR: Allison Johnson
+PUBLISHED: 2025-09-05T21:29:15Z
+URL: https://www.theverge.com/reviews/772813/google-pixel-10-review
+DESCRIPTION: Asking the Pixel 10 to be more than what it is feels greedy. Google's non-Pro Pixel is priced fairly at $799, which is significantly less than the $999 Pixel 10 Pro. It comes with some handy upgrades, like Qi2 charging with built-in magnets. Its AI features f…
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+is a senior reviewer with over a decade of experience writing about consumer tech. She has a special interest in mobile photography and telecom. Previously, she worked at DPReview.
+
+Asking the Pixel 10 to be more than what it is feels greedy.
+
+Google’s non-Pro Pixel is priced fairly at $799, which is significantly less than the $999 Pixel 10 Pro. It comes with some handy upgrades, like Qi2 charging with built-in magnets. Its AI features finally show promise. It includes a dedicated telephoto lens for the first time. It’s a proper flagship and an all-around easygoing Android phone. But if I’m being greedy, then I do have one request: better cameras.
+
+The rear cameras on the Pixel 10 are totally fine. For someone who’s not picky about image quality, they’d be better than fine. And maybe I’d think they were fine, too, if I wasn’t cursed with the knowledge that the cameras on last year’s model are better. And that’s because up until this year, the non-Pro Pixel came with the same main and ultrawide camera hardware as the Pro. But we can’t have everything, and when Google added that telephoto lens this year, it downgraded the other two rear cameras to essentially what’s in the midrange Pixel 9A. So the Pixel 10 has a perfectly fine camera system, as long as you’re not too greedy.
+
+Outside of the camera situation, the Pixel 10 comes with the same major upgrades as the Pro phones this year: a new chip and some magnets. Tensor G5 is the new processor on the 10 series, which I’ve found to run a tad cooler than previous versions. The G5 is Google’s first custom chipset made by TSMC, and it handles heavier workloads well. The regular 10 comes with 12GB of RAM compared to 16GB in the 10 Pro, and I did notice a little more stuttering on dense web pages than on the Pro. But for the non-professional phone user, it handles most tasks just fine.
+
+Google Pixel 10 specifications Tensor G5 chipset with 12GB of RAM | 128GB or 256GB of storage
+
+6.3-inch 1080p 60-120Hz OLED
+
+48-megpaixel f/1.7 main camera | 13-megapixel ultrawide | 10.8-megapixel 5x telephoto | 10.5-megapixel selfie camera
+
+4,970mAh lithium-ion battery
+
+Qi2 wireless charging up to 15W; 55 percent charge in 30 minutes with wired 30W charger
+
+IP68 dust and water resistant
+
+There’s a whole lot of on-device AI running on the new chip — which you can read more about in my Pixel 10 Pro review — and I suspect it contributes to the Pixel 10’s just-okay battery life. A full day of moderate use is no problem, but if you add some intensive activities like an extended hotspot or gaming session, then you might start looking for a charger in the late afternoon. The average person probably won’t be bothered by it, but power users will want a charger or power bank handy to avoid battery anxiety at the end of the day.
+
+AI is still hit-or-miss, but the hits are getting better.
+
+AI is still hit-or-miss, but the hits are getting better. The Pixel 10 doesn’t offer the generative AI-assisted camera zoom feature that the Pro and Pro XL have, but you do get Magic Cue, which fetches helpful information based on what you’re doing. And it actually does work. It’s only in a handful of Google apps right now, but it can help put something on your calendar as you hash out plans in Messages or suggest a destination when you open Google Maps based on something you saved in your screenshots. I had a few more false positives while testing it on the Pixel 10 than I did with the 10 Pro; there were times when it suggested information that wasn’t relevant or it offered to create a calendar event when I told a friend I’d “be there in 30.” I still found it more useful than not, and it’s easy enough to ignore when its suggestions are off the mark.
+
+The Pixel 10 gained a telephoto camera but lost a little image quality in the process.
+
+The Pixel 10 has Qi2 with built-in magnets, and it’s a delight. There’s no case required (unlike with the Samsung S25 series phones), and I thoroughly enjoyed thwacking the phone onto a bedside PixelSnap charger at the end of each day. With the addition of what is essentially MagSafe, the Pixel series is looking like a pretty complete alternative to the iOS ecosystem these days. Each night when I put my phone on the charger, triggering bedtime mode, my Pixel watch followed suit and changed modes, too. That’s not a new feature, but little moments like that add up throughout the day.
+
+I spent a week with the Pixel 10 Pro before switching to the regular 10, and there’s not much that feels radically different on the cheaper model — except the display. The standard 10 comes with a 6.3-inch 1080p screen with up to a 120Hz refresh rate, compared to the 1280p display on the 10 Pro. Its peak brightness of 3,000 nits is enough to keep the phone usable on a sunny day, and 1080p is just enough resolution for a screen that size. The screen seems more prone to dropping from its top 120Hz refresh rate, which is fine but a little jarring when you’re scrolling the NYT Games app and suddenly looking at 60Hz.
+
+I also noticed some vignetting when using the phone in bright light — darkness around the edges of the screen, like you might see in a photograph. This turns out to be a known issue, resolved by switching to the “natural” display color profile. Overall, it’s a fine display but you definitely get more by spending more on the Pro.
+
+Previous Next
+
+
+
+
+
+
+
+
+
+
+
+1 / 7
+
+On the subject of getting more for more with the 10 Pro: cameras. The Pixel 10’s 48-megapixel f/1.7 main camera doesn’t seem all that different from the 10 Pro’s 50-megapixel f/1.7 camera — until you get to the sensor size. The regular 10 uses a 1/2.0-inch type sensor that’s about half the size of the 1/1.31-inch type sensor in the Pro models. A bigger sensor will produce cleaner images with better dynamic range, and it’s a difference I felt, especially in portrait mode. Particularly if light is low, your subject is moving, and if you’re using the 2x zoom option, portrait mode on the regular 10 isn’t as good as on the Pros. Images show more noise, fine detail like hair looks crunchy, and subject isolation isn’t as precise.
+
+A portrait-mode photo with the subject moving toward the camera at high speed is about as tough a scenario as you can throw at a phone camera, so it’s not too surprising that the Pixel 10 can’t handle it well. But it’s one way that the smaller camera sensor results in noticeably worse performance. Outside of portraits, the Pixel 10 takes perfectly nice photos. The ultrawide — also a smaller sensor than on the Pros — handles dim indoor lighting acceptably. The 5x telephoto lens is handy and definitely an upgrade over using 5x digital zoom. Maybe a telephoto lens and a killer main camera are too much to ask for in a $799 phone, but I’ll keep wishing for both anyway.
+
+Gotta admit the blue color is nice.
+
+Last year, the Pixel 9 felt like the phone that Android had needed for a long time: something elegant, simple, and durable. The Pixel 10 takes that same model and mostly improves it, adding Qi2 and a telephoto lens. The price stayed the same, which is nothing to sneeze at when the prices of everything else keep going up.
+
+Losing the higher-end camera might not be a dealbreaker for most people, but it’s a little tough to swallow if you know what you’re missing out on. Most people who buy this phone won’t be burdened with that knowledge, and I think the Pixel 10 will make that group perfectly happy.
+
+Photography by Allison Johnson / The Verge
+
+Agree to Continue: Google Pixel 10, 10 Pro, and 10 Pro XL Every smart device now requires you to agree to a series of terms and conditions before you can use it — contracts that no one actually reads. It’s impossible for us to read and analyze every single one of these agreements. But we started counting exactly how many times you have to hit “agree” to use devices when we review them since these are agreements most people don’t read and definitely can’t negotiate. To use a Pixel 10 series phone, you must agree to: Google Terms of Service
+
+Google Play Terms of Service
+
+Google Privacy Policy (included in ToS
+
+Install apps and updates: “You agree this device may also automatically download and install updates and apps from Google, your carrier, and your device’s manufacturer, possibly using cellular data.”
+
+Google Device Arbitration Agreement
+
+Google’s Generative AI Prohibited Use Policy if you opt in to using Gemini Assistant The following agreements are optional: Provide anonymous location data for Google’s services
+
+“Allow apps and services to scan for Wi-Fi networks and nearby devices at any time, even when Wi-Fi or Bluetooth is off.”
+
+Send usage and diagnostic data to Google
+
+Talk to Google hands-free: “If you agree, Google Assistant will wait in standby mode to detect ‘Hey Google’ and certain quick phrases.”
+
+Allow Assistant on lock screen Additionally, if you want to use Google Assistant, you must agree to let Google collect app info and contact info from your devices. Other features like Google Wallet may require additional agreements. Final tally: five mandatory agreements and at least five optional agreements

@@ -1,0 +1,30 @@
+COMPANY: AMAZON
+ARTICLE: 2/3
+GENERATED: 2025-09-14 15:10:26
+================================================================================
+
+TITLE: Hertz is selling its used cars on Amazon
+SOURCE: The Verge
+AUTHOR: Jess Weatherbed
+PUBLISHED: 2025-08-20T12:19:05Z
+URL: https://www.theverge.com/news/762183/hertz-amazon-autos-used-rental-vehicles
+DESCRIPTION: Hertz has announced that it will start selling used cars from its rental business on Amazon Autos. The company’s pre-owned vehicles are now available in Dallas, Houston, Los Angeles, and Seattle, according to a new page on Hertz’s website, with “more location…
+EXTRACTION_STATUS: SUCCESS
+
+--------------------------------------------------------------------------------
+CONTENT:
+--------------------------------------------------------------------------------
+
+is a news writer focused on creative industries, computing, and internet culture. Jess started her career at TechRadar, covering news and hardware reviews.
+
+Posts from this author will be added to your daily email digest and your homepage feed.
+
+Hertz has announced that it will start selling used cars from its rental business on Amazon Autos. The company’s pre-owned vehicles are now available in Dallas, Houston, Los Angeles, and Seattle, according to a new page on Hertz’s website, with “more locations coming soon.”
+
+The Verge was unable to find any live Hertz vehicle listings at the time of writing. CNBC reports that customers living within 75 miles of the four launch cities can start browsing on Amazon Autos “as soon as Wednesday” and that Hertz is planning to expand its operation to 45 locations across the US, bringing availability more in line with the wider list of Amazon Autos locations.
+
+“Now you can conveniently shop our maintained-from-day-one vehicles on the online marketplace of - well - just about everything else,” Hertz says on its website. “Just shop at Amazon Autos and pick up at your local Hertz Car Sales location within 3 days.”
+
+Amazon launched its Autos business in December last year, initially limited to selling new and “certified pre-owned” Hyundai vehicles via a partnership with the Korean automaker’s dealers in several states. Previously, customers could browse car showrooms and compare prices on Amazon but not actually buy a car. That changed last year when several Hyundai dealers started to list models for sale on the site.
+
+Hertz is the first rental fleet partnership for Amazon Autos, and will offer used vehicles from a wider variety of brands, including Ford, Toyota, Chevrolet, and Nissan.
